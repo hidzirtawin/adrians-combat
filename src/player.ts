@@ -88,8 +88,8 @@ export class Player {
     this.dashCooldown = Math.max(0, this.dashCooldown - dt);
     this.invuln = Math.max(0, this.invuln - dt);
 
-    if (this.shield < this.maxShield && this.timeSinceDamage > 4 && this.shield > 0) {
-      this.shield = Math.min(this.maxShield, this.shield + 15 * dt);
+    if (this.shield < this.maxShield && this.timeSinceDamage > 5 && this.shield > 0) {
+      this.shield = Math.min(this.maxShield, this.shield + 8 * dt);
     }
 
     this.forward.set(-Math.sin(this.yaw), 0, -Math.cos(this.yaw));
@@ -212,20 +212,21 @@ export class Player {
     if (this.dead || this.invuln > 0) return { absorbed: 0, hull: 0, died: false };
 
     this.timeSinceDamage = 0;
-    let remaining = amount;
+
+    // A quarter of every hit punches through the shield, so sustained fire
+    // always threatens the LIFE bar instead of being erased by regeneration.
+    const bypass = amount * 0.25;
+    let shieldDamage = amount - bypass;
     let absorbed = 0;
 
     if (this.shield > 0) {
-      absorbed = Math.min(this.shield, remaining);
+      absorbed = Math.min(this.shield, shieldDamage);
       this.shield -= absorbed;
-      remaining -= absorbed;
+      shieldDamage -= absorbed;
     }
 
-    let hull = 0;
-    if (remaining > 0) {
-      hull = remaining;
-      this.health -= remaining;
-    }
+    const hull = bypass + shieldDamage;
+    this.health -= hull;
 
     this.addShake(0.35 + amount * 0.012);
 

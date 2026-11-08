@@ -24,7 +24,7 @@ export const DIFFICULTIES: Record<Difficulty, DifficultyConfig> = {
     speed: 0.88,
     count: 0.8,
     score: 0.8,
-    shieldRegen: 23,
+    shieldRegen: 2.5,
   },
   normal: {
     label: 'NORMAL',
@@ -35,7 +35,7 @@ export const DIFFICULTIES: Record<Difficulty, DifficultyConfig> = {
     speed: 1,
     count: 1,
     score: 1,
-    shieldRegen: 18,
+    shieldRegen: 8,
   },
   hard: {
     label: 'HARD',
@@ -46,7 +46,7 @@ export const DIFFICULTIES: Record<Difficulty, DifficultyConfig> = {
     speed: 1.08,
     count: 1.2,
     score: 1.3,
-    shieldRegen: 15,
+    shieldRegen: 4.5,
   },
   insane: {
     label: 'INSANE',
@@ -57,7 +57,7 @@ export const DIFFICULTIES: Record<Difficulty, DifficultyConfig> = {
     speed: 1.16,
     count: 1.4,
     score: 1.7,
-    shieldRegen: 12,
+    shieldRegen: 2.5,
   },
 };
 

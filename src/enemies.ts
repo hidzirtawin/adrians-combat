@@ -325,6 +325,33 @@ function makeGlowTexture(): THREE.CanvasTexture {
 
 const sharedGlowTexture = makeGlowTexture();
 
+function makeTargetTexture(): THREE.CanvasTexture {
+  const size = 96;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  ctx.clearRect(0, 0, size, size);
+  const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  grad.addColorStop(0, 'rgba(255,42,66,1)');
+  grad.addColorStop(0.18, 'rgba(255,28,52,0.96)');
+  grad.addColorStop(0.42, 'rgba(255,14,42,0.5)');
+  grad.addColorStop(0.68, 'rgba(255,0,34,0.14)');
+  grad.addColorStop(1, 'rgba(255,0,34,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+  ctx.strokeStyle = 'rgba(255,95,115,0.9)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(size / 2, size / 2, size * 0.35, 0, Math.PI * 2);
+  ctx.stroke();
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+const targetTexture = makeTargetTexture();
+
 function addGlow(
   parent: THREE.Object3D,
   color: number,
@@ -471,6 +498,8 @@ function disposeGroup(group: THREE.Object3D): void {
   group.traverse((obj) => {
     const mesh = obj as THREE.Mesh;
     if (mesh.geometry) mesh.geometry.dispose();
+    const sprite = obj as THREE.Sprite;
+    if (sprite.isSprite) sprite.material.dispose();
     const material = mesh.material as THREE.Material | THREE.Material[] | undefined;
     if (Array.isArray(material)) {
       for (const item of material) item.dispose();
@@ -2800,6 +2829,7 @@ export class Enemy {
   private localHitOffset: number;
   private limbs?: ZombieLimbs;
   private groundShadow: THREE.Mesh | null = null;
+  private targetDot: THREE.Sprite | null = null;
   private spin = 0;
   private glbRig?: GlbRig;
   private moveSpeed = 0;
@@ -2853,6 +2883,25 @@ export class Enemy {
       this.baseEmissives.push(material.emissive.clone());
       this.baseIntensities.push(material.emissiveIntensity);
     }
+
+    const dotSize = Math.min(0.4, Math.max(0.19, this.localHitRadius * 0.24));
+    const dotMaterial = new THREE.SpriteMaterial({
+      map: targetTexture,
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.95,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      depthTest: false,
+    });
+    const dot = new THREE.Sprite(dotMaterial);
+    dot.scale.setScalar(dotSize);
+    const dotY = this.hoverHeight > 0 ? 0 : this.localHitOffset;
+    dot.position.set(0, dotY, 0.06);
+    dot.renderOrder = 20;
+    dot.userData.baseScale = dotSize;
+    this.group.add(dot);
+    this.targetDot = dot;
   }
 
   private buildModel(kind: EnemyKind): Built {
@@ -2968,6 +3017,7 @@ export class Enemy {
       this.deathT = 0;
       this.fallVelocity = 0.25;
       if (this.groundShadow) this.groundShadow.visible = false;
+      if (this.targetDot) this.targetDot.visible = false;
       this.playGlbClip('death', 0.08, true);
       return true;
     }
@@ -3569,6 +3619,12 @@ export class Enemy {
   }
 
   private animate(dt: number): void {
+    if (this.targetDot) {
+      const pulse = 1 + Math.sin(this.age * 5.2) * 0.13;
+      const base = (this.targetDot.userData.baseScale as number | undefined) ?? this.targetDot.scale.x;
+      this.targetDot.scale.setScalar(base * pulse);
+      (this.targetDot.material as THREE.SpriteMaterial).opacity = 0.72 + Math.sin(this.age * 5.2) * 0.18;
+    }
     if (this.glbRig) {
       this.glbRig.mixer.update(dt);
       if (this.glbRig.lock > 0) {

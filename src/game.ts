@@ -1704,7 +1704,7 @@ export class Game {
   private tickPlayerPassive(dt: number): void {
     this.player.timeSinceDamage += dt;
     this.player.invuln = Math.max(0, this.player.invuln - dt);
-    if (this.player.shield < this.player.maxShield && this.player.timeSinceDamage > 3.2) {
+    if (this.player.shield < this.player.maxShield && this.player.timeSinceDamage > 5) {
       this.player.shield = Math.min(this.player.maxShield, this.player.shield + currentDifficulty().shieldRegen * dt);
     }
   }
@@ -1901,8 +1901,10 @@ export class Game {
   private damagePlayer(amount: number, at: THREE.Vector3): void {
     if (this.state !== 'playing') return;
     const scaled = amount * currentDifficulty().damage;
+    const hadShield = this.player.shield > 0;
     const result = this.player.damage(scaled);
     if (result.absorbed + result.hull <= 0) return;
+    if (hadShield && this.player.shield <= 0) this.hud.toast('SHIELD BREAK', 1.3);
 
     this.hud.flashDamage(scaled);
     this.audio.play('damage');
