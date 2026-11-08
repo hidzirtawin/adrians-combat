@@ -4,13 +4,21 @@ import type { AudioEngine } from './audio';
 import { loadModel } from './assets';
 import { GUN_VISUALS, createGunModel } from './gunModels';
 
-export type WeaponId = 'pulse' | 'viper' | 'arx' | 'scatter' | 'longshot' | 'rail';
+export type WeaponId =
+  | 'pulse' | 'viper' | 'arx' | 'scatter' | 'longshot' | 'rail'
+  | 'vanguard' | 'warlord' | 'sentinel'
+  | 'sidearm' | 'magnum' | 'wasp'
+  | 'vector' | 'breacher' | 'vulcan'
+  | 'ion' | 'plasma' | 'disruptor';
+
+export type WeaponCategory = 'RIFLE' | 'SMG' | 'SHOTGUN' | 'PISTOL' | 'SNIPER' | 'LMG' | 'BLASTER';
 
 export interface WeaponDef {
   id: WeaponId;
   name: string;
   tag: string;
   role: string;
+  category: WeaponCategory;
   desc: string;
   damage: number;
   pellets: number;
@@ -26,44 +34,122 @@ export interface WeaponDef {
   pierce: boolean;
 }
 
-export const WEAPON_IDS: WeaponId[] = ['pulse', 'viper', 'arx', 'scatter', 'longshot', 'rail'];
+export const WEAPON_IDS: WeaponId[] = [
+  'pulse', 'viper', 'arx', 'scatter', 'longshot', 'rail',
+  'vanguard', 'warlord', 'sentinel',
+  'sidearm', 'magnum', 'wasp',
+  'vector', 'breacher', 'vulcan',
+  'ion', 'plasma', 'disruptor',
+];
 
 export const WEAPONS: Record<WeaponId, WeaponDef> = {
   pulse: {
-    id: 'pulse', name: 'PULSE RIFLE', tag: 'AUTO', role: 'BALANCED',
+    id: 'pulse', name: 'PULSE RIFLE', tag: 'AUTO', role: 'BALANCED', category: 'RIFLE',
     desc: 'Reliable automatic rifle. Good at every range.',
     damage: 14, pellets: 1, spread: 0.011, interval: 0.098, mag: 32, reload: 1.2,
     range: 90, auto: true, color: 0x43f3ff, recoil: 0.011, shake: 0.06, pierce: false,
   },
   viper: {
-    id: 'viper', name: 'VIPER SMG', tag: 'RAPID', role: 'CLOSE / RAPID',
+    id: 'viper', name: 'VIPER SMG', tag: 'RAPID', role: 'CLOSE / RAPID', category: 'SMG',
     desc: 'Very high fire rate. Shreds crowds up close.',
     damage: 8, pellets: 1, spread: 0.028, interval: 0.065, mag: 40, reload: 1.3,
     range: 60, auto: true, color: 0x7dff6a, recoil: 0.007, shake: 0.045, pierce: false,
   },
   arx: {
-    id: 'arx', name: 'ARX RIFLE', tag: 'AUTO', role: 'HEAVY AUTO',
+    id: 'arx', name: 'ARX RIFLE', tag: 'AUTO', role: 'HEAVY AUTO', category: 'RIFLE',
     desc: 'Hard-hitting assault rifle with a steady kick.',
     damage: 18, pellets: 1, spread: 0.012, interval: 0.13, mag: 30, reload: 1.6,
     range: 105, auto: true, color: 0xffc247, recoil: 0.016, shake: 0.08, pierce: false,
   },
   scatter: {
-    id: 'scatter', name: 'SCATTER BLASTER', tag: 'CLOSE', role: 'SHOTGUN',
+    id: 'scatter', name: 'SCATTER BLASTER', tag: 'CLOSE', role: 'SHOTGUN', category: 'SHOTGUN',
     desc: 'Eight-pellet blast. Devastating at point-blank range.',
     damage: 11, pellets: 8, spread: 0.075, interval: 0.78, mag: 6, reload: 1.75,
     range: 34, auto: false, color: 0xffc247, recoil: 0.052, shake: 0.36, pierce: false,
   },
   longshot: {
-    id: 'longshot', name: 'LONGSHOT DMR', tag: 'SEMI', role: 'MARKSMAN',
+    id: 'longshot', name: 'LONGSHOT DMR', tag: 'SEMI', role: 'MARKSMAN', category: 'SNIPER',
     desc: 'Semi-auto marksman rifle. Huge damage per shot.',
     damage: 36, pellets: 1, spread: 0.004, interval: 0.35, mag: 14, reload: 1.8,
     range: 150, auto: false, color: 0x8ff8ff, recoil: 0.032, shake: 0.24, pierce: false,
   },
   rail: {
-    id: 'rail', name: 'RAIL LANCE', tag: 'PIERCE', role: 'ANTI-ARMOR',
+    id: 'rail', name: 'RAIL LANCE', tag: 'PIERCE', role: 'ANTI-ARMOR', category: 'SNIPER',
     desc: 'Charged lance. Penetrates a whole line of enemies.',
     damage: 105, pellets: 1, spread: 0, interval: 1.05, mag: 4, reload: 2.2,
     range: 130, auto: false, color: 0xff2fa8, recoil: 0.062, shake: 0.42, pierce: true,
+  },
+  vanguard: {
+    id: 'vanguard', name: 'VANGUARD AR', tag: 'AUTO', role: 'ASSAULT', category: 'RIFLE',
+    desc: 'Fast-handling carbine. Flat recoil and a quick reload.',
+    damage: 16, pellets: 1, spread: 0.012, interval: 0.105, mag: 30, reload: 1.35,
+    range: 95, auto: true, color: 0x4fa8ff, recoil: 0.012, shake: 0.06, pierce: false,
+  },
+  warlord: {
+    id: 'warlord', name: 'WARLORD AK', tag: 'AUTO', role: 'BATTLE RIFLE', category: 'RIFLE',
+    desc: 'Heavy 7.62 rifle. Slow, loud and brutal.',
+    damage: 21, pellets: 1, spread: 0.016, interval: 0.145, mag: 30, reload: 1.7,
+    range: 100, auto: true, color: 0xff8a3d, recoil: 0.021, shake: 0.12, pierce: false,
+  },
+  sentinel: {
+    id: 'sentinel', name: 'SENTINEL BR', tag: 'SEMI', role: 'BATTLE RIFLE', category: 'RIFLE',
+    desc: 'Precision semi-auto rifle. Two clean shots drop most targets.',
+    damage: 42, pellets: 1, spread: 0.005, interval: 0.34, mag: 15, reload: 1.9,
+    range: 160, auto: false, color: 0xd7e8ff, recoil: 0.038, shake: 0.26, pierce: false,
+  },
+  sidearm: {
+    id: 'sidearm', name: 'SIDEARM 9', tag: 'SEMI', role: 'PISTOL', category: 'PISTOL',
+    desc: 'Compact service pistol. Fast draw, crisp single shots.',
+    damage: 26, pellets: 1, spread: 0.009, interval: 0.24, mag: 15, reload: 1.05,
+    range: 70, auto: false, color: 0xb8c6d6, recoil: 0.026, shake: 0.14, pierce: false,
+  },
+  magnum: {
+    id: 'magnum', name: 'MAGNUM 44', tag: 'SEMI', role: 'REVOLVER', category: 'PISTOL',
+    desc: 'Six heavy rounds. Punishing damage and a violent kick.',
+    damage: 64, pellets: 1, spread: 0.006, interval: 0.62, mag: 6, reload: 1.95,
+    range: 95, auto: false, color: 0xffd27a, recoil: 0.072, shake: 0.46, pierce: false,
+  },
+  wasp: {
+    id: 'wasp', name: 'WASP 93', tag: 'AUTO', role: 'MACHINE PISTOL', category: 'PISTOL',
+    desc: 'Machine pistol. Wild recoil, enormous close-range output.',
+    damage: 9, pellets: 1, spread: 0.035, interval: 0.062, mag: 24, reload: 1.4,
+    range: 52, auto: true, color: 0x9dff5e, recoil: 0.014, shake: 0.07, pierce: false,
+  },
+  vector: {
+    id: 'vector', name: 'VECTOR PDW', tag: 'RAPID', role: 'CLOSE / RAPID', category: 'SMG',
+    desc: 'Hyper-cyclic PDW. The fastest trigger in the armory.',
+    damage: 7, pellets: 1, spread: 0.03, interval: 0.048, mag: 50, reload: 1.5,
+    range: 55, auto: true, color: 0x9be7ff, recoil: 0.006, shake: 0.04, pierce: false,
+  },
+  breacher: {
+    id: 'breacher', name: 'BREACHER 12', tag: 'AUTO', role: 'AUTO SHOTGUN', category: 'SHOTGUN',
+    desc: 'Ten-pellet automatic shotgun. Clears a doorway in one burst.',
+    damage: 9, pellets: 10, spread: 0.085, interval: 0.5, mag: 8, reload: 2.2,
+    range: 30, auto: true, color: 0xff9a3d, recoil: 0.055, shake: 0.38, pierce: false,
+  },
+  vulcan: {
+    id: 'vulcan', name: 'VULCAN LMG', tag: 'AUTO', role: 'SUPPORT', category: 'LMG',
+    desc: 'Belt-fed suppression. A hundred rounds of sustained fire.',
+    damage: 16, pellets: 1, spread: 0.02, interval: 0.085, mag: 100, reload: 4.2,
+    range: 90, auto: true, color: 0xffc247, recoil: 0.017, shake: 0.09, pierce: false,
+  },
+  ion: {
+    id: 'ion', name: 'ION BLASTER', tag: 'SEMI', role: 'HEAVY BLASTER', category: 'BLASTER',
+    desc: 'Hand-cannon blaster. Superheated bolts punch through light armor.',
+    damage: 38, pellets: 1, spread: 0.011, interval: 0.32, mag: 12, reload: 1.55,
+    range: 100, auto: false, color: 0xff5a3d, recoil: 0.044, shake: 0.3, pierce: false,
+  },
+  plasma: {
+    id: 'plasma', name: 'PLASMA CARBINE', tag: 'AUTO', role: 'PLASMA RIFLE', category: 'BLASTER',
+    desc: 'Rapid plasma carbine. Green bolts splash and stagger.',
+    damage: 15, pellets: 1, spread: 0.014, interval: 0.08, mag: 45, reload: 1.6,
+    range: 80, auto: true, color: 0x7dff6a, recoil: 0.012, shake: 0.07, pierce: false,
+  },
+  disruptor: {
+    id: 'disruptor', name: 'DISRUPTOR', tag: 'PIERCE', role: 'PLASMA SNIPER', category: 'BLASTER',
+    desc: 'Prototype disruptor. One shot pierces an entire column.',
+    damage: 130, pellets: 1, spread: 0, interval: 1.15, mag: 4, reload: 2.35,
+    range: 170, auto: false, color: 0xb06bff, recoil: 0.07, shake: 0.5, pierce: true,
   },
 };
 
@@ -219,6 +305,571 @@ interface RifleStyle {
   verticalGrip?: boolean;
 }
 
+function buildRifleModel(style: RifleStyle): WeaponModel {
+  const group = new THREE.Group();
+  const metal = gunMaterial(0x2b333d, 0x000000, 0, 0.94, 0.3);
+  const dark = gunMaterial(0x14181e, 0x000000, 0, 0.9, 0.4);
+  const steel = gunMaterial(0x3b4550, 0x000000, 0, 0.96, 0.26);
+  const polymer = polymerMaterial(0x1b2128, 0.74);
+  const glove = gloveMaterial();
+  const accent = new THREE.MeshPhysicalMaterial({
+    color: 0x101418,
+    emissive: style.accent,
+    emissiveIntensity: 0.85,
+    metalness: 0.6,
+    roughness: 0.3,
+    clearcoat: 0.6,
+    clearcoatRoughness: 0.2,
+  });
+  const lens = new THREE.MeshPhysicalMaterial({
+    color: 0x061018,
+    emissive: style.accent,
+    emissiveIntensity: 1.1,
+    metalness: 0.1,
+    roughness: 0.05,
+    clearcoat: 1,
+    clearcoatRoughness: 0.03,
+    transparent: true,
+    opacity: 0.9,
+    side: THREE.DoubleSide,
+  });
+
+  // ── Receiver, upper and picatinny rail ──
+  const receiver = new THREE.Mesh(new RoundedBoxGeometry(0.17, 0.18, 0.46, 4, 0.035), metal);
+  receiver.position.set(0, 0.02, 0);
+  group.add(receiver);
+
+  const upper = new THREE.Mesh(new RoundedBoxGeometry(0.15, 0.07, 0.5, 3, 0.02), dark);
+  upper.position.set(0, 0.12, -0.01);
+  group.add(upper);
+
+  const rail = new THREE.Mesh(new RoundedBoxGeometry(0.075, 0.02, 0.42, 2, 0.006), dark);
+  rail.position.set(0, 0.165, -0.04);
+  group.add(rail);
+  for (let i = 0; i < 10; i++) {
+    const slot = new THREE.Mesh(new THREE.BoxGeometry(0.082, 0.01, 0.016), steel);
+    slot.position.set(0, 0.173, -0.23 + i * 0.042);
+    group.add(slot);
+  }
+
+  const glowStrip = new THREE.Mesh(new THREE.BoxGeometry(0.006, 0.012, 0.18), accent);
+  glowStrip.position.set(0.088, 0.02, -0.05);
+  group.add(glowStrip);
+
+  // ── Ejection port and charging handle ──
+  const port = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.055, 0.14), dark);
+  port.position.set(0.086, 0.07, 0);
+  group.add(port);
+
+  const bolt = new THREE.Group();
+  bolt.name = 'bolt';
+  bolt.position.set(0.095, 0.065, 0.05);
+  bolt.userData.baseZ = bolt.position.z;
+  const boltShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 0.06, 8), steel);
+  boltShaft.rotation.z = Math.PI / 2;
+  bolt.add(boltShaft);
+  const boltKnob = new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 8), steel);
+  boltKnob.position.x = 0.045;
+  bolt.add(boltKnob);
+  group.add(bolt);
+
+  // ── Handguard with vents and accent strips ──
+  const hgLen = Math.max(0.2, style.handguard);
+  const hgZ = -0.23 - hgLen / 2;
+  const handguard = new THREE.Mesh(new RoundedBoxGeometry(0.15, 0.15, hgLen, 4, 0.03), polymer);
+  handguard.position.set(0, 0.015, hgZ);
+  group.add(handguard);
+
+  for (const side of [-1, 1]) {
+    for (let i = 0; i < 3; i++) {
+      const vent = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.05, 0.055), dark);
+      vent.position.set(side * 0.077, 0.02, hgZ - hgLen / 2 + 0.07 + i * 0.088);
+      group.add(vent);
+    }
+    const accentStrip = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.018, hgLen * 0.7), accent);
+    accentStrip.position.set(side * 0.078, -0.035, hgZ);
+    group.add(accentStrip);
+  }
+
+  // ── Barrel, gas block and muzzle brake ──
+  const barrelStart = -0.23 - hgLen;
+  const barrelLen = Math.max(0.18, style.barrel);
+  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.023, 0.026, barrelLen, 12), steel);
+  barrel.rotation.x = Math.PI / 2;
+  barrel.position.set(0, 0.035, barrelStart - barrelLen / 2);
+  group.add(barrel);
+
+  const gasBlock = new THREE.Mesh(new RoundedBoxGeometry(0.06, 0.07, 0.07, 2, 0.015), dark);
+  gasBlock.position.set(0, 0.045, barrelStart - 0.04);
+  group.add(gasBlock);
+
+  const brake = new THREE.Mesh(new THREE.CylinderGeometry(0.033, 0.028, 0.08, 12), metal);
+  brake.rotation.x = Math.PI / 2;
+  brake.position.set(0, 0.035, barrelStart - barrelLen - 0.035);
+  group.add(brake);
+  for (let i = 0; i < 3; i++) {
+    const portSlot = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.012, 0.014), dark);
+    portSlot.position.set(0, 0.062, barrelStart - barrelLen - 0.012 - i * 0.02);
+    group.add(portSlot);
+  }
+
+  if (style.coils) {
+    for (let i = 0; i < 4; i++) {
+      const coil = new THREE.Mesh(new THREE.TorusGeometry(0.056, 0.012, 8, 24), accent);
+      coil.position.set(0, 0.035, barrelStart - barrelLen * 0.35 - i * 0.085);
+      group.add(coil);
+    }
+  }
+
+  if (style.pump) {
+    const pump = new THREE.Group();
+    pump.name = 'pump';
+    pump.position.set(0, 0, hgZ);
+    pump.userData.baseZ = hgZ;
+    const pumpBody = new THREE.Mesh(new RoundedBoxGeometry(0.155, 0.12, 0.16, 3, 0.03), polymer);
+    pumpBody.position.y = -0.02;
+    pump.add(pumpBody);
+    for (let i = 0; i < 3; i++) {
+      const ridge = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.012, 0.018), dark);
+      ridge.position.set(0, -0.02, -0.05 + i * 0.05);
+      pump.add(ridge);
+    }
+    group.add(pump);
+
+    const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.026, hgLen + 0.2, 10), steel);
+    tube.rotation.x = Math.PI / 2;
+    tube.position.set(0, -0.03, hgZ - 0.12);
+    group.add(tube);
+  }
+
+  // ── Optics ──
+  if (style.optic === 'reddot') {
+    const mount = new THREE.Mesh(new RoundedBoxGeometry(0.05, 0.035, 0.14, 2, 0.01), dark);
+    mount.position.set(0, 0.185, -0.04);
+    group.add(mount);
+    const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.13, 16, 1, true), metal);
+    tube.rotation.x = Math.PI / 2;
+    tube.position.set(0, 0.215, -0.05);
+    group.add(tube);
+    const front = new THREE.Mesh(new THREE.CircleGeometry(0.038, 20), lens);
+    front.position.set(0, 0.215, -0.116);
+    group.add(front);
+    const dot = new THREE.Mesh(new THREE.SphereGeometry(0.008, 8, 6), accent);
+    dot.position.set(0, 0.215, -0.1);
+    group.add(dot);
+  } else if (style.optic === 'holo') {
+    const mount = new THREE.Mesh(new RoundedBoxGeometry(0.065, 0.03, 0.13, 2, 0.01), dark);
+    mount.position.set(0, 0.188, -0.04);
+    group.add(mount);
+    const glass = new THREE.Mesh(new THREE.PlaneGeometry(0.058, 0.064), lens);
+    glass.position.set(0, 0.24, -0.085);
+    group.add(glass);
+    for (const side of [-1, 1]) {
+      const arm = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.085, 0.014), dark);
+      arm.position.set(side * 0.032, 0.235, -0.085);
+      group.add(arm);
+    }
+    const topBar = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.012, 0.014), dark);
+    topBar.position.set(0, 0.278, -0.085);
+    group.add(topBar);
+    const bottomBar = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.012, 0.014), dark);
+    bottomBar.position.set(0, 0.192, -0.085);
+    group.add(bottomBar);
+  } else if (style.optic === 'scope') {
+    for (const z of [-0.1, 0.06]) {
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.052, 0.009, 8, 20), dark);
+      ring.position.set(0, 0.235, z);
+      group.add(ring);
+    }
+    const scope = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.042, 0.27, 18), metal);
+    scope.rotation.x = Math.PI / 2;
+    scope.position.set(0, 0.235, -0.03);
+    group.add(scope);
+    const frontLens = new THREE.Mesh(new THREE.CircleGeometry(0.043, 22), lens);
+    frontLens.position.set(0, 0.235, -0.166);
+    group.add(frontLens);
+    const rearLens = new THREE.Mesh(new THREE.CircleGeometry(0.034, 20), lens);
+    rearLens.rotation.y = Math.PI;
+    rearLens.position.set(0, 0.235, 0.106);
+    group.add(rearLens);
+    const turret = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.035, 10), dark);
+    turret.position.set(0, 0.29, 0.02);
+    group.add(turret);
+  } else {
+    const rear = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.04, 0.03), dark);
+    rear.position.set(0, 0.19, 0.05);
+    group.add(rear);
+    const rearNotch = new THREE.Mesh(new THREE.BoxGeometry(0.046, 0.02, 0.012), steel);
+    rearNotch.position.set(0, 0.2, 0.034);
+    group.add(rearNotch);
+    const frontPost = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.06, 0.018), dark);
+    frontPost.position.set(0, 0.2, barrelStart + 0.02);
+    group.add(frontPost);
+    const frontTip = new THREE.Mesh(new THREE.SphereGeometry(0.009, 8, 6), accent);
+    frontTip.position.set(0, 0.234, barrelStart + 0.02);
+    group.add(frontTip);
+  }
+
+  // ── Magazine ──
+  const magazine = new THREE.Group();
+  magazine.position.set(0, -0.07, -0.03);
+  magazine.userData.baseY = magazine.position.y;
+  if (style.mag > 0.05) {
+    const magBody = new THREE.Mesh(new RoundedBoxGeometry(0.075, style.mag, 0.115, 3, 0.02), polymer);
+    magBody.position.set(0, -style.mag / 2, 0);
+    magBody.rotation.x = 0.1;
+    magazine.add(magBody);
+    const plate = new THREE.Mesh(new RoundedBoxGeometry(0.085, 0.02, 0.13, 2, 0.008), dark);
+    plate.position.set(0, -style.mag - 0.01, 0.008);
+    magazine.add(plate);
+    for (let i = 0; i < 3; i++) {
+      const rib = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.012, 0.12), dark);
+      rib.position.set(0, -style.mag * 0.3 - i * 0.06, 0);
+      magazine.add(rib);
+    }
+  }
+  group.add(magazine);
+
+  // ── Pistol grip, trigger guard and trigger ──
+  const grip = new THREE.Mesh(new RoundedBoxGeometry(0.085, 0.22, 0.115, 4, 0.03), polymer);
+  grip.position.set(0, -0.18, 0.12);
+  grip.rotation.x = -0.3;
+  group.add(grip);
+  for (let i = 0; i < 3; i++) {
+    const ridge = new THREE.Mesh(new THREE.BoxGeometry(0.088, 0.012, 0.02), dark);
+    ridge.position.set(0, -0.12 - i * 0.05, 0.145 + i * 0.015);
+    group.add(ridge);
+  }
+
+  const guard = new THREE.Mesh(new THREE.TorusGeometry(0.055, 0.007, 6, 18), dark);
+  guard.rotation.y = Math.PI / 2;
+  guard.position.set(0, -0.06, 0.04);
+  group.add(guard);
+
+  const trigger = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.05, 0.014), steel);
+  trigger.position.set(0, -0.055, 0.045);
+  trigger.rotation.x = 0.2;
+  group.add(trigger);
+
+  // ── Stock ──
+  if (style.stock) {
+    const buffer = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.2, 10), steel);
+    buffer.rotation.x = Math.PI / 2;
+    buffer.position.set(0, 0.05, 0.3);
+    group.add(buffer);
+
+    const stock = new THREE.Mesh(new RoundedBoxGeometry(0.1, 0.22, 0.16, 3, 0.03), polymer);
+    stock.position.set(0, -0.02, 0.43);
+    group.add(stock);
+
+    const cheek = new THREE.Mesh(new RoundedBoxGeometry(0.09, 0.05, 0.2, 2, 0.015), polymer);
+    cheek.position.set(0, 0.1, 0.36);
+    group.add(cheek);
+  }
+
+  if (style.verticalGrip) {
+    const vg = new THREE.Mesh(new RoundedBoxGeometry(0.055, 0.15, 0.075, 3, 0.02), polymer);
+    vg.position.set(0, -0.11, hgZ + 0.02);
+    vg.rotation.x = 0.1;
+    group.add(vg);
+  }
+
+  // ── Gloved hands ──
+  const addHand = (position: THREE.Vector3, rotation: THREE.Euler): THREE.Group => {
+    const hand = new THREE.Group();
+    hand.name = 'viewmodel-hand';
+    hand.position.copy(position);
+    hand.rotation.copy(rotation);
+    const palm = new THREE.Mesh(new RoundedBoxGeometry(0.062, 0.1, 0.085, 3, 0.022), glove);
+    hand.add(palm);
+    const thumb = new THREE.Mesh(new THREE.CapsuleGeometry(0.018, 0.045, 4, 8), glove);
+    thumb.position.set(-0.03, 0.035, 0.02);
+    thumb.rotation.z = 0.9;
+    hand.add(thumb);
+    for (let i = 0; i < 4; i++) {
+      const finger = new THREE.Mesh(new THREE.CapsuleGeometry(0.013, 0.05, 4, 8), glove);
+      finger.position.set(0, 0.042 - i * 0.022, -0.05);
+      finger.rotation.x = 1.35;
+      hand.add(finger);
+    }
+    group.add(hand);
+    return hand;
+  };
+
+  addHand(new THREE.Vector3(0.0, -0.19, 0.13), new THREE.Euler(0.05, 0.08, 0.06));
+  if (!style.verticalGrip) {
+    addHand(new THREE.Vector3(0, -0.1, hgZ + 0.06), new THREE.Euler(-0.15, 0, 0));
+  }
+
+  group.position.set(0, 0.015, 0.03);
+  return {
+    group,
+    muzzle: new THREE.Vector3(0, 0.035, barrelStart - barrelLen - 0.075),
+    color: style.accent,
+    magazine,
+    bolt,
+    ejectPort: new THREE.Vector3(0.09, 0.07, 0.02),
+  };
+}
+
+
+function buildPistolModel(style: RifleStyle, sciFi = false, auto = false): WeaponModel {
+  const group = new THREE.Group();
+  const metal = gunMaterial(0x343c46, 0x000000, 0, 0.92, 0.32);
+  const dark = gunMaterial(0x14181e, 0x000000, 0, 0.88, 0.42);
+  const steel = gunMaterial(0x59636f, 0x000000, 0, 0.96, 0.24);
+  const polymer = polymerMaterial(0x1b2128, 0.72);
+  const glove = gloveMaterial();
+  const accent = new THREE.MeshPhysicalMaterial({
+    color: 0x101418,
+    emissive: style.accent,
+    emissiveIntensity: 0.9,
+    metalness: 0.6,
+    roughness: 0.28,
+    clearcoat: 0.5,
+    clearcoatRoughness: 0.22,
+  });
+
+  const slide = new THREE.Mesh(new RoundedBoxGeometry(0.095, 0.11, 0.42, 4, 0.025), metal);
+  slide.position.set(0, 0.045, -0.04);
+  group.add(slide);
+
+  const frame = new THREE.Mesh(new RoundedBoxGeometry(0.082, 0.05, 0.34, 3, 0.016), dark);
+  frame.position.set(0, -0.03, 0.0);
+  group.add(frame);
+
+  const barrelLen = sciFi ? 0.17 : 0.12;
+  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.021, 0.024, barrelLen, 12), steel);
+  barrel.rotation.x = Math.PI / 2;
+  barrel.position.set(0, 0.045, -0.26 - barrelLen / 2);
+  group.add(barrel);
+
+  const muzzle = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.026, 0.06, 12), metal);
+  muzzle.rotation.x = Math.PI / 2;
+  muzzle.position.set(0, 0.045, -0.26 - barrelLen - 0.025);
+  group.add(muzzle);
+
+  const glow = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.014, 0.15), accent);
+  glow.position.set(0.047, 0.055, -0.08);
+  group.add(glow);
+
+  if (sciFi) {
+    for (let i = 0; i < 3; i++) {
+      const fin = new THREE.Mesh(new THREE.TorusGeometry(0.032, 0.008, 6, 16), accent);
+      fin.position.set(0, 0.045, -0.3 - i * 0.045);
+      group.add(fin);
+    }
+    const scope = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.024, 0.16, 12), dark);
+    scope.rotation.x = Math.PI / 2;
+    scope.position.set(0, 0.125, -0.06);
+    group.add(scope);
+    const lens = new THREE.Mesh(new THREE.CircleGeometry(0.023, 16), accent);
+    lens.position.set(0, 0.125, -0.14);
+    group.add(lens);
+  } else if (style.optic !== 'iron') {
+    const sight = new THREE.Mesh(new RoundedBoxGeometry(0.036, 0.034, 0.08, 2, 0.008), dark);
+    sight.position.set(0, 0.115, -0.05);
+    group.add(sight);
+    const dot = new THREE.Mesh(new THREE.CircleGeometry(0.014, 12), accent);
+    dot.position.set(0, 0.125, -0.092);
+    group.add(dot);
+  } else {
+    const post = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.026, 0.014), steel);
+    post.position.set(0, 0.112, -0.22);
+    group.add(post);
+    const rear = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.022, 0.016), dark);
+    rear.position.set(0, 0.112, 0.13);
+    group.add(rear);
+  }
+
+  const grip = new THREE.Mesh(new RoundedBoxGeometry(0.078, 0.24, 0.11, 4, 0.026), polymer);
+  grip.position.set(0, -0.16, 0.115);
+  grip.rotation.x = -0.3;
+  group.add(grip);
+  for (let i = 0; i < 3; i++) {
+    const ridge = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.012, 0.018), dark);
+    ridge.position.set(0, -0.1 - i * 0.045, 0.135 + i * 0.013);
+    group.add(ridge);
+  }
+
+  const guard = new THREE.Mesh(new THREE.TorusGeometry(0.045, 0.006, 6, 16), dark);
+  guard.rotation.y = Math.PI / 2;
+  guard.position.set(0, -0.06, 0.03);
+  group.add(guard);
+  const trigger = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.042, 0.012), steel);
+  trigger.position.set(0, -0.055, 0.035);
+  trigger.rotation.x = 0.2;
+  group.add(trigger);
+
+  if (auto) {
+    const mag = new THREE.Mesh(new RoundedBoxGeometry(0.062, 0.2, 0.085, 3, 0.018), polymer);
+    mag.position.set(0, -0.26, 0.12);
+    mag.rotation.x = -0.25;
+    group.add(mag);
+    const plate = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.016, 0.09), dark);
+    plate.position.set(0, -0.36, 0.145);
+    group.add(plate);
+  }
+
+  const hand = new THREE.Group();
+  hand.name = 'viewmodel-hand';
+  hand.position.set(0.012, -0.18, 0.1);
+  hand.rotation.set(0.08, 0.04, 0.08);
+  const palm = new THREE.Mesh(new RoundedBoxGeometry(0.062, 0.1, 0.085, 3, 0.022), glove);
+  hand.add(palm);
+  const thumb = new THREE.Mesh(new THREE.CapsuleGeometry(0.018, 0.045, 4, 8), glove);
+  thumb.position.set(-0.03, 0.035, 0.02);
+  thumb.rotation.z = 0.9;
+  hand.add(thumb);
+  for (let i = 0; i < 4; i++) {
+    const finger = new THREE.Mesh(new THREE.CapsuleGeometry(0.013, 0.05, 4, 8), glove);
+    finger.position.set(0, 0.042 - i * 0.022, -0.05);
+    finger.rotation.x = 1.35;
+    hand.add(finger);
+  }
+  group.add(hand);
+
+  group.position.set(0, 0.02, 0.02);
+  return {
+    group,
+    muzzle: new THREE.Vector3(0, 0.045, -0.28 - barrelLen - 0.075),
+    color: style.accent,
+    ejectPort: new THREE.Vector3(0.052, 0.07, 0.02),
+  };
+}
+
+function buildRevolverModel(style: RifleStyle): WeaponModel {
+  const group = new THREE.Group();
+  const metal = gunMaterial(0x4a4f57, 0x000000, 0, 0.94, 0.3);
+  const dark = gunMaterial(0x171b20, 0x000000, 0, 0.9, 0.4);
+  const steel = gunMaterial(0x6b7078, 0x000000, 0, 0.98, 0.22);
+  const wood = new THREE.MeshPhysicalMaterial({
+    color: 0x5a321c,
+    metalness: 0.05,
+    roughness: 0.55,
+    clearcoat: 0.4,
+    clearcoatRoughness: 0.4,
+    sheen: 0.2,
+    sheenColor: new THREE.Color(0x8a5a34),
+  });
+  const glove = gloveMaterial();
+  const accent = new THREE.MeshPhysicalMaterial({
+    color: 0x1a1206,
+    emissive: style.accent,
+    emissiveIntensity: 0.7,
+    metalness: 0.7,
+    roughness: 0.3,
+  });
+
+  const frame = new THREE.Mesh(new RoundedBoxGeometry(0.085, 0.12, 0.3, 4, 0.02), metal);
+  frame.position.set(0, 0.03, 0.02);
+  group.add(frame);
+
+  const top = new THREE.Mesh(new RoundedBoxGeometry(0.07, 0.035, 0.34, 3, 0.012), dark);
+  top.position.set(0, 0.105, -0.02);
+  group.add(top);
+
+  const cylinder = new THREE.Mesh(new THREE.CylinderGeometry(0.068, 0.068, 0.17, 12), steel);
+  cylinder.rotation.x = Math.PI / 2;
+  cylinder.position.set(0, 0.035, -0.04);
+  group.add(cylinder);
+  for (let i = 0; i < 6; i++) {
+    const chamber = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.175, 8), dark);
+    chamber.rotation.x = Math.PI / 2;
+    const a = (i / 6) * Math.PI * 2;
+    chamber.position.set(Math.cos(a) * 0.036, 0.035 + Math.sin(a) * 0.036, -0.04);
+    group.add(chamber);
+  }
+
+  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.021, 0.023, 0.32, 12), steel);
+  barrel.rotation.x = Math.PI / 2;
+  barrel.position.set(0, 0.055, -0.29);
+  group.add(barrel);
+  const rib = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.015, 0.3), dark);
+  rib.position.set(0, 0.085, -0.29);
+  group.add(rib);
+  const front = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.03, 0.012), accent);
+  front.position.set(0, 0.1, -0.44);
+  group.add(front);
+
+  const hammer = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.05, 0.03), steel);
+  hammer.position.set(0, 0.12, 0.16);
+  hammer.rotation.x = -0.4;
+  group.add(hammer);
+
+  const grip = new THREE.Mesh(new RoundedBoxGeometry(0.075, 0.25, 0.105, 4, 0.03), wood);
+  grip.position.set(0, -0.14, 0.15);
+  grip.rotation.x = -0.42;
+  group.add(grip);
+
+  const guard = new THREE.Mesh(new THREE.TorusGeometry(0.045, 0.006, 6, 16), dark);
+  guard.rotation.y = Math.PI / 2;
+  guard.position.set(0, -0.05, 0.045);
+  group.add(guard);
+  const trigger = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.04, 0.012), steel);
+  trigger.position.set(0, -0.045, 0.05);
+  trigger.rotation.x = 0.2;
+  group.add(trigger);
+
+  const hand = new THREE.Group();
+  hand.name = 'viewmodel-hand';
+  hand.position.set(0.012, -0.16, 0.13);
+  hand.rotation.set(0.05, 0.04, 0.08);
+  const palm = new THREE.Mesh(new RoundedBoxGeometry(0.062, 0.1, 0.085, 3, 0.022), glove);
+  hand.add(palm);
+  const thumb = new THREE.Mesh(new THREE.CapsuleGeometry(0.018, 0.045, 4, 8), glove);
+  thumb.position.set(-0.03, 0.035, 0.02);
+  thumb.rotation.z = 0.9;
+  hand.add(thumb);
+  for (let i = 0; i < 4; i++) {
+    const finger = new THREE.Mesh(new THREE.CapsuleGeometry(0.013, 0.05, 4, 8), glove);
+    finger.position.set(0, 0.042 - i * 0.022, -0.05);
+    finger.rotation.x = 1.35;
+    hand.add(finger);
+  }
+  group.add(hand);
+
+  group.position.set(0, 0.02, 0.02);
+  return {
+    group,
+    muzzle: new THREE.Vector3(0, 0.055, -0.47),
+    color: style.accent,
+    ejectPort: new THREE.Vector3(0.045, 0.06, 0.02),
+  };
+}
+
+const RIFLE_STYLES: Record<WeaponId, RifleStyle> = {
+  pulse: { accent: 0x43f3ff, barrel: 0.36, handguard: 0.4, mag: 0.22, optic: 'reddot', stock: true },
+  viper: { accent: 0x7dff6a, barrel: 0.24, handguard: 0.26, mag: 0.28, optic: 'reddot', stock: false, verticalGrip: true },
+  arx: { accent: 0xffc247, barrel: 0.46, handguard: 0.46, mag: 0.26, optic: 'holo', stock: true },
+  scatter: { accent: 0xffc247, barrel: 0.5, handguard: 0.3, mag: 0, optic: 'iron', stock: true, pump: true },
+  longshot: { accent: 0x8ff8ff, barrel: 0.62, handguard: 0.36, mag: 0.16, optic: 'scope', stock: true },
+  rail: { accent: 0xff2fa8, barrel: 0.72, handguard: 0.4, mag: 0.18, optic: 'scope', stock: true, coils: true },
+  vanguard: { accent: 0x4fa8ff, barrel: 0.42, handguard: 0.4, mag: 0.22, optic: 'reddot', stock: true },
+  warlord: { accent: 0xff8a3d, barrel: 0.46, handguard: 0.36, mag: 0.26, optic: 'iron', stock: true },
+  sentinel: { accent: 0xd7e8ff, barrel: 0.5, handguard: 0.44, mag: 0.2, optic: 'holo', stock: true },
+  sidearm: { accent: 0xb8c6d6, barrel: 0.12, handguard: 0, mag: 0, optic: 'iron', stock: false },
+  magnum: { accent: 0xffd27a, barrel: 0.32, handguard: 0, mag: 0, optic: 'iron', stock: false },
+  wasp: { accent: 0x9dff5e, barrel: 0.14, handguard: 0, mag: 0, optic: 'reddot', stock: false },
+  vector: { accent: 0x9be7ff, barrel: 0.28, handguard: 0.26, mag: 0.3, optic: 'reddot', stock: false, verticalGrip: true },
+  breacher: { accent: 0xff9a3d, barrel: 0.5, handguard: 0.32, mag: 0.16, optic: 'iron', stock: true },
+  vulcan: { accent: 0xffc247, barrel: 0.56, handguard: 0.5, mag: 0.34, optic: 'reddot', stock: true },
+  ion: { accent: 0xff5a3d, barrel: 0.17, handguard: 0, mag: 0, optic: 'reddot', stock: false },
+  plasma: { accent: 0x7dff6a, barrel: 0.46, handguard: 0.44, mag: 0.24, optic: 'holo', stock: true, coils: true },
+  disruptor: { accent: 0xb06bff, barrel: 0.76, handguard: 0.42, mag: 0.2, optic: 'scope', stock: true, coils: true },
+};
+
+const PISTOL_IDS = new Set<WeaponId>(['sidearm', 'wasp', 'ion']);
+const REVOLVER_IDS = new Set<WeaponId>(['magnum']);
+
+export function buildProceduralWeapon(id: WeaponId): WeaponModel {
+  const style = RIFLE_STYLES[id];
+  if (REVOLVER_IDS.has(id)) return buildRevolverModel(style);
+  if (PISTOL_IDS.has(id)) return buildPistolModel(style, id === 'ion', id === 'wasp');
+  return buildRifleModel(style);
+}
+
+
 export class WeaponSystem {
   current: WeaponId = 'pulse';
   ammo: Record<WeaponId, number> = fullAmmo();
@@ -289,14 +940,8 @@ export class WeaponSystem {
     this.initShells();
     this.initSmoke();
 
-    this.models = {
-      pulse: this.buildRifle({ accent: 0x43f3ff, barrel: 0.36, handguard: 0.4, mag: 0.22, optic: 'reddot', stock: true }),
-      viper: this.buildRifle({ accent: 0x7dff6a, barrel: 0.24, handguard: 0.26, mag: 0.28, optic: 'reddot', stock: false, verticalGrip: true }),
-      arx: this.buildRifle({ accent: 0xffc247, barrel: 0.46, handguard: 0.46, mag: 0.26, optic: 'holo', stock: true }),
-      scatter: this.buildRifle({ accent: 0xffc247, barrel: 0.5, handguard: 0.3, mag: 0, optic: 'iron', stock: true, pump: true }),
-      longshot: this.buildRifle({ accent: 0x8ff8ff, barrel: 0.62, handguard: 0.36, mag: 0.16, optic: 'scope', stock: true }),
-      rail: this.buildRifle({ accent: 0xff2fa8, barrel: 0.72, handguard: 0.4, mag: 0.18, optic: 'scope', stock: true, coils: true }),
-    };
+    this.models = {} as Record<WeaponId, WeaponModel>;
+    for (const id of WEAPON_IDS) this.models[id] = buildProceduralWeapon(id);
     for (const id of WEAPON_IDS) {
       this.models[id].group.visible = id === this.current;
       this.root.add(this.models[id].group);
@@ -323,13 +968,17 @@ export class WeaponSystem {
   private async loadRealGun(): Promise<void> {
     await Promise.all(
       WEAPON_IDS.map(async (id) => {
-        await loadModel(GUN_VISUALS[id].asset);
+        const visual = GUN_VISUALS[id];
+        if (!visual) return;
+        await loadModel(visual.asset);
         this.applyGunModel(id);
       }),
     );
   }
 
   private applyGunModel(id: WeaponId): void {
+    const visual = GUN_VISUALS[id];
+    if (!visual) return;
     const model = this.models[id];
     if (model.group.getObjectByName('glb-gun')) return;
 
@@ -347,8 +996,8 @@ export class WeaponSystem {
     model.rig = undefined;
     model.magazine = undefined;
     model.bolt = undefined;
-    model.muzzle = new THREE.Vector3(...GUN_VISUALS[id].muzzle);
-    model.ejectPort = new THREE.Vector3(...GUN_VISUALS[id].eject);
+    model.muzzle = new THREE.Vector3(...visual.muzzle);
+    model.ejectPort = new THREE.Vector3(...visual.eject);
   }
 
   private buildViewmodelHands(): THREE.Group {
@@ -487,312 +1136,6 @@ export class WeaponSystem {
         baseScale: 0.06,
       });
     }
-  }
-
-  private buildRifle(style: RifleStyle): WeaponModel {
-    const group = new THREE.Group();
-    const metal = gunMaterial(0x2b333d, 0x000000, 0, 0.94, 0.3);
-    const dark = gunMaterial(0x14181e, 0x000000, 0, 0.9, 0.4);
-    const steel = gunMaterial(0x3b4550, 0x000000, 0, 0.96, 0.26);
-    const polymer = polymerMaterial(0x1b2128, 0.74);
-    const glove = gloveMaterial();
-    const accent = new THREE.MeshPhysicalMaterial({
-      color: 0x101418,
-      emissive: style.accent,
-      emissiveIntensity: 0.85,
-      metalness: 0.6,
-      roughness: 0.3,
-      clearcoat: 0.6,
-      clearcoatRoughness: 0.2,
-    });
-    const lens = new THREE.MeshPhysicalMaterial({
-      color: 0x061018,
-      emissive: style.accent,
-      emissiveIntensity: 1.1,
-      metalness: 0.1,
-      roughness: 0.05,
-      clearcoat: 1,
-      clearcoatRoughness: 0.03,
-      transparent: true,
-      opacity: 0.9,
-      side: THREE.DoubleSide,
-    });
-
-    // ── Receiver, upper and picatinny rail ──
-    const receiver = new THREE.Mesh(new RoundedBoxGeometry(0.17, 0.18, 0.46, 4, 0.035), metal);
-    receiver.position.set(0, 0.02, 0);
-    group.add(receiver);
-
-    const upper = new THREE.Mesh(new RoundedBoxGeometry(0.15, 0.07, 0.5, 3, 0.02), dark);
-    upper.position.set(0, 0.12, -0.01);
-    group.add(upper);
-
-    const rail = new THREE.Mesh(new RoundedBoxGeometry(0.075, 0.02, 0.42, 2, 0.006), dark);
-    rail.position.set(0, 0.165, -0.04);
-    group.add(rail);
-    for (let i = 0; i < 10; i++) {
-      const slot = new THREE.Mesh(new THREE.BoxGeometry(0.082, 0.01, 0.016), steel);
-      slot.position.set(0, 0.173, -0.23 + i * 0.042);
-      group.add(slot);
-    }
-
-    const glowStrip = new THREE.Mesh(new THREE.BoxGeometry(0.006, 0.012, 0.18), accent);
-    glowStrip.position.set(0.088, 0.02, -0.05);
-    group.add(glowStrip);
-
-    // ── Ejection port and charging handle ──
-    const port = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.055, 0.14), dark);
-    port.position.set(0.086, 0.07, 0);
-    group.add(port);
-
-    const bolt = new THREE.Group();
-    bolt.name = 'bolt';
-    bolt.position.set(0.095, 0.065, 0.05);
-    bolt.userData.baseZ = bolt.position.z;
-    const boltShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 0.06, 8), steel);
-    boltShaft.rotation.z = Math.PI / 2;
-    bolt.add(boltShaft);
-    const boltKnob = new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 8), steel);
-    boltKnob.position.x = 0.045;
-    bolt.add(boltKnob);
-    group.add(bolt);
-
-    // ── Handguard with vents and accent strips ──
-    const hgLen = Math.max(0.2, style.handguard);
-    const hgZ = -0.23 - hgLen / 2;
-    const handguard = new THREE.Mesh(new RoundedBoxGeometry(0.15, 0.15, hgLen, 4, 0.03), polymer);
-    handguard.position.set(0, 0.015, hgZ);
-    group.add(handguard);
-
-    for (const side of [-1, 1]) {
-      for (let i = 0; i < 3; i++) {
-        const vent = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.05, 0.055), dark);
-        vent.position.set(side * 0.077, 0.02, hgZ - hgLen / 2 + 0.07 + i * 0.088);
-        group.add(vent);
-      }
-      const accentStrip = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.018, hgLen * 0.7), accent);
-      accentStrip.position.set(side * 0.078, -0.035, hgZ);
-      group.add(accentStrip);
-    }
-
-    // ── Barrel, gas block and muzzle brake ──
-    const barrelStart = -0.23 - hgLen;
-    const barrelLen = Math.max(0.18, style.barrel);
-    const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.023, 0.026, barrelLen, 12), steel);
-    barrel.rotation.x = Math.PI / 2;
-    barrel.position.set(0, 0.035, barrelStart - barrelLen / 2);
-    group.add(barrel);
-
-    const gasBlock = new THREE.Mesh(new RoundedBoxGeometry(0.06, 0.07, 0.07, 2, 0.015), dark);
-    gasBlock.position.set(0, 0.045, barrelStart - 0.04);
-    group.add(gasBlock);
-
-    const brake = new THREE.Mesh(new THREE.CylinderGeometry(0.033, 0.028, 0.08, 12), metal);
-    brake.rotation.x = Math.PI / 2;
-    brake.position.set(0, 0.035, barrelStart - barrelLen - 0.035);
-    group.add(brake);
-    for (let i = 0; i < 3; i++) {
-      const portSlot = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.012, 0.014), dark);
-      portSlot.position.set(0, 0.062, barrelStart - barrelLen - 0.012 - i * 0.02);
-      group.add(portSlot);
-    }
-
-    if (style.coils) {
-      for (let i = 0; i < 4; i++) {
-        const coil = new THREE.Mesh(new THREE.TorusGeometry(0.056, 0.012, 8, 24), accent);
-        coil.position.set(0, 0.035, barrelStart - barrelLen * 0.35 - i * 0.085);
-        group.add(coil);
-      }
-    }
-
-    if (style.pump) {
-      const pump = new THREE.Group();
-      pump.name = 'pump';
-      pump.position.set(0, 0, hgZ);
-      pump.userData.baseZ = hgZ;
-      const pumpBody = new THREE.Mesh(new RoundedBoxGeometry(0.155, 0.12, 0.16, 3, 0.03), polymer);
-      pumpBody.position.y = -0.02;
-      pump.add(pumpBody);
-      for (let i = 0; i < 3; i++) {
-        const ridge = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.012, 0.018), dark);
-        ridge.position.set(0, -0.02, -0.05 + i * 0.05);
-        pump.add(ridge);
-      }
-      group.add(pump);
-
-      const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.026, hgLen + 0.2, 10), steel);
-      tube.rotation.x = Math.PI / 2;
-      tube.position.set(0, -0.03, hgZ - 0.12);
-      group.add(tube);
-    }
-
-    // ── Optics ──
-    if (style.optic === 'reddot') {
-      const mount = new THREE.Mesh(new RoundedBoxGeometry(0.05, 0.035, 0.14, 2, 0.01), dark);
-      mount.position.set(0, 0.185, -0.04);
-      group.add(mount);
-      const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.13, 16, 1, true), metal);
-      tube.rotation.x = Math.PI / 2;
-      tube.position.set(0, 0.215, -0.05);
-      group.add(tube);
-      const front = new THREE.Mesh(new THREE.CircleGeometry(0.038, 20), lens);
-      front.position.set(0, 0.215, -0.116);
-      group.add(front);
-      const dot = new THREE.Mesh(new THREE.SphereGeometry(0.008, 8, 6), accent);
-      dot.position.set(0, 0.215, -0.1);
-      group.add(dot);
-    } else if (style.optic === 'holo') {
-      const mount = new THREE.Mesh(new RoundedBoxGeometry(0.065, 0.03, 0.13, 2, 0.01), dark);
-      mount.position.set(0, 0.188, -0.04);
-      group.add(mount);
-      const glass = new THREE.Mesh(new THREE.PlaneGeometry(0.058, 0.064), lens);
-      glass.position.set(0, 0.24, -0.085);
-      group.add(glass);
-      for (const side of [-1, 1]) {
-        const arm = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.085, 0.014), dark);
-        arm.position.set(side * 0.032, 0.235, -0.085);
-        group.add(arm);
-      }
-      const topBar = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.012, 0.014), dark);
-      topBar.position.set(0, 0.278, -0.085);
-      group.add(topBar);
-      const bottomBar = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.012, 0.014), dark);
-      bottomBar.position.set(0, 0.192, -0.085);
-      group.add(bottomBar);
-    } else if (style.optic === 'scope') {
-      for (const z of [-0.1, 0.06]) {
-        const ring = new THREE.Mesh(new THREE.TorusGeometry(0.052, 0.009, 8, 20), dark);
-        ring.position.set(0, 0.235, z);
-        group.add(ring);
-      }
-      const scope = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.042, 0.27, 18), metal);
-      scope.rotation.x = Math.PI / 2;
-      scope.position.set(0, 0.235, -0.03);
-      group.add(scope);
-      const frontLens = new THREE.Mesh(new THREE.CircleGeometry(0.043, 22), lens);
-      frontLens.position.set(0, 0.235, -0.166);
-      group.add(frontLens);
-      const rearLens = new THREE.Mesh(new THREE.CircleGeometry(0.034, 20), lens);
-      rearLens.rotation.y = Math.PI;
-      rearLens.position.set(0, 0.235, 0.106);
-      group.add(rearLens);
-      const turret = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.035, 10), dark);
-      turret.position.set(0, 0.29, 0.02);
-      group.add(turret);
-    } else {
-      const rear = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.04, 0.03), dark);
-      rear.position.set(0, 0.19, 0.05);
-      group.add(rear);
-      const rearNotch = new THREE.Mesh(new THREE.BoxGeometry(0.046, 0.02, 0.012), steel);
-      rearNotch.position.set(0, 0.2, 0.034);
-      group.add(rearNotch);
-      const frontPost = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.06, 0.018), dark);
-      frontPost.position.set(0, 0.2, barrelStart + 0.02);
-      group.add(frontPost);
-      const frontTip = new THREE.Mesh(new THREE.SphereGeometry(0.009, 8, 6), accent);
-      frontTip.position.set(0, 0.234, barrelStart + 0.02);
-      group.add(frontTip);
-    }
-
-    // ── Magazine ──
-    const magazine = new THREE.Group();
-    magazine.position.set(0, -0.07, -0.03);
-    magazine.userData.baseY = magazine.position.y;
-    if (style.mag > 0.05) {
-      const magBody = new THREE.Mesh(new RoundedBoxGeometry(0.075, style.mag, 0.115, 3, 0.02), polymer);
-      magBody.position.set(0, -style.mag / 2, 0);
-      magBody.rotation.x = 0.1;
-      magazine.add(magBody);
-      const plate = new THREE.Mesh(new RoundedBoxGeometry(0.085, 0.02, 0.13, 2, 0.008), dark);
-      plate.position.set(0, -style.mag - 0.01, 0.008);
-      magazine.add(plate);
-      for (let i = 0; i < 3; i++) {
-        const rib = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.012, 0.12), dark);
-        rib.position.set(0, -style.mag * 0.3 - i * 0.06, 0);
-        magazine.add(rib);
-      }
-    }
-    group.add(magazine);
-
-    // ── Pistol grip, trigger guard and trigger ──
-    const grip = new THREE.Mesh(new RoundedBoxGeometry(0.085, 0.22, 0.115, 4, 0.03), polymer);
-    grip.position.set(0, -0.18, 0.12);
-    grip.rotation.x = -0.3;
-    group.add(grip);
-    for (let i = 0; i < 3; i++) {
-      const ridge = new THREE.Mesh(new THREE.BoxGeometry(0.088, 0.012, 0.02), dark);
-      ridge.position.set(0, -0.12 - i * 0.05, 0.145 + i * 0.015);
-      group.add(ridge);
-    }
-
-    const guard = new THREE.Mesh(new THREE.TorusGeometry(0.055, 0.007, 6, 18), dark);
-    guard.rotation.y = Math.PI / 2;
-    guard.position.set(0, -0.06, 0.04);
-    group.add(guard);
-
-    const trigger = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.05, 0.014), steel);
-    trigger.position.set(0, -0.055, 0.045);
-    trigger.rotation.x = 0.2;
-    group.add(trigger);
-
-    // ── Stock ──
-    if (style.stock) {
-      const buffer = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.2, 10), steel);
-      buffer.rotation.x = Math.PI / 2;
-      buffer.position.set(0, 0.05, 0.3);
-      group.add(buffer);
-
-      const stock = new THREE.Mesh(new RoundedBoxGeometry(0.1, 0.22, 0.16, 3, 0.03), polymer);
-      stock.position.set(0, -0.02, 0.43);
-      group.add(stock);
-
-      const cheek = new THREE.Mesh(new RoundedBoxGeometry(0.09, 0.05, 0.2, 2, 0.015), polymer);
-      cheek.position.set(0, 0.1, 0.36);
-      group.add(cheek);
-    }
-
-    if (style.verticalGrip) {
-      const vg = new THREE.Mesh(new RoundedBoxGeometry(0.055, 0.15, 0.075, 3, 0.02), polymer);
-      vg.position.set(0, -0.11, hgZ + 0.02);
-      vg.rotation.x = 0.1;
-      group.add(vg);
-    }
-
-    // ── Gloved hands ──
-    const addHand = (position: THREE.Vector3, rotation: THREE.Euler): THREE.Group => {
-      const hand = new THREE.Group();
-      hand.position.copy(position);
-      hand.rotation.copy(rotation);
-      const palm = new THREE.Mesh(new RoundedBoxGeometry(0.062, 0.1, 0.085, 3, 0.022), glove);
-      hand.add(palm);
-      const thumb = new THREE.Mesh(new THREE.CapsuleGeometry(0.018, 0.045, 4, 8), glove);
-      thumb.position.set(-0.03, 0.035, 0.02);
-      thumb.rotation.z = 0.9;
-      hand.add(thumb);
-      for (let i = 0; i < 4; i++) {
-        const finger = new THREE.Mesh(new THREE.CapsuleGeometry(0.013, 0.05, 4, 8), glove);
-        finger.position.set(0, 0.042 - i * 0.022, -0.05);
-        finger.rotation.x = 1.35;
-        hand.add(finger);
-      }
-      group.add(hand);
-      return hand;
-    };
-
-    addHand(new THREE.Vector3(0.0, -0.19, 0.13), new THREE.Euler(0.05, 0.08, 0.06));
-    if (!style.verticalGrip) {
-      addHand(new THREE.Vector3(0, -0.1, hgZ + 0.06), new THREE.Euler(-0.15, 0, 0));
-    }
-
-    group.position.set(0, 0.015, 0.03);
-    return {
-      group,
-      muzzle: new THREE.Vector3(0, 0.035, barrelStart - barrelLen - 0.075),
-      color: style.accent,
-      magazine,
-      bolt,
-      ejectPort: new THREE.Vector3(0.09, 0.07, 0.02),
-    };
   }
 
   private ejectShell(): void {

@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import { clone as cloneSkeleton } from 'three/addons/utils/SkeletonUtils.js';
 import { getModel, getModelMetrics, type ModelKey } from './assets';
+import type { WeaponId } from './weapons';
 
-export type GunId = 'pulse' | 'viper' | 'arx' | 'scatter' | 'longshot' | 'rail';
+export type GunId = WeaponId;
 
 export interface GunVisual {
   asset: ModelKey;
@@ -21,7 +22,7 @@ export interface GunVisual {
  * Six distinct authored models. The AKM is the heavy rifle, the SCAR-like
  * rifle is the pulse carbine, and the rest fill their own roles.
  */
-export const GUN_VISUALS: Record<GunId, GunVisual> = {
+export const GUN_VISUALS: Partial<Record<GunId, GunVisual>> = {
   pulse: {
     asset: 'rifle',
     length: 1.75,
@@ -133,6 +134,7 @@ export interface BuiltGun {
  */
 export function createGunModel(id: GunId, tint = true): BuiltGun | null {
   const visual = GUN_VISUALS[id];
+  if (!visual) return null;
   const asset = getModel(visual.asset);
   const metrics = getModelMetrics(visual.asset);
   if (!asset || !metrics) return null;

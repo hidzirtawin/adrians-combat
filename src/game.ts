@@ -16,6 +16,7 @@ import { EnemyManager, type CombatContext, type EnemyKind } from './enemies';
 import { FX } from './fx';
 import { HUD, type BuffDisplay } from './hud';
 import { MenuMusic } from './menuMusic';
+import { isSectorFinale, isSectorStart, sectorForWave, type SectorDef } from './levels';
 import { Input, bindMobileControls, type Action } from './input';
 import { PickupManager, PICKUP_COLORS, PICKUP_LABELS, type PickupKind } from './pickups';
 import {
@@ -34,7 +35,7 @@ import {
 import { Player } from './player';
 import { loadRecord, resetRecord, saveSettings, settings, submitRecord, type Difficulty } from './settings';
 import { SquadClient, type SquadMode, type SquadNotice, type SquadRoom } from './squad';
-import { WEAPONS, WEAPON_IDS, WeaponSystem, type WeaponDef, type WeaponId } from './weapons';
+import { WEAPONS, WEAPON_IDS, WeaponSystem, type WeaponCategory, type WeaponDef, type WeaponId } from './weapons';
 
 type GameState = 'menu' | 'playing' | 'paused' | 'gameover';
 
@@ -67,13 +68,25 @@ const WAVE_TAGS = [
   'DEFEND THE ROOM',
 ];
 
-const WEAPON_SFX: Record<WeaponId, 'pulse' | 'viper' | 'arx' | 'scatter' | 'longshot' | 'rail'> = {
+const WEAPON_SFX: Record<WeaponId, SfxName> = {
   pulse: 'pulse',
   viper: 'viper',
   arx: 'arx',
   scatter: 'scatter',
   longshot: 'longshot',
   rail: 'rail',
+  vanguard: 'pulse',
+  warlord: 'arx',
+  sentinel: 'longshot',
+  sidearm: 'pistol',
+  magnum: 'magnum',
+  wasp: 'pistol',
+  vector: 'viper',
+  breacher: 'scatter',
+  vulcan: 'lmg',
+  ion: 'blaster',
+  plasma: 'plasma',
+  disruptor: 'rail',
 };
 
 export class Game {
@@ -114,6 +127,8 @@ export class Game {
   private bestScore = 0;
   private score = 0;
   private wave = 0;
+  private level = 1;
+  private sector: SectorDef = sectorForWave(1).sector;
   private waveModifier: 'standard' | 'armored' | 'air' | 'horde' | 'elite' = 'standard';
   private waveHpMul = 1;
   private kills = 0;
@@ -152,6 +167,7 @@ export class Game {
   private armoryPreview?: ArmoryPreview;
   private menuMusic: MenuMusic;
   private armorySelection: WeaponId = 'pulse';
+  private armoryFilter: WeaponCategory | 'ALL' = 'ALL';
   private aiming = false;
   private runSalvage = 0;
   private pendingSalvage = 0;
@@ -162,6 +178,8 @@ export class Game {
   private torchLight: THREE.PointLight;
   private arHemi!: THREE.HemisphereLight;
   private arKey!: THREE.DirectionalLight;
+  private arRim!: THREE.DirectionalLight;
+  private arFill!: THREE.DirectionalLight;
   private envBrightness = 0.65;
   private multiKillCount = 0;
   private multiKillTimer = 0;
@@ -375,10 +393,12 @@ export class Game {
 
     const rim = new THREE.DirectionalLight(0xff5fc0, 1.15);
     rim.position.set(-7, 4, -6);
+    this.arRim = rim;
     group.add(rim);
 
     const fill = new THREE.DirectionalLight(0x59ffb0, 0.7);
     fill.position.set(0, 3, 8);
+    this.arFill = fill;
     group.add(fill);
 
     group.visible = false;
@@ -460,6 +480,17 @@ export class Game {
       this.audio.play('wave');
       this.renderArmory();
       this.syncSalvageUI();
+    });
+
+    const filterBar = document.getElementById('armoryFilters');
+    filterBar?.addEventListener('click', (event) => {
+      const button = (event.target as HTMLElement).closest<HTMLElement>('[data-filter]');
+      const filter = button?.dataset.filter as WeaponCategory | 'ALL' | undefined;
+      if (!filter) return;
+      this.armoryFilter = filter;
+      this.renderArmory();
+      this.audio.init();
+      this.audio.play('ui');
     });
 
     const bombGrid = document.getElementById('armoryBombs');
@@ -1055,7 +1086,16 @@ export class Game {
 
     const equippedId = this.selectedGun();
     const gun = this.armorySelection;
-    gunGrid.innerHTML = WEAPON_IDS.map((id) => {
+    const filterBar = document.getElementById('armoryFilters');
+    const categories: Array<WeaponCategory | 'ALL'> = ['ALL', 'RIFLE', 'SMG', 'SHOTGUN', 'PISTOL', 'SNIPER', 'LMG', 'BLASTER'];
+    if (filterBar) {
+      filterBar.innerHTML = categories.map((category) => {
+        const active = category === this.armoryFilter;
+        return `<button class="armory-filter${active ? ' active' : ''}" data-filter="${category}">${category}</button>`;
+      }).join('');
+    }
+    const visibleIds = WEAPON_IDS.filter((id) => this.armoryFilter === 'ALL' || WEAPONS[id].category === this.armoryFilter);
+    gunGrid.innerHTML = visibleIds.map((id) => {
       const def = WEAPONS[id];
       const selected = id === gun;
       const equipped = id === equippedId;
@@ -1064,7 +1104,7 @@ export class Game {
       const rate = 1 / def.interval;
       return `<button class="armory-card${selected ? ' selected' : ''}${unlocked ? '' : ' locked'}" data-gun="${id}">
         ${unlocked ? (equipped ? '<span class="selected-badge">EQUIPPED</span>' : '') : '<span class="lock-badge">LOCKED</span>'}
-        <span class="a-role">${def.role} · ${def.tag}</span>
+        <span class="a-role">${def.category} · ${def.role} · ${def.tag}</span>
         <h4>${def.name}</h4>
         <p>${def.desc}</p>
         <div class="armory-stats">
@@ -1399,6 +1439,8 @@ export class Game {
     this.lastBombText = '';
     this.score = 0;
     this.wave = 0;
+    this.level = 1;
+    this.sector = sectorForWave(1).sector;
     this.kills = 0;
     this.shotsFired = 0;
     this.shotsHit = 0;
@@ -1430,6 +1472,7 @@ export class Game {
     this.dailyStreak = daily.streak;
     this.syncSalvageUI();
     this.hud.setWave(1);
+    this.hud.setLevel(1, this.sector.name, this.sector.accent);
     this.hud.setScore(0, this.bestScore);
     this.hud.setCombo(1, false);
     this.hud.setBoss(null);
@@ -1443,50 +1486,69 @@ export class Game {
     this.spawnQueue = [];
     this.spawnClock = 0;
     this.hud.setWave(n);
+    const sector = sectorForWave(n);
+    this.level = sector.level;
+    this.sector = sector.sector;
+    this.hud.setLevel(sector.level, sector.sector.name, sector.sector.accent);
+    this.applySectorTheme(sector.sector);
+
     const modRoll = Math.random();
     this.waveModifier = n >= 4 && n % 3 === 0
       ? (modRoll < 0.3 ? 'armored' : modRoll < 0.55 ? 'air' : modRoll < 0.8 ? 'horde' : 'elite')
       : 'standard';
-    this.waveHpMul = this.waveModifier === 'elite' ? 1.5 : 1;
+    this.waveHpMul = (this.waveModifier === 'elite' ? 1.5 : 1) * sector.hpMul;
 
     const isBoss = n % 5 === 0;
+    const finale = isSectorFinale(n);
     if (isBoss) {
       const index = (Math.floor(n / 5) - 1) % BOSS_CYCLE.length;
       const boss = BOSS_CYCLE[index];
       const mirrored = boss.kind === 'mirrored';
 
-      this.spawnQueue.push({ kind: boss.kind, at: 1.5, scale: boss.scale });
-      if (mirrored) this.spawnQueue.push({ kind: boss.kind, at: 2.1, scale: boss.scale });
+      this.spawnQueue.push({ kind: boss.kind, at: 1.5, scale: boss.scale * (1 + (sector.level - 1) * 0.04) });
+      if (mirrored) this.spawnQueue.push({ kind: boss.kind, at: 2.1, scale: boss.scale * (1 + (sector.level - 1) * 0.04) });
+      if (finale) {
+        const second = BOSS_CYCLE[(index + 4) % BOSS_CYCLE.length];
+        this.spawnQueue.push({ kind: second.kind, at: 2.6, scale: second.scale * 0.82 });
+      }
 
       const escorts = Math.max(1, Math.min(7, Math.round((1 + Math.floor(n / 5)) * currentDifficulty().count)));
       for (let i = 0; i < escorts; i++) {
         this.spawnQueue.push({ kind: i % 2 === 0 ? 'ufo' : 'drone', at: 2.5 + i * 0.7, scale: 1 });
       }
 
-      this.hud.showBanner('⚠ WARNING', boss.name, mirrored ? 'TWO SIGNATURES INBOUND' : 'BOSS WAVE — DESTROY IT', 3.2);
+      this.hud.showBanner(finale ? 'SECTOR BOSS' : '⚠ WARNING', boss.name, finale ? `${sector.sector.name} · FINAL GUARDIAN` : mirrored ? 'TWO SIGNATURES INBOUND' : 'BOSS WAVE — DESTROY IT', 3.2);
       this.audio.play('klaxon', { volume: 0.7 });
       this.audio.play('boss');
     } else {
       const modifierCount = this.waveModifier === 'horde' ? 1.45 : this.waveModifier === 'elite' ? 0.8 : this.waveModifier === 'armored' ? 0.9 : 1;
-      const count = Math.max(2, Math.min(22, Math.round((3 + (n - 1) * 1.1) * currentDifficulty().count * modifierCount)));
+      const count = Math.max(2, Math.min(30, Math.round((3 + (n - 1) * 1.1) * currentDifficulty().count * modifierCount * sector.countMul)));
       for (let i = 0; i < count; i++) {
         this.spawnQueue.push({ kind: this.pickKind(n), at: 0.8 + i * 0.6, scale: 1 });
       }
-      const sub = this.waveModifier === 'armored'
-        ? 'ARMORED COLUMN · TANKS INBOUND'
-        : this.waveModifier === 'air'
-          ? 'AIR SUPERIORITY · FIGHTERS INBOUND'
-          : this.waveModifier === 'horde'
-            ? 'HORDE SURGE · HOLD THE LINE'
-            : this.waveModifier === 'elite'
-              ? 'ELITE GUARD · HARDER TARGETS'
-              : WAVE_TAGS[n % WAVE_TAGS.length];
-      this.hud.showBanner('INCOMING', `WAVE ${String(n).padStart(2, '0')}`, sub, 2.6);
+      if (isSectorStart(n)) {
+        this.hud.showBanner(`SECTOR ${sector.level}`, sector.sector.name, sector.sector.tagline, 3.2);
+      } else {
+        const sub = this.waveModifier === 'armored'
+          ? 'ARMORED COLUMN · TANKS INBOUND'
+          : this.waveModifier === 'air'
+            ? 'AIR SUPERIORITY · FIGHTERS INBOUND'
+            : this.waveModifier === 'horde'
+              ? 'HORDE SURGE · HOLD THE LINE'
+              : this.waveModifier === 'elite'
+                ? 'ELITE GUARD · HARDER TARGETS'
+                : WAVE_TAGS[n % WAVE_TAGS.length];
+        this.hud.showBanner('INCOMING', `WAVE ${String(n).padStart(2, '0')}`, sub, 2.6);
+      }
       this.audio.play('wave');
     }
   }
 
   private pickKind(wave: number): EnemyKind {
+    if (Math.random() < 0.26) {
+      const bias = this.sector.bias;
+      if (bias.length > 0) return bias[Math.floor(Math.random() * bias.length)];
+    }
     if (this.waveModifier === 'armored') {
       const pool: EnemyKind[] = ['tank', 'apc', 'artillery', 'brute', 'mech', 'tank', 'apc'];
       return pool[Math.floor(Math.random() * pool.length)];
@@ -1598,14 +1660,21 @@ export class Game {
 
       if (this.spawnQueue.length === 0 && this.enemies.aliveCount === 0 && this.wave > 0) {
         this.waveActive = false;
-        this.intermission = 4;
-        const bonus = 200 + this.wave * 100;
+        const sectorClear = isSectorFinale(this.wave);
+        this.intermission = sectorClear ? 5 : 4;
+        const bonus = 200 + this.wave * 100 + (sectorClear ? 500 + this.level * 250 : 0);
         this.score += bonus;
-        this.addRunSalvage(25 + this.wave * 6);
+        this.addRunSalvage(25 + this.wave * 6 + (sectorClear ? 150 : 0));
         this.flushSalvage();
-        this.hud.showBanner('SECTOR CLEAR', `WAVE ${this.wave} CLEARED`, `+${bonus.toLocaleString('en-US')} BONUS`, 3);
-        this.hud.toast('SUPPLY DROP INBOUND', 2.2);
-        this.audio.play('wave');
+        if (sectorClear) {
+          this.hud.showBanner('SECTOR CLEAR', `LEVEL ${this.level} COMPLETE`, `+${bonus.toLocaleString('en-US')} BONUS · NEXT SECTOR INBOUND`, 3.6);
+          this.hud.toast('SECTOR BONUS BANKED', 2.2);
+          this.audio.play('boss');
+        } else {
+          this.hud.showBanner('SECTOR CLEAR', `WAVE ${this.wave} CLEARED`, `+${bonus.toLocaleString('en-US')} BONUS`, 3);
+          this.hud.toast('SUPPLY DROP INBOUND', 2.2);
+          this.audio.play('wave');
+        }
         this.player.addShield(20);
         this.player.heal(10);
         this.syncSquad();
@@ -1798,6 +1867,12 @@ export class Game {
     this.scene.environmentIntensity = THREE.MathUtils.lerp(this.scene.environmentIntensity, 0.32 + this.envBrightness * 0.85, blend);
   }
 
+  private applySectorTheme(sector: SectorDef): void {
+    if (this.arRim) this.arRim.color.setHex(sector.accent);
+    if (this.arFill) this.arFill.color.setHex(sector.accent);
+    this.arena.setTheme(sector.accent);
+  }
+
   private applyARRoam(dt: number): void {
     if (this.state !== 'playing') return;
     const mx = this.input.moveX;
@@ -1916,18 +1991,18 @@ export class Game {
           const damage = def.damage * (overcharge ? 2 : 1);
           const died = hit.enemy.takeDamage(damage);
           this.fx.burst(hit.point, def.color, 5, 4, 0.32);
-          this.fx.damageNumber(hit.point, damage, overcharge ? '#ffd76e' : '#9ff8ff', def.id === 'rail');
+          this.fx.damageNumber(hit.point, damage, overcharge ? '#ffd76e' : '#9ff8ff', def.pierce);
           this.audio.play('hit');
           if (died) this.handleKill(hit.enemy, hit.point);
         }
       }
 
-      const width = def.id === 'rail' ? 0.035 : 0.018;
-      const life = def.id === 'rail' ? 0.16 : 0.085;
+      const width = def.pierce ? 0.035 : 0.018;
+      const life = def.pierce ? 0.16 : 0.085;
       this.fx.tracer(muzzle, end, def.color, width, life);
     }
 
-    if (def.id === 'rail') this.audio.play('ion', { volume: 0.35 });
+    if (def.pierce) this.audio.play('ion', { volume: 0.35 });
     this.audio.play(WEAPON_SFX[def.id] ?? 'pulse');
     this.hud.showHitmarker(anyHit);
     this.haptic(def.pellets > 1 ? 18 : def.pierce ? 28 : 6);
@@ -2191,7 +2266,7 @@ export class Game {
       : null;
     const displayScore = squadMe ? Math.max(this.score, squadMe.score) : this.score;
     set('statScore', displayScore.toLocaleString('en-US'));
-    set('statWave', String(this.wave));
+    set('statWave', `${this.wave} / ${this.level}`);
     set('statKills', String(this.kills));
     const accuracy = this.shotsFired > 0 ? Math.round((this.shotsHit / this.shotsFired) * 100) : 0;
     set('statAcc', `${accuracy}%`);

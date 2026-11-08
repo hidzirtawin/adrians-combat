@@ -12,8 +12,9 @@ An original camera-first AR shooter built for the phone browser.
 - **Motion aim** — gyroscope + compass turn your phone into the gun; drag anywhere to fine-tune. If motion is denied, drag-to-aim still works.
 - **Location** — GPS moves you through the real world so enemies and pickups stay anchored around you. GPS is also used for the experimental tag mode.
 - **Two touch controls** — FIRE and RELOAD, both the same size like a native AR shooter. Hold FIRE to charge a stronger special bomb. Auto-reload tops up after a short pause or an empty magazine.
-- **Armory with 3D preview** — drag to rotate each weapon in a studio render. Six distinct authored gun models, not one tinted rifle.
-- **Special bombs** — hold **FIRE** for 0.9 s to charge a stronger Frag, Shock or Cryo blast. A ring fills around the button; the blast gets +35% damage and +18% radius.
+- **Armory with 3D preview** — drag to rotate each weapon in a studio render. Six authored GLB guns plus twelve procedural rifles, pistols, revolvers, an LMG and sci-fi blasters.
+- **Special bombs** — hold **FIRE** for 0.9 s to charge a stronger blast with your equipped Frag, Shock, Cryo, Plasma, Cluster or EMP bomb. A ring fills around the button; the blast gets +35% damage and +18% radius.
+- **Sector levels** — eight named levels of ten waves each, with unique accents, enemy rosters, sector bosses and escalating multipliers. Levels loop with harder modifiers after the eighth sector.
 - **Progression** — earn Salvage from kills, waves and bosses. Locked weapons are greyed out until bought; the game-over screen shows your next unlock and progress. The first run each day pays 2× Salvage.
 - **Enemies** — Hellwasps, Grave Saucers, Gravewalkers, Gorehulks, Void Spawn, Ripclaws, Cacklers, Void Larvae, Hellbrutes, Iron Reapers, Cinderbread, Straw Reapers, Shriek Wraiths, Tomb Bound, Hell Lanterns, Frost Maws, Scream Spires, Rotor Reavers, Sky Shredders, Starfangs, Black Omens, Pale Phantoms, Hex Casters, Rime Terrors, Siege Tanks, Iron Carriers, Grave Artillery, Grim Reapers and Evil Clowns, each with their own AI, voice and projectiles. Spawn pools are randomised every wave.
 - **Four difficulty levels** — Easy / Normal / Hard / Insane. Scales enemy HP, damage, speed, horde size, shield regen and score. Pick it from the main menu or Settings; it persists.
@@ -129,20 +130,32 @@ Browser camera AR also has no depth sensing or room occlusion. Holograms can app
 | Change loadout | **ARMORY** on the main menu |
 | Pause / exit | Small pause icon, top-right |
 
-There are no movement keys and no virtual joystick. Weapon choice happens in the Armory before a run.
+There are no movement keys. The AR **EVADE** stick lets you sidestep incoming fire, and weapon choice happens in the Armory before a run.
 
 ### Weapons and bombs
 
 **Primaries**
 
-| Weapon | Style | Magazine |
-| --- | --- | --- |
-| Pulse Rifle | Balanced automatic | 32 |
-| Viper SMG | Very fast, close range | 40 |
-| ARX Rifle | Hard-hitting automatic | 30 |
-| Scatter Blaster | 8-pellet shotgun | 6 |
-| Longshot DMR | Semi-auto marksman | 14 |
-| Rail Lance | Piercing anti-armor shot | 4 |
+| Weapon | Category | Style | Magazine |
+| --- | --- | --- | --- |
+| Pulse Rifle | Rifle | Balanced automatic | 32 |
+| Viper SMG | SMG | Very fast, close range | 40 |
+| ARX Rifle | Rifle | Hard-hitting automatic | 30 |
+| Scatter Blaster | Shotgun | 8-pellet shotgun | 6 |
+| Longshot DMR | Sniper | Semi-auto marksman | 14 |
+| Rail Lance | Sniper | Piercing anti-armor shot | 4 |
+| Vanguard AR | Rifle | Fast-handling carbine | 30 |
+| Warlord AK | Rifle | Heavy battle rifle | 30 |
+| Sentinel BR | Rifle | Precision semi-auto | 15 |
+| Sidearm 9 | Pistol | Service pistol | 15 |
+| Magnum 44 | Pistol | Six-shot revolver | 6 |
+| Wasp 93 | Pistol | Machine pistol | 24 |
+| Vector PDW | SMG | Hyper-cyclic PDW | 50 |
+| Breacher 12 | Shotgun | Auto shotgun, 10 pellets | 8 |
+| Vulcan LMG | LMG | Belt-fed suppression | 100 |
+| Ion Blaster | Blaster | Heavy hand cannon | 12 |
+| Plasma Carbine | Blaster | Rapid plasma rifle | 45 |
+| Disruptor | Blaster | Piercing plasma sniper | 4 |
 
 **Bombs**
 
@@ -151,6 +164,9 @@ There are no movement keys and no virtual joystick. Weapon choice happens in the
 | Frag | 220 damage in a 6 m blast | 12 s |
 | Shock | 120 damage, 8 m, brief freeze | 14 s |
 | Cryo | 80 damage, 9 m, long freeze | 13 s |
+| Plasma | 340 damage in a 7 m blast | 18 s |
+| Cluster | 150 damage in an 11 m blast | 17 s |
+| EMP | 90 damage, 10 m, long freeze | 15 s |
 
 The Armory shows damage, rate, magazine, range, radius and freeze values on each card. Loadout persists between runs and squad sessions.
 
@@ -229,7 +245,7 @@ src/
   game.ts               camera-AR game loop, waves, scoring, squad glue
   cameraAR.ts           camera stream, gyro/compass aim, GPS tracking
   enemies.ts            animated GLB enemies + procedural bosses
-  weapons.ts            six primaries + AKM viewmodel
+  weapons.ts            eighteen primaries, procedural gun builders + AKM viewmodel
   bombs.ts              Frag / Shock / Cryo bomb definitions
   pickups.ts            power-ups and magnet collection
   hud.ts                HUD, radar, squad board, tag prompt

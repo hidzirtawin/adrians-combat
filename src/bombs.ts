@@ -1,6 +1,6 @@
 import { settings } from './settings';
 
-export type BombId = 'frag' | 'shock' | 'cryo';
+export type BombId = 'frag' | 'shock' | 'cryo' | 'plasma' | 'cluster' | 'emp';
 
 export interface BombDef {
   id: BombId;
@@ -16,7 +16,7 @@ export interface BombDef {
   fuse: number;
 }
 
-export const BOMB_IDS: BombId[] = ['frag', 'shock', 'cryo'];
+export const BOMB_IDS: BombId[] = ['frag', 'shock', 'cryo', 'plasma', 'cluster', 'emp'];
 
 export const BOMBS: Record<BombId, BombDef> = {
   frag: {
@@ -55,6 +55,45 @@ export const BOMBS: Record<BombId, BombDef> = {
     cooldown: 13,
     freeze: 5,
     color: 0x43f3ff,
+    throwSpeed: 9,
+    fuse: 0.9,
+  },
+  plasma: {
+    id: 'plasma',
+    name: 'PLASMA BOMB',
+    short: 'PLASMA',
+    desc: 'Superheated plasma. Highest damage of any bomb.',
+    damage: 340,
+    radius: 7,
+    cooldown: 18,
+    freeze: 0,
+    color: 0xb45bff,
+    throwSpeed: 9,
+    fuse: 0.9,
+  },
+  cluster: {
+    id: 'cluster',
+    name: 'CLUSTER BOMB',
+    short: 'CLUSTER',
+    desc: 'Wide fragmentation blast. Clears entire swarms.',
+    damage: 150,
+    radius: 11,
+    cooldown: 17,
+    freeze: 0,
+    color: 0xffd75e,
+    throwSpeed: 9,
+    fuse: 0.9,
+  },
+  emp: {
+    id: 'emp',
+    name: 'EMP BOMB',
+    short: 'EMP',
+    desc: 'Electromagnetic pulse. Long freeze across a wide radius.',
+    damage: 90,
+    radius: 10,
+    cooldown: 15,
+    freeze: 4.5,
+    color: 0x8fd4ff,
     throwSpeed: 9,
     fuse: 0.9,
   },

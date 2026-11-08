@@ -519,6 +519,19 @@ export class Arena {
     for (const ring of this.holoRings) ring.visible = true;
   }
 
+  /** Recolours the arena accents for the current sector level. */
+  setTheme(accent: number): void {
+    const color = new THREE.Color(accent);
+    this.floorMaterial.color.copy(color).multiplyScalar(0.18);
+    if (this.accentLights[0]) this.accentLights[0].color.copy(color);
+    if (this.accentLights[1]) this.accentLights[1].color.copy(color).lerp(new THREE.Color(0xff2fa8), 0.35);
+    if (this.accentLights[2]) this.accentLights[2].color.copy(color).lerp(new THREE.Color(0xffc247), 0.4);
+    for (const ring of this.holoRings) {
+      const material = ring.material as THREE.MeshBasicMaterial;
+      if (material?.color) material.color.lerp(color, 0.35);
+    }
+  }
+
   /** Camera-AR mode: no walls, no cover collision, enemies can surround the player. */
   setFreeRoam(active: boolean): void {
     this.freeRoam = active;

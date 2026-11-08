@@ -1,5 +1,6 @@
 export type SfxName =
   | 'pulse' | 'viper' | 'arx' | 'scatter' | 'longshot' | 'rail'
+  | 'pistol' | 'magnum' | 'lmg' | 'plasma'
   | 'enemyShot' | 'hit' | 'kill' | 'explosion' | 'pickup' | 'reload'
   | 'empty' | 'dash' | 'wave' | 'ui' | 'lock' | 'damage' | 'boss' | 'gameover' | 'place'
   | 'blaster' | 'lightsaber' | 'hyperspace' | 'klaxon' | 'droid' | 'tie' | 'xwing' | 'force' | 'ion';
@@ -20,13 +21,17 @@ interface GunProfile {
   electric?: boolean;
 }
 
-const GUN_PROFILES: Record<'pulse' | 'viper' | 'arx' | 'scatter' | 'longshot' | 'rail', GunProfile> = {
+const GUN_PROFILES: Record<'pulse' | 'viper' | 'arx' | 'scatter' | 'longshot' | 'rail' | 'pistol' | 'magnum' | 'lmg' | 'plasma', GunProfile> = {
   pulse: { crack: 0.15, crackFreq: 3400, bodyGain: 0.1, bodyDur: 0.085, bodyFreq: 1800, bodyEnd: 300, thumpGain: 0.12, thumpFreq: 105, thumpDur: 0.14, thumpEnd: 42, tailGain: 0.055, tailDur: 0.34 },
   viper: { crack: 0.12, crackFreq: 4100, bodyGain: 0.075, bodyDur: 0.06, bodyFreq: 2400, bodyEnd: 420, thumpGain: 0.08, thumpFreq: 122, thumpDur: 0.1, thumpEnd: 55, tailGain: 0.04, tailDur: 0.24 },
   arx: { crack: 0.17, crackFreq: 3100, bodyGain: 0.13, bodyDur: 0.115, bodyFreq: 1500, bodyEnd: 220, thumpGain: 0.15, thumpFreq: 96, thumpDur: 0.17, thumpEnd: 38, tailGain: 0.07, tailDur: 0.42 },
   scatter: { crack: 0.13, crackFreq: 2700, bodyGain: 0.17, bodyDur: 0.19, bodyFreq: 900, bodyEnd: 140, thumpGain: 0.21, thumpFreq: 84, thumpDur: 0.22, thumpEnd: 30, tailGain: 0.1, tailDur: 0.52 },
   longshot: { crack: 0.21, crackFreq: 4500, bodyGain: 0.12, bodyDur: 0.09, bodyFreq: 1300, bodyEnd: 180, thumpGain: 0.12, thumpFreq: 88, thumpDur: 0.19, thumpEnd: 30, tailGain: 0.09, tailDur: 0.58 },
   rail: { crack: 0.18, crackFreq: 5200, bodyGain: 0.1, bodyDur: 0.1, bodyFreq: 2100, bodyEnd: 300, thumpGain: 0.1, thumpFreq: 80, thumpDur: 0.21, thumpEnd: 28, tailGain: 0.08, tailDur: 0.52, electric: true },
+  pistol: { crack: 0.14, crackFreq: 3800, bodyGain: 0.09, bodyDur: 0.07, bodyFreq: 1900, bodyEnd: 320, thumpGain: 0.1, thumpFreq: 130, thumpDur: 0.11, thumpEnd: 58, tailGain: 0.045, tailDur: 0.3 },
+  magnum: { crack: 0.22, crackFreq: 2800, bodyGain: 0.2, bodyDur: 0.19, bodyFreq: 700, bodyEnd: 120, thumpGain: 0.24, thumpFreq: 70, thumpDur: 0.24, thumpEnd: 28, tailGain: 0.12, tailDur: 0.6 },
+  lmg: { crack: 0.18, crackFreq: 2900, bodyGain: 0.14, bodyDur: 0.12, bodyFreq: 1400, bodyEnd: 210, thumpGain: 0.16, thumpFreq: 90, thumpDur: 0.18, thumpEnd: 36, tailGain: 0.075, tailDur: 0.46 },
+  plasma: { crack: 0.1, crackFreq: 4800, bodyGain: 0.09, bodyDur: 0.13, bodyFreq: 2200, bodyEnd: 500, thumpGain: 0.07, thumpFreq: 110, thumpDur: 0.16, thumpEnd: 40, tailGain: 0.07, tailDur: 0.45, electric: true },
 };
 
 /** All sound is synthesized at runtime with the Web Audio API — zero audio assets. */
@@ -291,6 +296,10 @@ export class AudioEngine {
       scatter: 0.24,
       longshot: 0.28,
       rail: 0.26,
+      pistol: 0.16,
+      magnum: 0.28,
+      lmg: 0.22,
+      plasma: 0.22,
       explosion: 0.3,
       boss: 0.18,
       gameover: 0.22,
@@ -346,6 +355,22 @@ export class AudioEngine {
       case 'rail':
         if (!this.playSample('rail', t, bus, 1.0, 0.9)) this.gunshot('rail', bus);
         this.tone(1800, t, 0.14, 'sawtooth', 0.035, bus, 7000, 0.001, 160);
+        break;
+      case 'pistol':
+        if (!this.playSample('pistol', t, bus, 0.9, 1.04)) this.gunshot('pistol', bus);
+        break;
+      case 'magnum':
+        if (!this.playSample('magnum', t, bus, 1.0, 0.94)) this.gunshot('magnum', bus);
+        this.noise(t + 0.02, 0.16, 0.05, bus, 'lowpass', 700, 160);
+        break;
+      case 'lmg':
+        if (!this.playSample('lmg', t, bus, 0.96, 0.98)) this.gunshot('lmg', bus);
+        this.tone(120, t, 0.12, 'sine', 0.04, bus, 500, 0.001, 50);
+        break;
+      case 'plasma':
+        if (!this.playSample('plasma', t, bus, 0.95, 1.02)) this.gunshot('plasma', bus);
+        this.tone(2400, t, 0.1, 'sine', 0.025, bus, 8000, 0.001, 700);
+        this.tone(1200, t + 0.03, 0.14, 'triangle', 0.02, bus, 6000, 0.001, 260);
         break;
       case 'enemyShot':
         this.tone(1320, t, 0.16, 'sawtooth', 0.045, bus, 4200, 0.001, 180);

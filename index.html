@@ -35,6 +35,7 @@
       <div id="hudTop">
         <div class="brand-mini">ADRIAN'S <span>COMBAT MISSION</span></div>
         <div id="waveChip">WAVE <b id="waveNum">01</b></div>
+        <div id="levelChip"><span id="levelNum">LVL 01</span><b id="sectorName">NEON OUTSKIRTS</b></div>
         <div id="diffChip">NORMAL</div>
         <div id="scoreChip"><span>SCORE</span><b id="scoreVal">0</b><em id="bestVal">BEST 0</em></div>
         <div id="salvageChip"><span>SALVAGE</span><b id="salvageVal">0</b></div>
@@ -155,6 +156,7 @@
       <div class="menu-stats">
         <div><span>HIGH SCORE</span><b id="menuBest">0</b></div>
         <div><span>BEST WAVE</span><b id="menuWave">0</b></div>
+        <div><span>BEST LEVEL</span><b id="menuLevel">1</b></div>
         <div><span>SALVAGE</span><b id="menuSalvage" class="accent">0</b></div>
       </div>
       <div id="dailyHint" class="daily-hint hidden">DAILY BONUS READY · FIRST RUN TODAY PAYS 2× SALVAGE</div>
@@ -178,7 +180,7 @@
     <div id="armory" class="screen modal hidden">
       <div class="panel wide">
         <div class="panel-head"><small>LOADOUT</small><h2>ARMORY</h2></div>
-        <p class="armory-help">Pick one primary and one bomb. Your loadout saves automatically. Hold FIRE to charge and throw a special bomb.</p>
+        <p class="armory-help">Pick one primary and one bomb. Your loadout saves automatically. Hold FIRE to charge and throw a special bomb. New weapons unlock with Salvage.</p>
         <div id="loadoutSummary" class="loadout-summary"></div>
         <div class="armory-wallet"><span>AVAILABLE SALVAGE</span><b id="armorySalvage">0</b></div>
 
@@ -201,6 +203,7 @@
         </div>
 
         <h3 class="armory-title">PRIMARY WEAPON</h3>
+        <div id="armoryFilters" class="armory-filters"></div>
         <div id="armoryGuns" class="armory-grid"></div>
 
         <h3 class="armory-title">BOMB</h3>
@@ -281,7 +284,7 @@
         <div class="panel-head"><small id="overKicker">SIGNAL TERMINATED</small><h2>SIGNAL LOST</h2><span id="recordBadge" class="record hidden">NEW RECORD</span></div>
         <div class="stats-grid">
           <div><span>SCORE</span><b id="statScore">0</b></div>
-          <div><span>WAVE</span><b id="statWave">1</b></div>
+          <div><span>WAVE / LEVEL</span><b id="statWave">1 / 1</b></div>
           <div><span>KILLS</span><b id="statKills">0</b></div>
           <div><span>ACCURACY</span><b id="statAcc">0%</b></div>
           <div><span>BEST COMBO</span><b id="statCombo">x1</b></div>
@@ -406,11 +409,11 @@
             <h3>COMBAT DOCTRINE</h3>
             <p>Chain kills to build a combo multiplier up to <b>x8</b>. Your shield regenerates after a few seconds out of fire, but damage to your <b>LIFE</b> bar is permanent — grab repair cells and shield cores. Watch the LIFE bar at the bottom-left: green is healthy, amber is damaged, red is critical. A red arrow around the crosshair shows where damage came from.</p>
             <p><b>Hellwasps</b> orbit and snipe. <b>Grave Saucers</b> strafe in spreads. <b>Gravewalkers</b> rush, <b>Gorehulks</b> soak damage, <b>Void Spawn</b> arrive in pairs, <b>Ripclaws</b> sprint, <b>Cacklers</b> swarm, <b>Cinderbread</b> hurl gumdrops, <b>Straw Reapers</b> and <b>Frost Maws</b> hunt, <b>Shriek Wraiths</b> wail, <b>Tomb Bound</b> advance, <b>Hell Lanterns</b> float, and <b>Scream Spires</b> flood the room with sound. <b>Rotor Reavers</b> and <b>Sky Shredders</b> own the air, <b>Starfangs</b> and <b>Black Omens</b> bring starship fire, <b>Siege Tanks</b>, <b>Iron Carriers</b> and <b>Grave Artillery</b> roll in, and <b>Pale Phantoms</b>, <b>Hex Casters</b> and <b>Rime Terrors</b> close in. <b>Grim Reapers</b> teleport through the room and fire soul bolts, while <b>Evil Clowns</b> lunge in with juggling-orb volleys. Every third wave can roll an <b>Armoured</b>, <b>Air</b>, <b>Horde</b> or <b>Elite</b> modifier. <b>Void Larvae</b>, <b>Hellbrutes</b> and <b>Iron Reapers</b> bring the heavy fire. Power-ups magnetize to you.</p>
-            <p>Keep turning — the invasion surrounds you. Open the <b>ARMORY</b> before a run to choose from six primaries and three bombs. Pick <b>Easy / Normal / Hard / Insane</b> on the main menu; it changes enemy health, damage, horde size and score. Use FIRE and RELOAD. Tune the camera FOV, torch, haptics and 3D audio in <b>Settings</b>.</p>
+            <p>Keep turning — the invasion surrounds you. Open the <b>ARMORY</b> before a run to choose from eighteen primaries and six bombs. Pick <b>Easy / Normal / Hard / Insane</b> on the main menu; it changes enemy health, damage, horde size and score. Use FIRE and RELOAD. Tune the camera FOV, torch, haptics and 3D audio in <b>Settings</b>.</p>
           </div>
           <div>
             <h3>ELEVEN BOSSES</h3>
-            <p>Every fifth wave sends a boss. The first five are <b>The Jailer</b>, <b>Bone Maw</b>, <b>The Grinning One</b>, <b>Void Colossus</b> and <b>The Butcher King</b>; later waves add <b>The Rainmaker</b>, <b>Aureole</b>, <b>The Brood Queen</b>, <b>The Mirrored</b>, <b>Umbra</b> and <b>The Collector</b>. Each attacks differently.</p>
+            <p>Every level is ten waves. Every fifth wave sends a boss, and the final wave of each level sends a sector boss backed by a second guardian. Levels cycle through eight named sectors — <b>Neon Outskirts</b>, <b>Ashen Foundry</b>, <b>Frozen Docks</b>, <b>Void Gardens</b>, <b>Bone Citadel</b>, <b>Hellgate</b>, <b>Orbital Wound</b> and <b>Final Dawn</b> — with their own accents, enemy rosters and escalating health. Every fifth wave sends a boss. The first five are <b>The Jailer</b>, <b>Bone Maw</b>, <b>The Grinning One</b>, <b>Void Colossus</b> and <b>The Butcher King</b>; later waves add <b>The Rainmaker</b>, <b>Aureole</b>, <b>The Brood Queen</b>, <b>The Mirrored</b>, <b>Umbra</b> and <b>The Collector</b>. Each attacks differently.</p>
             <p>Camera and motion power the AR view and your aim. Allow camera, motion and location when asked. Location keeps enemies anchored as you walk; motion keeps your aim true.</p>
             <p>No keyboard, no controller. Just your phone, your room, and two buttons.</p>
           </div>

@@ -23,6 +23,10 @@ this project.
 | Phantom, Rime Terror (`public/models/phantom.glb`, `rime.glb`) | Quaternius | [CC0 Public Domain Models](https://github.com/Papyszoo/CC0-Public-Domain-Models) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
 | Hex Caster (`public/models/hexer-rpg.glb`) | Quaternius RPG Characters | [CC0 Public Domain Models](https://github.com/Papyszoo/CC0-Public-Domain-Models) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
 
+The Vanguard AR, Warlord AK, Sentinel BR, Sidearm 9, Magnum 44, Wasp 93, Vector PDW,
+Breacher 12, Vulcan LMG, Ion Blaster, Plasma Carbine and Disruptor are built procedurally
+in `src/weapons.ts` and use no third-party models.
+
 ## Audio
 
 | Asset | Author | Source | License |

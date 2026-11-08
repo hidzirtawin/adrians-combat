@@ -60,10 +60,15 @@ if (settings.difficulty !== 'easy' && settings.difficulty !== 'normal' && settin
   settings.difficulty = 'normal';
 }
 
-if (!['pulse', 'viper', 'arx', 'scatter', 'longshot', 'rail'].includes(settings.primary)) {
+const PRIMARY_IDS = [
+  'pulse', 'viper', 'arx', 'scatter', 'longshot', 'rail',
+  'vanguard', 'warlord', 'sentinel', 'sidearm', 'magnum', 'wasp',
+  'vector', 'breacher', 'vulcan', 'ion', 'plasma', 'disruptor',
+];
+if (!PRIMARY_IDS.includes(settings.primary)) {
   settings.primary = 'pulse';
 }
-if (!['frag', 'shock', 'cryo'].includes(settings.bomb)) {
+if (!['frag', 'shock', 'cryo', 'plasma', 'cluster', 'emp'].includes(settings.bomb)) {
   settings.bomb = 'frag';
 }
 if (!Number.isFinite(settings.fov)) settings.fov = 68;

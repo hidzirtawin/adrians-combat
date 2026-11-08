@@ -3,7 +3,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { clone as cloneSkeleton } from 'three/addons/utils/SkeletonUtils.js';
 import { loadModel } from './assets';
 import { GUN_VISUALS, createGunModel } from './gunModels';
-import { WEAPONS, type WeaponId } from './weapons';
+import { WEAPONS, WEAPON_IDS, buildProceduralWeapon, type WeaponId } from './weapons';
 
 /**
  * Small studio renderer used by the Armory. It keeps its own WebGL context and
@@ -115,15 +115,25 @@ export class ArmoryPreview {
   }
 
   private async load(): Promise<void> {
-    const ids: WeaponId[] = ['pulse', 'viper', 'arx', 'scatter', 'longshot', 'rail'];
     await Promise.all(
-      ids.map(async (id) => {
-        await loadModel(GUN_VISUALS[id].asset);
-        const built = createGunModel(id, true);
-        if (!built) return;
-        built.root.visible = false;
-        this.root.add(built.root);
-        this.models.set(id, built.root);
+      WEAPON_IDS.map(async (id) => {
+        const visual = GUN_VISUALS[id];
+        if (visual) {
+          await loadModel(visual.asset);
+          const built = createGunModel(id, true);
+          if (!built) return;
+          built.root.visible = false;
+          this.root.add(built.root);
+          this.models.set(id, built.root);
+          return;
+        }
+        const built = buildProceduralWeapon(id);
+        built.group.traverse((obj) => {
+          if (obj.name === 'viewmodel-hand') obj.visible = false;
+        });
+        built.group.visible = false;
+        this.root.add(built.group);
+        this.models.set(id, built.group);
       }),
     );
     this.setWeapon(this.weapon);

@@ -3508,3 +3508,70 @@ body.camera-ar #buffBar {
   font-size: 0.68em;
   letter-spacing: 0.015em;
 }
+
+/* ══════════════════════════ SECTOR LEVEL CHIP ══════════════════════════ */
+#levelChip {
+  --sector: #43f3ff;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--display);
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  color: var(--sector);
+  border: 1px solid color-mix(in srgb, var(--sector) 34%, transparent);
+  background: rgba(4, 10, 18, 0.55);
+  padding: 8px 10px;
+  clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--sector) 55%, transparent);
+}
+
+#levelChip b {
+  font-weight: 500;
+  font-size: 7px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  #levelChip b {
+    display: none;
+  }
+}
+
+/* ══════════════════════════ ARMORY CATEGORY FILTERS ══════════════════════════ */
+.armory-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 12px;
+}
+
+.armory-filter {
+  font-family: var(--display);
+  font-size: 7px;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  border: 1px solid rgba(67, 243, 255, 0.16);
+  background: rgba(4, 10, 18, 0.6);
+  padding: 6px 9px;
+  cursor: pointer;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+}
+
+.armory-filter:hover {
+  color: var(--text);
+  border-color: rgba(67, 243, 255, 0.4);
+}
+
+.armory-filter.active {
+  color: #03121a;
+  background: var(--cyan);
+  border-color: var(--cyan);
+  box-shadow: 0 0 14px rgba(67, 243, 255, 0.4);
+}

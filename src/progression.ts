@@ -13,14 +13,30 @@ export interface ProgressState {
 
 export const WEAPON_PRICES: Record<WeaponId, number> = {
   pulse: 0,
+  sidearm: 450,
   viper: 600,
+  vanguard: 900,
+  vector: 1100,
   arx: 1200,
+  magnum: 1400,
+  warlord: 1500,
   scatter: 1800,
+  wasp: 1900,
+  ion: 2000,
+  sentinel: 2200,
+  breacher: 2400,
   longshot: 2600,
+  plasma: 2800,
+  vulcan: 3200,
   rail: 4000,
+  disruptor: 4500,
 };
 
-export const WEAPON_ORDER: WeaponId[] = ['pulse', 'viper', 'arx', 'scatter', 'longshot', 'rail'];
+export const WEAPON_ORDER: WeaponId[] = [
+  'pulse', 'sidearm', 'viper', 'vanguard', 'vector', 'arx', 'magnum', 'warlord',
+  'scatter', 'wasp', 'ion', 'sentinel', 'breacher', 'longshot', 'plasma', 'vulcan',
+  'rail', 'disruptor',
+];
 
 const KEY = 'adrianscombat.progress.v1';
 

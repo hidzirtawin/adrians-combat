@@ -22,6 +22,9 @@ function el<T extends HTMLElement>(id: string): T {
 export class HUD {
   private root = el<HTMLDivElement>('hud');
   private waveNum = el<HTMLElement>('waveNum');
+  private levelChip = el<HTMLElement>('levelChip');
+  private levelNum = el<HTMLElement>('levelNum');
+  private sectorName = el<HTMLElement>('sectorName');
   private scoreVal = el<HTMLElement>('scoreVal');
   private bestVal = el<HTMLElement>('bestVal');
   private diffChip = el<HTMLElement>('diffChip');
@@ -74,6 +77,7 @@ export class HUD {
   private radarCtx: CanvasRenderingContext2D;
   private menuBest = el<HTMLElement>('menuBest');
   private menuWave = el<HTMLElement>('menuWave');
+  private menuLevel = el<HTMLElement>('menuLevel');
   private arHint = el<HTMLElement>('arHint');
   private squadHud = el<HTMLElement>('squadHud');
   private sqMode = el<HTMLElement>('sqMode');
@@ -97,6 +101,7 @@ export class HUD {
   private lastShield = -1;
   private pipKey = '';
   private pipElements: HTMLElement[] = [];
+  private pipFull = 1;
   private buffKey = '';
   private buffElements: Array<{ root: HTMLElement; fill: HTMLElement }> = [];
   private lastBossName = '';
@@ -124,6 +129,7 @@ export class HUD {
   setMenuRecord(record: HighRecord): void {
     this.menuBest.textContent = record.score.toLocaleString('en-US');
     this.menuWave.textContent = String(record.wave);
+    this.menuLevel.textContent = String(Math.max(1, Math.ceil(record.wave / 10)));
     this.bestVal.textContent = `BEST ${record.score.toLocaleString('en-US')}`;
   }
 
@@ -131,6 +137,13 @@ export class HUD {
     if (wave === this.lastWave) return;
     this.lastWave = wave;
     this.waveNum.textContent = String(wave).padStart(2, '0');
+  }
+
+  setLevel(level: number, name: string, accent: number): void {
+    this.levelNum.textContent = `LVL ${String(level).padStart(2, '0')}`;
+    this.sectorName.textContent = name;
+    const hex = `#${accent.toString(16).padStart(6, '0')}`;
+    this.levelChip.style.setProperty('--sector', hex);
   }
 
   setDifficulty(label: string): void {
@@ -185,11 +198,13 @@ export class HUD {
       this.ammoMax.textContent = String(def.mag);
       this.ammoPips.innerHTML = '';
       this.pipElements = [];
-      for (let i = 0; i < def.mag; i++) {
+      const pipCount = Math.min(def.mag, 48);
+      for (let i = 0; i < pipCount; i++) {
         const pip = document.createElement('i');
         this.ammoPips.appendChild(pip);
         this.pipElements.push(pip);
       }
+      this.pipFull = def.mag;
       for (const slot of this.weaponSlots) {
         slot.classList.toggle('active', slot.dataset.slot === def.id);
       }
@@ -200,8 +215,11 @@ export class HUD {
     if (this.ammoNow.textContent !== ammoText) this.ammoNow.textContent = ammoText;
     this.ammoRow.classList.toggle('low', ammo > 0 && ammo <= Math.ceil(def.mag * 0.25));
     this.ammoRow.classList.toggle('empty', ammo <= 0);
+    const pipFill = this.pipElements.length === this.pipFull
+      ? ammo
+      : Math.round((ammo / Math.max(1, this.pipFull)) * this.pipElements.length);
     for (let i = 0; i < this.pipElements.length; i++) {
-      this.pipElements[i].classList.toggle('spent', i >= ammo);
+      this.pipElements[i].classList.toggle('spent', i >= pipFill);
     }
 
     const reloading = system.isReloading;
