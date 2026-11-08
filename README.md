@@ -28,6 +28,7 @@ An original camera-first AR shooter built for the phone browser.
 - **Realistic GLB weapon** — an authored AKM viewmodel with wood/metal materials, muzzle flash, live muzzle light, recoil, reload dip and idle sway.
 - **Realistic feedback** — camera recoil, damage-direction arrows, multi-kill callouts, haptics and positional 3D audio.
 - **Space-opera SFX** — original synthesized blaster bolts, TIE-style fighter screech, X-wing whine, hyperspace whoosh, Imperial klaxon, droid chirps, lightsaber ignition and a Force-like rumble. These are inspired by the genre, not licensed Star Wars recordings.
+- **Local soundtrack player** — pick an MP3 from your own device on the main menu. It is stored in the browser only (IndexedDB) and never uploaded, committed or deployed. Use music you have the rights to play.
 - **AR calibration** — field-of-view slider to match your camera, optional camera torch, and aim-assist / haptics / spatial-audio toggles.
 - **PBR visual overhaul** — environment reflections, clearcoat armour, procedural surface detail, plus authored GLB starships and monsters from CC0 packs.
 - **Glow & shadows** — emissive cores, eyes and thrusters, plus ground/air contact shadows for every enemy.

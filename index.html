@@ -157,6 +157,14 @@
       </div>
       <div id="dailyHint" class="daily-hint hidden">DAILY BONUS READY · FIRST RUN TODAY PAYS 2× SALVAGE</div>
 
+      <div class="menu-track">
+        <button id="btnMenuTrack" class="track-play" type="button">▶ PLAY YOUR TRACK</button>
+        <button id="btnMenuTrackPick" class="track-pick" type="button">CHANGE</button>
+        <span id="menuTrackName">NO LOCAL TRACK</span>
+        <input id="menuTrackFile" type="file" accept="audio/*" hidden />
+      </div>
+      <p class="menu-track-note">LOCAL FILE ONLY · NOT UPLOADED OR BUNDLED</p>
+
       <footer class="menu-foot">
         <span>CAMERA AR</span><span id="arStatus">REAR CAMERA · GYRO · GPS</span><span>BUILD 1.1.0</span>
       </footer>
@@ -408,13 +416,7 @@
       </div>
     </div>
 
-    <!-- ══════════════════════ RECOVERY / FATAL ══════════════════════ -->
-    <div id="recoveryNotice" class="hidden">
-      <strong>PREVIOUS SESSION ENDED</strong>
-      <span id="recoveryText">The app closed or reloaded without warning. That usually means the phone ran low on memory or the browser refreshed the tab.</span>
-      <button id="recoveryClose">DISMISS</button>
-    </div>
-
+    <!-- ══════════════════════ FATAL ══════════════════════ -->
     <div id="fatal" class="hidden" role="alert">
       <div class="fatal-card">
         <small>SYSTEM FAULT</small>

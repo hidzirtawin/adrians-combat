@@ -6,8 +6,6 @@ if (window.matchMedia('(prefers-reduced-motion: reduce)').matches && !localStora
   settings.reducedMotion = true;
 }
 
-const RUN_KEY = 'adrianscombat.run';
-
 function bootDone(): void {
   const boot = document.getElementById('boot');
   if (!boot) return;
@@ -25,28 +23,6 @@ function showFatal(message: string): void {
   boot?.classList.add('done');
 }
 
-function showRecovery(): void {
-  const notice = document.getElementById('recoveryNotice');
-  const text = document.getElementById('recoveryText');
-  if (!notice) return;
-
-  let reason = 'The app reloaded without warning. That usually means the phone ran low on memory or the browser refreshed the tab.';
-  try {
-    const stored = Number(sessionStorage.getItem(RUN_KEY) ?? 0);
-    if (stored > 0) {
-      const minutes = Math.max(1, Math.round((Date.now() - stored) / 60000));
-      reason = `Your last run was interrupted about ${minutes} min ago. The app closed or reloaded without warning — usually low phone memory or the browser refreshing the tab.`;
-    }
-    sessionStorage.removeItem(RUN_KEY);
-  } catch {
-    /* private mode */
-  }
-
-  if (text) text.textContent = reason;
-  notice.classList.remove('hidden');
-  document.getElementById('recoveryClose')?.addEventListener('click', () => notice.classList.add('hidden'), { once: true });
-}
-
 window.addEventListener('error', (event) => {
   console.error('[fatal]', event.error ?? event.message);
   showFatal('A script error stopped the game. Reload to restart your run.');
@@ -59,7 +35,6 @@ window.addEventListener('unhandledrejection', (event) => {
 
 document.getElementById('fatalReload')?.addEventListener('click', () => window.location.reload());
 
-showRecovery();
 
 try {
   const game = new Game();

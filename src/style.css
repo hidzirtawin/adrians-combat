@@ -3300,3 +3300,66 @@ body.aiming #crosshair {
   body.camera-ar #btnAim::before { top: 11px; font-size: 19px; }
   body.camera-ar #btnAim span { margin-top: 23px; }
 }
+
+/* ══════════════════════════ LOCAL MENU SOUNDTRACK ══════════════════════════ */
+.menu-track {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  max-width: 100%;
+}
+
+.track-play,
+.track-pick {
+  font-family: var(--display);
+  font-size: 7px;
+  letter-spacing: 0.14em;
+  color: var(--cyan-soft);
+  border: 1px solid rgba(67, 243, 255, 0.3);
+  background: rgba(4, 14, 24, 0.6);
+  padding: 8px 11px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.track-play:hover,
+.track-pick:hover {
+  border-color: rgba(67, 243, 255, 0.7);
+  background: rgba(67, 243, 255, 0.12);
+}
+
+.track-pick {
+  color: var(--muted);
+  border-color: rgba(120, 160, 180, 0.25);
+}
+
+#menuTrackName {
+  font-family: var(--display);
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  max-width: min(340px, 46vw);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-track-note {
+  position: relative;
+  z-index: 2;
+  margin-top: 4px;
+  font-family: var(--display);
+  font-size: 6px;
+  letter-spacing: 0.12em;
+  color: rgba(120, 160, 180, 0.55);
+}
+
+@media (max-width: 620px) {
+  .menu-track { gap: 6px; }
+  #menuTrackName { max-width: 100%; }
+  .menu-track-note { display: none; }
+}

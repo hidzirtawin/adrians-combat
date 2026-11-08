@@ -15,6 +15,7 @@ import { currentDifficulty } from './difficulty';
 import { EnemyManager, type CombatContext, type EnemyKind } from './enemies';
 import { FX } from './fx';
 import { HUD, type BuffDisplay } from './hud';
+import { MenuMusic } from './menuMusic';
 import { Input, bindMobileControls, type Action } from './input';
 import { PickupManager, PICKUP_COLORS, PICKUP_LABELS, type PickupKind } from './pickups';
 import {
@@ -142,6 +143,7 @@ export class Game {
   private readonly bombMats = new Map<number, THREE.MeshBasicMaterial>();
   private lastBombText = '';
   private armoryPreview?: ArmoryPreview;
+  private menuMusic: MenuMusic;
   private armorySelection: WeaponId = 'pulse';
   private aiming = false;
   private runSalvage = 0;
@@ -273,6 +275,7 @@ export class Game {
       if (document.hidden && this.state === 'playing') this.pause();
     });
 
+    this.menuMusic = new MenuMusic();
     this.renderer.setAnimationLoop(this.loop);
   }
 
@@ -1259,6 +1262,7 @@ export class Game {
     this.audio.startMusic();
     this.audio.setPaused(false);
     this.audio.startAmbience();
+    this.menuMusic.suspend();
     this.audio.play('hyperspace', { volume: 0.55 });
 
     this.worldRoot.position.set(0, 0, 0);
@@ -1301,11 +1305,6 @@ export class Game {
     }
 
     this.state = 'playing';
-    try {
-      sessionStorage.setItem('adrianscombat.run', String(Date.now()));
-    } catch {
-      /* private mode */
-    }
     this.cameraActive = true;
     this.cameraReady = false;
     this.setScreen(null);
@@ -2119,6 +2118,7 @@ export class Game {
     this.hud.hideARHint();
     this.hud.setSquad(null);
     this.hud.showSquadFinal(null);
+    this.menuMusic.resume();
     this.hud.setTagPrompt(null);
     this.enemies.clear();
     this.pickups.clear();
