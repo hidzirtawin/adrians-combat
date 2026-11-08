@@ -7,6 +7,7 @@ import type { Arena } from './arena';
 import type { FX } from './fx';
 import type { AudioEngine, SfxName } from './audio';
 import { currentDifficulty } from './difficulty';
+import { settings } from './settings';
 
 export type EnemyKind =
   | 'drone' | 'ufo' | 'zombie' | 'brute' | 'alien'
@@ -2862,6 +2863,14 @@ export class Enemy {
       : 1 + Math.max(0, wave - 1) * 0.13;
     this.maxHp = Math.round(this.stats.hp * difficulty * (this.isBoss ? cfg.bossHp : cfg.hp) * Math.max(1, hpMul));
     this.hp = this.maxHp;
+
+    this.group.traverse((obj) => {
+      const mesh = obj as THREE.Mesh;
+      if (mesh.isMesh) {
+        mesh.castShadow = settings.quality !== 'low';
+        mesh.receiveShadow = false;
+      }
+    });
 
     this.group.position.copy(position);
     if (this.hoverHeight > 0) this.group.position.y = this.hoverHeight;

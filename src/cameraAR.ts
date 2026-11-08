@@ -52,12 +52,21 @@ export class CameraAR {
   private gyroTimer = 0;
   private wakeLock: { release: () => Promise<void> } | null = null;
   private videoResumeBound = false;
+  private lightCanvas = document.createElement('canvas');
+  private lightCtx: CanvasRenderingContext2D | null;
+  private lightTimer = 0;
+  private lightColor = new THREE.Color(1, 1, 1);
+  private lightBrightness = 0.65;
+  private lightReady = false;
 
   constructor(canvas: HTMLElement) {
     this.canvas = canvas;
     const video = document.getElementById('arVideo') as HTMLVideoElement | null;
     if (!video) throw new Error('Missing #arVideo');
     this.video = video;
+    this.lightCanvas.width = 16;
+    this.lightCanvas.height = 16;
+    this.lightCtx = this.lightCanvas.getContext('2d', { willReadFrequently: true });
   }
 
   async start(onChange?: () => void): Promise<boolean> {
@@ -144,6 +153,7 @@ export class CameraAR {
 
   update(camera: THREE.PerspectiveCamera, dt: number): void {
     if (!this.active) return;
+    this.sampleLight(dt);
 
     this.position.lerp(this.target, 1 - Math.exp(-7 * dt));
     camera.position.set(
@@ -173,6 +183,38 @@ export class CameraAR {
     const max = 12;
     this.walkOffset.x = THREE.MathUtils.clamp(this.walkOffset.x + dx, -max, max);
     this.walkOffset.z = THREE.MathUtils.clamp(this.walkOffset.z + dz, -max, max);
+  }
+
+  get lightEstimate(): { color: THREE.Color; brightness: number; ready: boolean } {
+    return { color: this.lightColor, brightness: this.lightBrightness, ready: this.lightReady };
+  }
+
+  private sampleLight(dt: number): void {
+    this.lightTimer -= dt;
+    if (this.lightTimer > 0) return;
+    this.lightTimer = 0.6;
+    if (!this.lightCtx || this.video.readyState < 2 || this.video.videoWidth === 0) return;
+    try {
+      this.lightCtx.drawImage(this.video, 0, 0, 16, 16);
+      const data = this.lightCtx.getImageData(0, 0, 16, 16).data;
+      let r = 0;
+      let g = 0;
+      let b = 0;
+      for (let i = 0; i < data.length; i += 4) {
+        r += data[i];
+        g += data[i + 1];
+        b += data[i + 2];
+      }
+      const n = data.length / 4;
+      r /= n * 255;
+      g /= n * 255;
+      b /= n * 255;
+      this.lightColor.setRGB(r, g, b);
+      this.lightBrightness = Math.min(1, Math.max(0.08, r * 0.2126 + g * 0.7152 + b * 0.0722));
+      this.lightReady = true;
+    } catch {
+      /* canvas read can fail if the stream is protected */
+    }
   }
 
   get gear(): { camera: boolean; gyro: boolean; gps: boolean } {

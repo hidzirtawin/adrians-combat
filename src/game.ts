@@ -160,6 +160,9 @@ export class Game {
   private cameraRecoilPitch = 0;
   private cameraRecoilYaw = 0;
   private torchLight: THREE.PointLight;
+  private arHemi!: THREE.HemisphereLight;
+  private arKey!: THREE.DirectionalLight;
+  private envBrightness = 0.65;
   private multiKillCount = 0;
   private multiKillTimer = 0;
 
@@ -183,6 +186,8 @@ export class Game {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.05;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.domElement.id = 'game-canvas';
     app.appendChild(this.renderer.domElement);
     preloadGameAssets();
@@ -300,6 +305,17 @@ export class Game {
     gridMat.depthWrite = false;
     group.add(grid);
 
+    const shadowCatcher = new THREE.Mesh(
+      new THREE.PlaneGeometry(80, 80),
+      new THREE.ShadowMaterial({ color: 0x000000, opacity: 0.34 }),
+    );
+    shadowCatcher.rotation.x = -Math.PI / 2;
+    shadowCatcher.position.y = 0.012;
+    shadowCatcher.receiveShadow = true;
+    shadowCatcher.renderOrder = 2;
+    shadowCatcher.name = 'ar-shadow-catcher';
+    group.add(shadowCatcher);
+
     for (const radius of [2, 4, 6, 9, 12]) {
       const ring = new THREE.Mesh(
         new THREE.RingGeometry(radius - 0.025, radius + 0.025, 96),
@@ -339,10 +355,22 @@ export class Game {
   private buildARLights(): THREE.Group {
     const group = new THREE.Group();
     const hemi = new THREE.HemisphereLight(0xbfeaff, 0x080b12, 1.75);
+    this.arHemi = hemi;
     group.add(hemi);
 
     const key = new THREE.DirectionalLight(0xdffcff, 2.9);
     key.position.set(4, 9, 5);
+    key.castShadow = true;
+    key.shadow.mapSize.set(1024, 1024);
+    key.shadow.camera.left = -16;
+    key.shadow.camera.right = 16;
+    key.shadow.camera.top = 16;
+    key.shadow.camera.bottom = -16;
+    key.shadow.camera.near = 1;
+    key.shadow.camera.far = 45;
+    key.shadow.bias = -0.0005;
+    key.shadow.normalBias = 0.02;
+    this.arKey = key;
     group.add(key);
 
     const rim = new THREE.DirectionalLight(0xff5fc0, 1.15);
@@ -862,6 +890,9 @@ export class Game {
     this.applyPixelRatio();
     this.bloom.strength = settings.quality === 'low' ? 0 : settings.quality === 'high' ? 0.85 : 0.62;
     this.composer.setSize(window.innerWidth, window.innerHeight);
+    const shadows = settings.quality !== 'low';
+    this.renderer.shadowMap.enabled = shadows;
+    if (this.arKey) this.arKey.castShadow = shadows;
   }
 
   private syncDifficultyUI(): void {
@@ -1283,6 +1314,7 @@ export class Game {
     this.arLights.visible = true;
     this.scene.fog = null;
     this.scene.background = null;
+    this.envBrightness = 0.65;
 
     this.resetRun();
     this.player.pos.set(0, 1.6, 0);
@@ -1606,6 +1638,7 @@ export class Game {
         if (Math.abs(this.cameraRecoilPitch) < 0.0001) this.cameraRecoilPitch = 0;
         if (Math.abs(this.cameraRecoilYaw) < 0.0001) this.cameraRecoilYaw = 0;
       }
+      this.applyLightEstimate(dt);
       this.player.pos.copy(this.camera.position);
       this.camera.getWorldDirection(this.camDir);
       this.player.yaw = Math.atan2(-this.camDir.x, -this.camDir.z);
@@ -1751,6 +1784,18 @@ export class Game {
         child.rotation.z += dt * 0.05;
       }
     }
+  }
+
+  private applyLightEstimate(dt: number): void {
+    const estimate = this.cameraAR.lightEstimate;
+    if (!estimate.ready) return;
+    const blend = 1 - Math.exp(-2.5 * dt);
+    this.envBrightness = THREE.MathUtils.lerp(this.envBrightness, estimate.brightness, blend);
+    const tint = estimate.color.clone().lerp(new THREE.Color(1, 1, 1), 0.42);
+    this.arHemi.color.lerp(tint, blend);
+    this.arHemi.intensity = THREE.MathUtils.lerp(this.arHemi.intensity, 0.75 + this.envBrightness * 1.45, blend);
+    this.arKey.intensity = THREE.MathUtils.lerp(this.arKey.intensity, 1.1 + this.envBrightness * 2.2, blend);
+    this.scene.environmentIntensity = THREE.MathUtils.lerp(this.scene.environmentIntensity, 0.32 + this.envBrightness * 0.85, blend);
   }
 
   private applyARRoam(dt: number): void {
@@ -2215,6 +2260,7 @@ export class Game {
     this.arena.group.visible = true;
     this.arGround.visible = false;
     this.arLights.visible = false;
+    this.scene.environmentIntensity = 0.55;
     this.pickups.setAttract(false);
     this.weapons.setVisible(false);
     this.worldRoot.position.set(0, 0, 0);
