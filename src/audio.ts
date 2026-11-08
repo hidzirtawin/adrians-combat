@@ -1,7 +1,8 @@
 export type SfxName =
   | 'pulse' | 'viper' | 'arx' | 'scatter' | 'longshot' | 'rail'
   | 'enemyShot' | 'hit' | 'kill' | 'explosion' | 'pickup' | 'reload'
-  | 'empty' | 'dash' | 'wave' | 'ui' | 'lock' | 'damage' | 'boss' | 'gameover' | 'place';
+  | 'empty' | 'dash' | 'wave' | 'ui' | 'lock' | 'damage' | 'boss' | 'gameover' | 'place'
+  | 'blaster' | 'lightsaber' | 'hyperspace' | 'klaxon' | 'droid' | 'tie' | 'xwing' | 'force' | 'ion';
 
 interface GunProfile {
   crack: number;
@@ -296,6 +297,15 @@ export class AudioEngine {
       enemyShot: 0.13,
       damage: 0.1,
       reload: 0.06,
+      blaster: 0.2,
+      lightsaber: 0.18,
+      hyperspace: 0.3,
+      klaxon: 0.16,
+      droid: 0.08,
+      tie: 0.14,
+      xwing: 0.14,
+      force: 0.3,
+      ion: 0.2,
     };
     const wetAmount = reverbAmounts[name] ?? 0;
     let wet: GainNode | null = null;
@@ -390,6 +400,7 @@ export class AudioEngine {
       case 'ui':
         this.tone(1200, t, 0.035, 'square', 0.022, bus, 5000);
         this.tone(1800, t + 0.025, 0.04, 'sine', 0.018, bus, 7000);
+        this.tone(980, t + 0.06, 0.03, 'sine', 0.012, bus, 6000);
         break;
       case 'lock':
         this.tone(760, t, 0.06, 'sine', 0.04, bus, 5000);
@@ -408,6 +419,54 @@ export class AudioEngine {
       case 'place':
         this.tone(220, t, 0.5, 'sine', 0.08, bus, 2400, 0.7, 880);
         this.tone(440, t + 0.2, 0.4, 'sine', 0.05, bus, 3000, 0.7, 1320);
+        break;
+      case 'blaster':
+        this.tone(1320, t, 0.2, 'sawtooth', 0.055, bus, 5000, 0.001, 170);
+        this.tone(640, t + 0.012, 0.16, 'square', 0.03, bus, 3200, 0.001, 110);
+        this.noise(t, 0.08, 0.025, bus, 'bandpass', 1900, 700);
+        break;
+      case 'lightsaber':
+        this.tone(82, t, 0.55, 'sawtooth', 0.055, bus, 320, 0.02, 160);
+        this.tone(164, t + 0.02, 0.5, 'sine', 0.04, bus, 700, 0.02, 240);
+        this.tone(110, t + 0.12, 0.65, 'triangle', 0.03, bus, 500);
+        this.noise(t, 0.35, 0.03, bus, 'bandpass', 900, 420);
+        break;
+      case 'hyperspace':
+        this.noise(t, 0.95, 0.075, bus, 'highpass', 380, 3600);
+        this.tone(58, t, 0.9, 'sine', 0.11, bus, 300, 0.02, 24);
+        this.tone(116, t + 0.1, 0.7, 'sawtooth', 0.03, bus, 800, 0.02, 38);
+        this.noise(t + 0.55, 0.35, 0.04, bus, 'lowpass', 900, 120);
+        break;
+      case 'klaxon':
+        [0, 0.18, 0.36, 0.54].forEach((offset, i) => {
+          this.tone(i % 2 === 0 ? 470 : 350, t + offset, 0.14, 'square', 0.045, bus, 2400, 0.01, i % 2 === 0 ? 430 : 320);
+        });
+        break;
+      case 'droid':
+        [880, 1320, 760, 1760].forEach((f, i) => {
+          this.tone(f, t + i * 0.055, 0.05, 'sine', 0.035, bus, 6000, 0.001, f * 1.15);
+        });
+        this.noise(t + 0.02, 0.08, 0.015, bus, 'highpass', 3200);
+        break;
+      case 'tie':
+        this.tone(920, t, 0.48, 'sawtooth', 0.06, bus, 3200, 0.01, 150);
+        this.tone(1380, t, 0.42, 'square', 0.03, bus, 4200, 0.01, 240);
+        this.noise(t, 0.4, 0.04, bus, 'bandpass', 1500, 500);
+        break;
+      case 'xwing':
+        this.tone(190, t, 0.55, 'sawtooth', 0.05, bus, 1300, 0.01, 430);
+        this.tone(380, t + 0.04, 0.45, 'triangle', 0.03, bus, 2200, 0.01, 860);
+        this.noise(t, 0.48, 0.04, bus, 'bandpass', 900, 2200);
+        break;
+      case 'force':
+        this.tone(54, t, 0.9, 'sine', 0.12, bus, 300, 0.02, 36);
+        [108, 162, 216].forEach((f, i) => this.tone(f, t + i * 0.03, 0.75, 'sine', 0.04, bus, 900, 0.02));
+        this.noise(t, 0.6, 0.04, bus, 'lowpass', 500, 110);
+        break;
+      case 'ion':
+        this.tone(180, t, 0.35, 'sawtooth', 0.045, bus, 3200, 0.02, 1400);
+        this.tone(900, t + 0.18, 0.22, 'sine', 0.04, bus, 7000, 0.001, 2400);
+        this.noise(t, 0.25, 0.03, bus, 'highpass', 2200);
         break;
     }
   }
@@ -574,14 +633,16 @@ export class AudioEngine {
         this.noise(t, 0.62, 0.045, bus, 'bandpass', 420, 180);
         break;
       case 'jet':
-        this.noise(t, 0.55, 0.09, bus, 'highpass', 700, 3200);
-        this.tone(220, t, 0.6, 'sawtooth', 0.06, bus, 2400, 0.01, 620);
-        this.tone(440, t + 0.08, 0.45, 'triangle', 0.035, bus, 3200, 0.01, 980);
+        this.tone(920, t, 0.42, 'sawtooth', 0.06, bus, 3200, 0.01, 150);
+        this.tone(1380, t, 0.36, 'square', 0.028, bus, 4200, 0.01, 240);
+        this.noise(t, 0.45, 0.07, bus, 'highpass', 700, 3200);
+        this.tone(220, t, 0.55, 'sawtooth', 0.04, bus, 2400, 0.01, 620);
         break;
       case 'striker':
-        this.tone(520, t, 0.42, 'sawtooth', 0.06, bus, 3200, 0.01, 780);
-        this.tone(1040, t + 0.06, 0.35, 'sine', 0.04, bus, 6000, 0.01, 1560);
-        this.noise(t, 0.3, 0.035, bus, 'bandpass', 1800, 800);
+        this.tone(190, t, 0.5, 'sawtooth', 0.05, bus, 1300, 0.01, 430);
+        this.tone(380, t + 0.04, 0.4, 'triangle', 0.03, bus, 2200, 0.01, 860);
+        this.tone(1040, t + 0.06, 0.35, 'sine', 0.035, bus, 6000, 0.01, 1560);
+        this.noise(t, 0.38, 0.04, bus, 'bandpass', 1800, 2200);
         break;
       case 'omen':
         this.tone(52, t, 0.9, 'sawtooth', 0.16, bus, 320, 0.02, 30);

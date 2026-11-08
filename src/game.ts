@@ -1164,6 +1164,7 @@ export class Game {
 
     this.haptic(14);
     this.bombCooldown = def.cooldown;
+    if (charged) this.audio.play('lightsaber', { volume: 0.7 });
     this.audio.play(charged ? 'boss' : 'dash');
     this.hud.toast(charged ? `${def.name} · SPECIAL` : `${def.name} OUT`, 1.2);
     this.updateBombUI();
@@ -1213,6 +1214,7 @@ export class Game {
     this.fx.ring(pos, def.color, radius, 0.9, 0.5);
     this.fx.ring(pos, 0xffffff, radius * 0.55, 0.5, 0.4);
     this.playSpatial('explosion', pos, 1.25);
+    this.audio.play('force', { volume: 0.5 });
     this.haptic([50, 25, 70]);
     this.player.addShake(0.8);
 
@@ -1250,6 +1252,7 @@ export class Game {
     this.audio.startMusic();
     this.audio.setPaused(false);
     this.audio.startAmbience();
+    this.audio.play('hyperspace', { volume: 0.55 });
 
     this.worldRoot.position.set(0, 0, 0);
     this.worldRoot.rotation.set(0, 0, 0);
@@ -1408,6 +1411,7 @@ export class Game {
       }
 
       this.hud.showBanner('⚠ WARNING', boss.name, mirrored ? 'TWO SIGNATURES INBOUND' : 'BOSS WAVE — DESTROY IT', 3.2);
+      this.audio.play('klaxon', { volume: 0.7 });
       this.audio.play('boss');
     } else {
       const count = Math.max(2, Math.min(16, Math.round((3 + (n - 1) * 1.1) * currentDifficulty().count)));
@@ -1495,6 +1499,7 @@ export class Game {
     );
     if (enemy.isBoss) {
       this.hud.showBanner('BOSS DEPLOYED', enemy.name, 'DESTROY IT', 2.6);
+      this.audio.play('force', { volume: 0.55 });
       this.audio.play('boss');
     }
   }
@@ -1761,6 +1766,7 @@ export class Game {
       this.fx.tracer(muzzle, end, def.color, width, life);
     }
 
+    if (def.id === 'rail') this.audio.play('ion', { volume: 0.35 });
     this.audio.play(WEAPON_SFX[def.id] ?? 'pulse');
     this.hud.showHitmarker(anyHit);
     this.haptic(def.pellets > 1 ? 18 : def.pierce ? 28 : 6);
@@ -1832,6 +1838,7 @@ export class Game {
     const color = PICKUP_COLORS[kind];
     this.hud.toast(PICKUP_LABELS[kind], 2.1);
     this.playSpatial('pickup', at, 0.9);
+    this.audio.play('droid', { volume: 0.42 });
     this.haptic(10);
     this.fx.ring(at, color, 2.2, 0.55);
     this.fx.burst(at, color, 20, 6, 0.7);
@@ -1901,7 +1908,11 @@ export class Game {
       this.camera.fov = fov;
       this.camera.updateProjectionMatrix();
     }
-    if (announce) this.hud.toast(active ? 'AIM LOCK · ZOOM' : 'AIM RELEASED', 0.9);
+    if (announce) {
+      this.audio.play(active ? 'lock' : 'ui');
+      if (active) this.audio.play('lightsaber', { volume: 0.38 });
+      this.hud.toast(active ? 'AIM LOCK · ZOOM' : 'AIM RELEASED', 0.9);
+    }
   }
 
   private requestLandscape(): void {
@@ -1985,6 +1996,7 @@ export class Game {
     this.input.enabled = false;
     this.input.firing = false;
     this.audio.play('gameover');
+    this.audio.play('force', { volume: 0.45 });
     this.audio.setPaused(true);
     this.clearBombs();
     this.bombCooldown = 0;
