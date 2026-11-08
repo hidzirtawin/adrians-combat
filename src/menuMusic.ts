@@ -15,6 +15,8 @@ export class MenuMusic {
   private suspended = false;
   private dbPromise: Promise<IDBDatabase | null> | null = null;
   private usingDefault = false;
+  private wantsPlay = true;
+  private autoplayArmed = false;
   private readonly defaultTrack = new URL('audio/menu.mp3', document.baseURI).href;
 
   constructor() {
@@ -34,9 +36,10 @@ export class MenuMusic {
         return;
       }
       if (this.audio.paused) {
-        this.suspended = false;
+        this.wantsPlay = true;
         void this.audio.play().catch(() => this.error());
       } else {
+        this.wantsPlay = false;
         this.audio.pause();
       }
     });
@@ -100,6 +103,7 @@ export class MenuMusic {
         this.audio.src = this.objectUrl;
         this.nameEl.textContent = file.name;
         this.updateUI();
+        this.tryPlay();
       };
       request.onerror = () => this.useDefault();
     } catch {
@@ -113,6 +117,33 @@ export class MenuMusic {
     this.audio.src = this.defaultTrack;
     this.nameEl.textContent = 'DAMN IT FEELS GOOD · AI HOMAGE';
     this.updateUI();
+    this.tryPlay();
+  }
+
+  private tryPlay(): void {
+    if (!this.audio.src || !this.wantsPlay) return;
+    const play = this.audio.play();
+    if (play) play.catch(() => this.armAutoplay());
+  }
+
+  private armAutoplay(): void {
+    if (this.autoplayArmed) return;
+    this.autoplayArmed = true;
+    const cleanup = (): void => {
+      window.removeEventListener('pointerdown', start, true);
+      window.removeEventListener('touchstart', start, true);
+      window.removeEventListener('keydown', start, true);
+    };
+    const start = (event: Event): void => {
+      cleanup();
+      this.autoplayArmed = false;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('.menu-track')) return;
+      this.tryPlay();
+    };
+    window.addEventListener('pointerdown', start, { once: true, capture: true });
+    window.addEventListener('touchstart', start, { once: true, capture: true, passive: true });
+    window.addEventListener('keydown', start, { once: true, capture: true });
   }
 
   private loadFile(): void {
@@ -120,6 +151,7 @@ export class MenuMusic {
     if (!file) return;
     if (this.objectUrl) URL.revokeObjectURL(this.objectUrl);
     this.usingDefault = false;
+    this.wantsPlay = true;
     this.objectUrl = URL.createObjectURL(file);
     this.audio.src = this.objectUrl;
     this.suspended = false;
@@ -153,14 +185,15 @@ export class MenuMusic {
 
   /** Called when a run starts so the menu track does not bleed into gameplay. */
   suspend(): void {
-    this.suspended = !this.audio.paused;
-    if (this.suspended) this.audio.pause();
+    this.wantsPlay = false;
+    this.suspended = true;
+    if (!this.audio.paused) this.audio.pause();
   }
 
   /** Called when returning to the main menu. */
   resume(): void {
-    if (!this.suspended) return;
     this.suspended = false;
-    if (this.audio.src) void this.audio.play().catch(() => this.error());
+    this.wantsPlay = true;
+    this.tryPlay();
   }
 }
