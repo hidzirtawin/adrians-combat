@@ -43,8 +43,11 @@ export class MenuMusic {
     this.audio.preload = 'auto';
     this.audio.loop = true;
     try {
-      const savedVolume = Number(localStorage.getItem('adrianscombat.trackVolume'));
-      if (Number.isFinite(savedVolume) && savedVolume >= 0 && savedVolume <= 1) this.baseVolume = savedVolume;
+      const rawVolume = localStorage.getItem('adrianscombat.trackVolume');
+      if (rawVolume !== null) {
+        const savedVolume = Number(rawVolume);
+        if (Number.isFinite(savedVolume) && savedVolume >= 0 && savedVolume <= 1) this.baseVolume = savedVolume;
+      }
     } catch {
       /* storage unavailable */
     }
