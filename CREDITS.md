@@ -1,6 +1,6 @@
 # Asset Credits
 
-ADRIAN'S COMBAT includes third-party 3D models and audio samples. The rest of
+ADRIAN'S COMBAT MISSION includes third-party 3D models and audio samples. The rest of
 the game (arena, bosses, effects, UI and synthesized audio) was generated in
 this project.
 

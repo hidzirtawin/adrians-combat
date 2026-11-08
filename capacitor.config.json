@@ -1,6 +1,6 @@
 {
   "appId": "com.adrianscombat.ar",
-  "appName": "ADRIAN'S COMBAT",
+  "appName": "ADRIAN'S COMBAT MISSION",
   "webDir": "dist",
   "server": {
     "androidScheme": "https"

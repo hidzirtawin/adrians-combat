@@ -3497,3 +3497,14 @@ body.camera-ar #buffBar {
     bottom: calc(18px + env(safe-area-inset-bottom));
   }
 }
+
+/* Longer product name: keep the wordmark inside the phone width. */
+.boot-logo span {
+  font-size: 0.72em;
+  letter-spacing: 0.16em;
+}
+
+.logo span {
+  font-size: 0.68em;
+  letter-spacing: 0.015em;
+}

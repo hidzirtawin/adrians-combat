@@ -1,4 +1,4 @@
-# ADRIAN'S COMBAT — AR Invasion
+# ADRIAN'S COMBAT MISSION — AR Invasion
 
 A camera-first AR shooter that runs in the phone browser. No keyboard, no controller: point your phone, hold **FIRE**, tap **RELOAD**, and walk around your room, garden or street. Hold **FIRE** to charge and throw your selected special bomb.
 
@@ -106,7 +106,7 @@ Same Wi-Fi only, up to six phones. The room server keeps a scoreboard; it does n
 
 ### An honest limitation
 
-Native AR games use ARKit/ARCore to share a physical world map between phones. Mobile browsers cannot do that reliably. ADRIAN'S COMBAT therefore delivers:
+Native AR games use ARKit/ARCore to share a physical world map between phones. Mobile browsers cannot do that reliably. ADRIAN'S COMBAT MISSION therefore delivers:
 
 - true camera + motion + GPS **solo** AR;
 - same-Wi-Fi **score rooms** for FFA and Teams;

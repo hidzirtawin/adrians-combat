@@ -1,7 +1,7 @@
 {
-  "name": "ADRIAN'S COMBAT — AR Invasion",
-  "short_name": "ADRIAN'S COMBAT",
-  "description": "ADRIAN'S COMBAT — fight drones, zombies, aliens, dinosaurs, minions, comic-style villains and eleven bosses in your room.",
+  "name": "ADRIAN'S COMBAT MISSION — AR Invasion",
+  "short_name": "COMBAT MISSION",
+  "description": "ADRIAN'S COMBAT MISSION — fight drones, zombies, aliens, dinosaurs, minions, comic-style villains and eleven bosses in your room.",
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",

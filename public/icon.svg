@@ -33,5 +33,5 @@
     <circle cx="288" cy="318" r="6" fill="#ffc247"/>
   </g>
   <text x="256" y="448" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="36" letter-spacing="5" fill="#d9f7ff">ADRIAN'S</text>
-  <text x="256" y="486" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" letter-spacing="11" fill="#43f3ff">COMBAT</text>
+  <text x="256" y="486" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" letter-spacing="5" fill="#43f3ff">COMBAT MISSION</text>
 </svg>
