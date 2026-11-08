@@ -3,6 +3,8 @@ import basicSsl from '@vitejs/plugin-basic-ssl';
 import { networkInterfaces } from 'node:os';
 import { squadServer } from './server/squadPlugin.mjs';
 
+import { cloudflare } from "@cloudflare/vite-plugin";
+
 function lanDomains(): string[] {
   const domains = new Set(['localhost', '127.0.0.1']);
   for (const addresses of Object.values(networkInterfaces())) {
@@ -18,6 +20,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     squadServer(),
     ...(mode === 'https' ? [basicSsl({ name: 'adrians-combat', domains: lanDomains() })] : []),
+    cloudflare()
   ],
   server: {
     host: true,

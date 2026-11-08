@@ -44,17 +44,17 @@ interface SpawnTicket {
 }
 
 const BOSS_CYCLE: Array<{ kind: EnemyKind; name: string; scale: number }> = [
-  { kind: 'warden', name: 'WARDEN', scale: 0.58 },
-  { kind: 'rex', name: 'TYRANT REX', scale: 1 },
-  { kind: 'jester', name: 'THE JESTER', scale: 0.9 },
-  { kind: 'titan', name: 'TITAN ZERO', scale: 0.7 },
-  { kind: 'warlord', name: 'WARLORD', scale: 0.85 },
-  { kind: 'barrage', name: 'BARRAGE', scale: 0.58 },
-  { kind: 'halo', name: 'HALO', scale: 0.58 },
-  { kind: 'hydra', name: 'HYDRA', scale: 0.58 },
-  { kind: 'twins', name: 'TWINS', scale: 0.58 },
-  { kind: 'shade', name: 'SHADE', scale: 0.58 },
-  { kind: 'hoarder', name: 'HOARDER', scale: 0.58 },
+  { kind: 'jailer', name: 'THE JAILER', scale: 0.58 },
+  { kind: 'rex', name: 'BONE MAW', scale: 1 },
+  { kind: 'jester', name: 'THE GRINNING ONE', scale: 0.9 },
+  { kind: 'titan', name: 'VOID COLOSSUS', scale: 0.7 },
+  { kind: 'warlord', name: 'THE BUTCHER KING', scale: 0.85 },
+  { kind: 'rainmaker', name: 'THE RAINMAKER', scale: 0.58 },
+  { kind: 'aureole', name: 'AUREOLE', scale: 0.58 },
+  { kind: 'brood', name: 'THE BROOD QUEEN', scale: 0.58 },
+  { kind: 'mirrored', name: 'THE MIRRORED', scale: 0.58 },
+  { kind: 'umbra', name: 'UMBRA', scale: 0.58 },
+  { kind: 'collector', name: 'THE COLLECTOR', scale: 0.58 },
 ];
 
 const WAVE_TAGS = [
@@ -1397,17 +1397,17 @@ export class Game {
     if (isBoss) {
       const index = (Math.floor(n / 5) - 1) % BOSS_CYCLE.length;
       const boss = BOSS_CYCLE[index];
-      const twins = boss.kind === 'twins';
+      const mirrored = boss.kind === 'mirrored';
 
       this.spawnQueue.push({ kind: boss.kind, at: 1.5, scale: boss.scale });
-      if (twins) this.spawnQueue.push({ kind: boss.kind, at: 2.1, scale: boss.scale });
+      if (mirrored) this.spawnQueue.push({ kind: boss.kind, at: 2.1, scale: boss.scale });
 
       const escorts = Math.max(1, Math.min(7, Math.round((1 + Math.floor(n / 5)) * currentDifficulty().count)));
       for (let i = 0; i < escorts; i++) {
         this.spawnQueue.push({ kind: i % 2 === 0 ? 'ufo' : 'drone', at: 2.5 + i * 0.7, scale: 1 });
       }
 
-      this.hud.showBanner('⚠ WARNING', boss.name, twins ? 'TWO SIGNATURES INBOUND' : 'BOSS WAVE — DESTROY IT', 3.2);
+      this.hud.showBanner('⚠ WARNING', boss.name, mirrored ? 'TWO SIGNATURES INBOUND' : 'BOSS WAVE — DESTROY IT', 3.2);
       this.audio.play('boss');
     } else {
       const count = Math.max(2, Math.min(16, Math.round((3 + (n - 1) * 1.1) * currentDifficulty().count)));
@@ -1431,7 +1431,7 @@ export class Game {
       ...wave4, 'voidling', 'mummy', 'demon', 'wendigo',
     ];
     const late: EnemyKind[] = [
-      ...wave7, 'mech', 'brute', 'siren',
+      ...wave7, 'mech', 'brute', 'spire',
     ];
     const pool = wave < 2 ? early : wave < 4 ? wave2 : wave < 7 ? wave4 : wave < 11 ? wave7 : late;
     return pool[Math.floor(Math.random() * pool.length)];

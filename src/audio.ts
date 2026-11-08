@@ -538,7 +538,7 @@ export class AudioEngine {
         this.noise(t + 0.02, 0.12, 0.035, bus, 'bandpass', 3400, 1800);
         this.tone(300, t + 0.04, 0.1, 'triangle', 0.03, bus, 900, 0.001, 180);
         break;
-      case 'siren':
+      case 'spire':
         this.tone(380, t, 0.35, 'sawtooth', 0.075, bus, 2200, 0.01, 980);
         this.tone(980, t + 0.35, 0.42, 'sawtooth', 0.06, bus, 2600, 0.01, 300);
         this.noise(t + 0.4, 0.3, 0.035, bus, 'bandpass', 1200, 400);
@@ -567,38 +567,72 @@ export class AudioEngine {
         this.tone(820, t + 0.05, 0.35, 'square', 0.035, bus, 3800, 0.01, 210);
         this.noise(t, 0.32, 0.04, bus, 'highpass', 1800, 700);
         break;
+      case 'helicopter':
+        this.tone(74, t, 0.18, 'sawtooth', 0.1, bus, 400, 0.01, 55);
+        this.tone(74, t + 0.22, 0.18, 'sawtooth', 0.08, bus, 400, 0.01, 52);
+        this.tone(74, t + 0.44, 0.2, 'sawtooth', 0.07, bus, 400, 0.01, 50);
+        this.noise(t, 0.62, 0.045, bus, 'bandpass', 420, 180);
+        break;
+      case 'jet':
+        this.noise(t, 0.55, 0.09, bus, 'highpass', 700, 3200);
+        this.tone(220, t, 0.6, 'sawtooth', 0.06, bus, 2400, 0.01, 620);
+        this.tone(440, t + 0.08, 0.45, 'triangle', 0.035, bus, 3200, 0.01, 980);
+        break;
+      case 'striker':
+        this.tone(520, t, 0.42, 'sawtooth', 0.06, bus, 3200, 0.01, 780);
+        this.tone(1040, t + 0.06, 0.35, 'sine', 0.04, bus, 6000, 0.01, 1560);
+        this.noise(t, 0.3, 0.035, bus, 'bandpass', 1800, 800);
+        break;
+      case 'omen':
+        this.tone(52, t, 0.9, 'sawtooth', 0.16, bus, 320, 0.02, 30);
+        [110, 165, 220].forEach((f, i) => this.tone(f, t + i * 0.04, 0.7, 'sine', 0.055, bus, 900));
+        this.noise(t, 0.6, 0.05, bus, 'lowpass', 500, 100);
+        break;
+      case 'phantom':
+        this.noise(t, 0.45, 0.03, bus, 'highpass', 2200, 600);
+        this.tone(980, t, 0.4, 'sine', 0.04, bus, 5000, 0.03, 420);
+        break;
+      case 'hexer':
+        [660, 880, 1100].forEach((f, i) => this.tone(f, t + i * 0.09, 0.3, 'triangle', 0.04, bus, 5000));
+        this.noise(t, 0.3, 0.02, bus, 'highpass', 3000);
+        break;
+      case 'yeti':
+        this.tone(68, t, 0.6, 'sawtooth', 0.14, bus, 500, 0.01, 38);
+        this.noise(t, 0.5, 0.07, bus, 'lowpass', 700, 150);
+        this.tone(190, t + 0.12, 0.25, 'square', 0.04, bus, 900, 0.01, 90);
+        break;
       case 'rex':
         this.tone(74, t, 0.78, 'sawtooth', 0.2, bus, 360, 0.01, 32);
         this.tone(44, t + 0.04, 0.65, 'triangle', 0.12, bus, 240, 0.01, 24);
         this.noise(t, 0.6, 0.07, bus, 'lowpass', 620, 110);
         this.tone(190, t + 0.18, 0.26, 'square', 0.05, bus, 900, 0.01, 80);
         break;
-      case 'hydra':
+      case 'brood':
         [118, 156, 205].forEach((f, i) => this.tone(f, t + i * 0.04, 0.5, 'sawtooth', 0.07, bus, 700, 0.01, f * 0.55));
         this.noise(t, 0.4, 0.05, bus, 'bandpass', 900, 250);
         break;
-      case 'warden':
+      case 'jailer':
         [82, 123, 164].forEach((f, i) => this.tone(f, t + i * 0.02, 0.9, 'sine', 0.1, bus, 800));
         this.noise(t, 0.5, 0.03, bus, 'lowpass', 500, 120);
         break;
-      case 'barrage':
+      case 'rainmaker':
         this.tone(120, t, 0.18, 'square', 0.1, bus, 900, 0.001, 70);
         this.tone(120, t + 0.22, 0.2, 'square', 0.09, bus, 900, 0.001, 60);
         this.noise(t + 0.04, 0.28, 0.05, bus, 'lowpass', 800, 180);
         break;
-      case 'halo':
+      case 'aureole':
         [440, 554, 659].forEach((f, i) => this.tone(f, t + i * 0.05, 0.85, 'sine', 0.045, bus, 5000));
         this.tone(220, t, 0.7, 'triangle', 0.04, bus, 1200);
         break;
-      case 'twins':
+      case 'mirrored':
         this.tone(320, t, 0.28, 'square', 0.045, bus, 2200, 0.001, 240);
         this.tone(338, t + 0.12, 0.28, 'square', 0.04, bus, 2200, 0.001, 250);
         break;
-      case 'shade':
+      case 'umbra':
         this.noise(t, 0.5, 0.04, bus, 'highpass', 2400, 600);
         this.tone(90, t, 0.6, 'sine', 0.07, bus, 500, 0.02, 44);
         break;
-      case 'hoarder':
+      case 'collector':
         [1200, 1600, 980, 2100].forEach((f, i) => this.tone(f, t + i * 0.055, 0.05, 'square', 0.03, bus, 6000));
         this.tone(150, t, 0.3, 'triangle', 0.05, bus, 700, 0.01, 90);
         break;

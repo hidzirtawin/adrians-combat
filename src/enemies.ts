@@ -11,9 +11,10 @@ import { currentDifficulty } from './difficulty';
 export type EnemyKind =
   | 'drone' | 'ufo' | 'zombie' | 'brute' | 'alien'
   | 'raptor' | 'imp' | 'voidling' | 'demon' | 'mech' | 'gingerbread'
-  | 'siren' | 'banshee' | 'scarecrow' | 'mummy' | 'pumpkin' | 'wendigo'
-  | 'warden' | 'barrage' | 'halo' | 'hydra' | 'twins' | 'shade' | 'hoarder'
-  | 'rex' | 'jester' | 'titan' | 'warlord';
+  | 'spire' | 'banshee' | 'scarecrow' | 'mummy' | 'pumpkin' | 'wendigo'
+  | 'jailer' | 'rainmaker' | 'aureole' | 'brood' | 'mirrored' | 'umbra' | 'collector'
+  | 'rex' | 'jester' | 'titan' | 'warlord'
+  | 'helicopter' | 'jet' | 'striker' | 'omen' | 'phantom' | 'hexer' | 'yeti';
 
 export interface EnemyStats {
   hp: number;
@@ -33,63 +34,91 @@ export interface EnemyStats {
 const STATS: Record<EnemyKind, EnemyStats> = {
   drone: {
     hp: 42, speed: 3.2, hitRadius: 0.8, hitOffset: 0, baseScale: 1, score: 100,
-    contact: 4, hover: 2.45, isBoss: false, name: 'DRONE', color: 0xff2fa8, projectileColor: 0xff4fc0,
+    contact: 4, hover: 2.45, isBoss: false, name: 'HELLWASP', color: 0xff2fa8, projectileColor: 0xff4fc0,
   },
   ufo: {
     hp: 78, speed: 3.6, hitRadius: 1.15, hitOffset: 0, baseScale: 1, score: 190,
-    contact: 6, hover: 2.9, isBoss: false, name: 'UFO', color: 0x57ffa8, projectileColor: 0x8dff5c,
+    contact: 6, hover: 2.9, isBoss: false, name: 'GRAVE SAUCER', color: 0x57ffa8, projectileColor: 0x8dff5c,
   },
   zombie: {
     hp: 58, speed: 2.85, hitRadius: 0.82, hitOffset: 1.05, baseScale: 1, score: 90,
-    contact: 9, hover: 0, isBoss: false, name: 'ZOMBIE', color: 0x7dff6a, projectileColor: 0x7dff6a,
+    contact: 9, hover: 0, isBoss: false, name: 'GRAVEWALKER', color: 0x7dff6a, projectileColor: 0x7dff6a,
   },
   brute: {
     hp: 210, speed: 1.55, hitRadius: 1.05, hitOffset: 1.15, baseScale: 1.55, score: 300,
-    contact: 18, hover: 0, isBoss: false, name: 'BRUTE', color: 0xffc247, projectileColor: 0xffc247,
+    contact: 18, hover: 0, isBoss: false, name: 'GOREHULK', color: 0xffc247, projectileColor: 0xffc247,
   },
   alien: {
     hp: 46, speed: 3.1, hitRadius: 0.7, hitOffset: 0.75, baseScale: 0.95, score: 130,
-    contact: 7, hover: 0, isBoss: false, name: 'ALIEN', color: 0x86e07a, projectileColor: 0x9dff8a,
+    contact: 7, hover: 0, isBoss: false, name: 'VOID SPAWN', color: 0x86e07a, projectileColor: 0x9dff8a,
   },
   raptor: {
     hp: 62, speed: 4.1, hitRadius: 0.8, hitOffset: 0.85, baseScale: 1, score: 160,
-    contact: 12, hover: 0, isBoss: false, name: 'RAPTOR', color: 0x9ed15c, projectileColor: 0x9ed15c,
+    contact: 12, hover: 0, isBoss: false, name: 'RIPCLAW', color: 0x9ed15c, projectileColor: 0x9ed15c,
   },
   imp: {
     hp: 34, speed: 2.9, hitRadius: 0.55, hitOffset: 0.52, baseScale: 0.9, score: 90,
-    contact: 4, hover: 0, isBoss: false, name: 'GIGGLE IMP', color: 0xffd75e, projectileColor: 0xffa14a,
+    contact: 4, hover: 0, isBoss: false, name: 'CACKLER', color: 0xffd75e, projectileColor: 0xffa14a,
   },
   gingerbread: {
     hp: 74, speed: 2.55, hitRadius: 0.72, hitOffset: 0.98, baseScale: 1, score: 130,
-    contact: 9, hover: 0, isBoss: false, name: 'GINGERBREAD', color: 0xffb36b, projectileColor: 0xffd7a0,
+    contact: 9, hover: 0, isBoss: false, name: 'CINDERBREAD', color: 0xffb36b, projectileColor: 0xffd7a0,
   },
-  siren: {
+  spire: {
     hp: 420, speed: 1.05, hitRadius: 1.15, hitOffset: 2.2, baseScale: 1, score: 480,
-    contact: 24, hover: 0, isBoss: false, name: 'SIREN TOWER', color: 0xff3b4e, projectileColor: 0xff5a6e,
+    contact: 24, hover: 0, isBoss: false, name: 'SCREAM SPIRE', color: 0xff3b4e, projectileColor: 0xff5a6e,
   },
   banshee: {
     hp: 120, speed: 2.9, hitRadius: 0.8, hitOffset: 1.05, baseScale: 1, score: 230,
-    contact: 10, hover: 1.35, isBoss: false, name: 'BANSHEE', color: 0x8fd4ff, projectileColor: 0x8fd4ff,
+    contact: 10, hover: 1.35, isBoss: false, name: 'SHRIEK WRAITH', color: 0x8fd4ff, projectileColor: 0x8fd4ff,
   },
   scarecrow: {
     hp: 165, speed: 1.8, hitRadius: 0.85, hitOffset: 1.3, baseScale: 1, score: 240,
-    contact: 12, hover: 0, isBoss: false, name: 'SCARECROW', color: 0xffc247, projectileColor: 0xff8a3d,
+    contact: 12, hover: 0, isBoss: false, name: 'STRAW REAPER', color: 0xffc247, projectileColor: 0xff8a3d,
   },
   mummy: {
     hp: 250, speed: 1.2, hitRadius: 0.9, hitOffset: 1.15, baseScale: 1, score: 270,
-    contact: 17, hover: 0, isBoss: false, name: 'MUMMY', color: 0xd8c9a8, projectileColor: 0xd8c9a8,
+    contact: 17, hover: 0, isBoss: false, name: 'TOMB BOUND', color: 0xd8c9a8, projectileColor: 0xd8c9a8,
   },
   pumpkin: {
     hp: 110, speed: 2.4, hitRadius: 0.75, hitOffset: 0.95, baseScale: 1, score: 210,
-    contact: 8, hover: 1.6, isBoss: false, name: 'JACK-O-LANTERN', color: 0xff8a3d, projectileColor: 0xff8a3d,
+    contact: 8, hover: 1.6, isBoss: false, name: 'HELL LANTERN', color: 0xff8a3d, projectileColor: 0xff8a3d,
   },
   wendigo: {
     hp: 185, speed: 3.25, hitRadius: 0.85, hitOffset: 1.4, baseScale: 1, score: 290,
-    contact: 16, hover: 0, isBoss: false, name: 'WENDIGO', color: 0x9fb7c9, projectileColor: 0x8ff8ff,
+    contact: 16, hover: 0, isBoss: false, name: 'FROST MAW', color: 0x9fb7c9, projectileColor: 0x8ff8ff,
+  },
+  helicopter: {
+    hp: 210, speed: 2.55, hitRadius: 1.2, hitOffset: 0, baseScale: 1, score: 340,
+    contact: 12, hover: 3.4, isBoss: false, name: 'ROTOR REAVER', color: 0xffc247, projectileColor: 0xff8a3d,
+  },
+  jet: {
+    hp: 150, speed: 5.2, hitRadius: 1.0, hitOffset: 0, baseScale: 1, score: 310,
+    contact: 15, hover: 3.8, isBoss: false, name: 'SKY SHREDDER', color: 0x8ff8ff, projectileColor: 0x43f3ff,
+  },
+  striker: {
+    hp: 300, speed: 2.8, hitRadius: 1.5, hitOffset: 0, baseScale: 1, score: 450,
+    contact: 16, hover: 3.3, isBoss: false, name: 'STARFANG', color: 0xff2fa8, projectileColor: 0xff4fc0,
+  },
+  omen: {
+    hp: 620, speed: 1.7, hitRadius: 2.0, hitOffset: 0, baseScale: 1, score: 680,
+    contact: 20, hover: 4.2, isBoss: false, name: 'BLACK OMEN', color: 0x8f5cff, projectileColor: 0xb07dff,
+  },
+  phantom: {
+    hp: 165, speed: 2.6, hitRadius: 0.8, hitOffset: 0.1, baseScale: 1, score: 290,
+    contact: 10, hover: 1.5, isBoss: false, name: 'PALE PHANTOM', color: 0x9fd8ff, projectileColor: 0x9fd8ff,
+  },
+  hexer: {
+    hp: 210, speed: 1.9, hitRadius: 0.8, hitOffset: 1.15, baseScale: 1, score: 330,
+    contact: 12, hover: 0, isBoss: false, name: 'HEX CASTER', color: 0xc08bff, projectileColor: 0xc08bff,
+  },
+  yeti: {
+    hp: 390, speed: 1.8, hitRadius: 1.0, hitOffset: 1.2, baseScale: 1, score: 390,
+    contact: 20, hover: 0, isBoss: false, name: 'RIME TERROR', color: 0xd8f4ff, projectileColor: 0xcfefff,
   },
   voidling: {
     hp: 95, speed: 3.2, hitRadius: 0.8, hitOffset: 0.7, baseScale: 1, score: 210,
-    contact: 14, hover: 0, isBoss: false, name: 'VOIDLING', color: 0x8f5cff, projectileColor: 0xb07dff,
+    contact: 14, hover: 0, isBoss: false, name: 'VOID LARVA', color: 0x8f5cff, projectileColor: 0xb07dff,
   },
   demon: {
     hp: 120, speed: 2.3, hitRadius: 0.85, hitOffset: 1.05, baseScale: 1.05, score: 240,
@@ -97,51 +126,51 @@ const STATS: Record<EnemyKind, EnemyStats> = {
   },
   mech: {
     hp: 190, speed: 1.7, hitRadius: 1.1, hitOffset: 1.1, baseScale: 1.05, score: 300,
-    contact: 10, hover: 0, isBoss: false, name: 'OMEGA MECH', color: 0x9fb7c9, projectileColor: 0x43f3ff,
+    contact: 10, hover: 0, isBoss: false, name: 'IRON REAPER', color: 0x9fb7c9, projectileColor: 0x43f3ff,
   },
-  warden: {
+  jailer: {
     hp: 900, speed: 1.9, hitRadius: 2.5, hitOffset: 0, baseScale: 1, score: 2200,
-    contact: 20, hover: 4.7, isBoss: true, name: 'WARDEN', color: 0xff2f6d, projectileColor: 0xff2f6d,
+    contact: 20, hover: 4.7, isBoss: true, name: 'THE JAILER', color: 0xff2f6d, projectileColor: 0xff2f6d,
   },
-  barrage: {
+  rainmaker: {
     hp: 1300, speed: 1.4, hitRadius: 3.25, hitOffset: 0, baseScale: 1, score: 3000,
-    contact: 24, hover: 5.4, isBoss: true, name: 'BARRAGE', color: 0x57ffa8, projectileColor: 0x7dff9e,
+    contact: 24, hover: 5.4, isBoss: true, name: 'THE RAINMAKER', color: 0x57ffa8, projectileColor: 0x7dff9e,
   },
-  halo: {
+  aureole: {
     hp: 1000, speed: 2.05, hitRadius: 2.8, hitOffset: 0, baseScale: 1, score: 2600,
-    contact: 18, hover: 5.0, isBoss: true, name: 'HALO', color: 0x43f3ff, projectileColor: 0x8ff8ff,
+    contact: 18, hover: 5.0, isBoss: true, name: 'AUREOLE', color: 0x43f3ff, projectileColor: 0x8ff8ff,
   },
-  hydra: {
+  brood: {
     hp: 1600, speed: 1.15, hitRadius: 2.2, hitOffset: 2.1, baseScale: 1, score: 3600,
-    contact: 24, hover: 0, isBoss: true, name: 'HYDRA', color: 0xb45cff, projectileColor: 0xc08bff,
+    contact: 24, hover: 0, isBoss: true, name: 'THE BROOD QUEEN', color: 0xb45cff, projectileColor: 0xc08bff,
   },
-  twins: {
+  mirrored: {
     hp: 520, speed: 2.7, hitRadius: 2.2, hitOffset: 0, baseScale: 1, score: 1400,
-    contact: 16, hover: 3.9, isBoss: true, name: 'TWINS', color: 0xffc247, projectileColor: 0xffd76e,
+    contact: 16, hover: 3.9, isBoss: true, name: 'THE MIRRORED', color: 0xffc247, projectileColor: 0xffd76e,
   },
-  shade: {
+  umbra: {
     hp: 1000, speed: 3.4, hitRadius: 2.3, hitOffset: 0, baseScale: 1, score: 2800,
-    contact: 18, hover: 3.6, isBoss: true, name: 'SHADE', color: 0x8f7dff, projectileColor: 0x7b6bff,
+    contact: 18, hover: 3.6, isBoss: true, name: 'UMBRA', color: 0x8f7dff, projectileColor: 0x7b6bff,
   },
-  hoarder: {
+  collector: {
     hp: 1500, speed: 1.25, hitRadius: 3.1, hitOffset: 0, baseScale: 1, score: 3400,
-    contact: 22, hover: 5.2, isBoss: true, name: 'HOARDER', color: 0xffc247, projectileColor: 0xffd76e,
+    contact: 22, hover: 5.2, isBoss: true, name: 'THE COLLECTOR', color: 0xffc247, projectileColor: 0xffd76e,
   },
   rex: {
     hp: 1600, speed: 2.1, hitRadius: 3, hitOffset: 1.6, baseScale: 1, score: 3800,
-    contact: 30, hover: 0, isBoss: true, name: 'TYRANT REX', color: 0x7a9a3a, projectileColor: 0xffc247,
+    contact: 30, hover: 0, isBoss: true, name: 'BONE MAW', color: 0x7a9a3a, projectileColor: 0xffc247,
   },
   jester: {
     hp: 1250, speed: 2.7, hitRadius: 2.2, hitOffset: 0, baseScale: 1.15, score: 3000,
-    contact: 18, hover: 3.8, isBoss: true, name: 'THE JESTER', color: 0xff2fa8, projectileColor: 0xffd75e,
+    contact: 18, hover: 3.8, isBoss: true, name: 'THE GRINNING ONE', color: 0xff2fa8, projectileColor: 0xffd75e,
   },
   titan: {
     hp: 2300, speed: 1.4, hitRadius: 2.9, hitOffset: 0, baseScale: 1, score: 4400,
-    contact: 26, hover: 4.8, isBoss: true, name: 'TITAN ZERO', color: 0x9a6bff, projectileColor: 0xc08bff,
+    contact: 26, hover: 4.8, isBoss: true, name: 'VOID COLOSSUS', color: 0x9a6bff, projectileColor: 0xc08bff,
   },
   warlord: {
     hp: 1500, speed: 3.1, hitRadius: 1.4, hitOffset: 1.2, baseScale: 1.2, score: 3600,
-    contact: 24, hover: 0, isBoss: true, name: 'WARLORD', color: 0xff3b5c, projectileColor: 0xff5a7a,
+    contact: 24, hover: 0, isBoss: true, name: 'THE BUTCHER KING', color: 0xff3b5c, projectileColor: 0xff5a7a,
   },
 };
 
@@ -321,9 +350,11 @@ interface Built {
 
 function buildGlbModel(
   key: ModelKey,
-  targetHeight: number,
+  targetSize: number,
   tint?: number,
   forcedHitRadius?: number,
+  mode: 'height' | 'longest' = 'height',
+  useRig = true,
 ): Built | null {
   const asset = getModel(key);
   const metrics = getModelMetrics(key);
@@ -331,11 +362,14 @@ function buildGlbModel(
 
   const group = new THREE.Group();
   const model = cloneSkeleton(asset.scene) as THREE.Group;
-  const scale = targetHeight / Math.max(0.001, metrics.height);
+  const baseSize = mode === 'longest'
+    ? Math.max(metrics.width, metrics.height, metrics.depth)
+    : metrics.height;
+  const scale = targetSize / Math.max(0.001, baseSize);
   model.scale.setScalar(scale);
   model.position.set(
     -metrics.center.x * scale,
-    -metrics.min.y * scale,
+    (mode === 'longest' ? -metrics.center.y : -metrics.min.y) * scale,
     -metrics.center.z * scale,
   );
   group.add(model);
@@ -396,9 +430,9 @@ function buildGlbModel(
     group,
     materials,
     hitRadius: radius,
-    hitOffset: targetHeight * 0.55,
+    hitOffset: mode === 'longest' ? 0 : targetSize * 0.55,
     baseScale: 1,
-    glb: { mixer, actions, current: actions.idle ?? null, lock: 0 },
+    glb: useRig ? { mixer, actions, current: actions.idle ?? null, lock: 0 } : undefined,
   };
 }
 
@@ -906,7 +940,7 @@ function buildGingerbread(): Built & { limbs: ZombieLimbs } {
   };
 }
 
-function buildSirenTower(): Built & { limbs: ZombieLimbs } {
+function buildSpire(): Built & { limbs: ZombieLimbs } {
   const group = new THREE.Group();
   const rust = mat(0x34373d, 0x000000, 0, 0.72, 0.58);
   const dark = mat(0x15181d, 0x000000, 0, 0.6, 0.72);
@@ -1419,6 +1453,168 @@ function buildWendigo(): Built & { limbs: ZombieLimbs } {
     baseScale: 1,
     limbs: { leftArm, rightArm, leftLeg, rightLeg },
   };
+}
+
+function buildHelicopter(): Built {
+  const group = new THREE.Group();
+  const armor = mat(0x25292e, 0x000000, 0, 0.78, 0.46);
+  const dark = mat(0x0b0e12, 0x000000, 0, 0.72, 0.58);
+  const glass = new THREE.MeshPhysicalMaterial({
+    color: 0x12352c,
+    emissive: 0x43f3ff,
+    emissiveIntensity: 0.35,
+    metalness: 0.15,
+    roughness: 0.08,
+    clearcoat: 1,
+    transparent: true,
+    opacity: 0.72,
+  });
+  const hazard = mat(0xffc247, 0xff8a3d, 0.35, 0.4, 0.4);
+
+  const hull = new THREE.Mesh(new RoundedBoxGeometry(0.72, 0.5, 1.5, 4, 0.12), armor);
+  hull.position.set(0, 0.05, 0);
+  group.add(hull);
+
+  const nose = new THREE.Mesh(new THREE.SphereGeometry(0.36, 16, 12), armor);
+  nose.position.set(0, 0.02, 0.72);
+  nose.scale.set(1, 0.82, 1.05);
+  group.add(nose);
+
+  const canopy = new THREE.Mesh(new THREE.SphereGeometry(0.31, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2), glass);
+  canopy.position.set(0, 0.22, 0.55);
+  canopy.scale.set(1, 0.8, 1.1);
+  group.add(canopy);
+
+  const boom = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.11, 1.35, 8), armor);
+  boom.rotation.x = Math.PI / 2;
+  boom.position.set(0, 0.08, -1.25);
+  group.add(boom);
+
+  const fin = new THREE.Mesh(new RoundedBoxGeometry(0.08, 0.45, 0.34, 3, 0.03), dark);
+  fin.position.set(0, 0.28, -1.85);
+  group.add(fin);
+
+  const tailRotor = new THREE.Group();
+  tailRotor.name = 'tail-rotor';
+  tailRotor.position.set(0.12, 0.3, -1.95);
+  for (const angle of [0, Math.PI / 2]) {
+    const blade = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.62, 0.035), dark);
+    blade.rotation.z = angle;
+    tailRotor.add(blade);
+  }
+  group.add(tailRotor);
+
+  const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.055, 0.42, 8), dark);
+  mast.position.set(0, 0.45, 0.05);
+  group.add(mast);
+
+  const mainRotor = new THREE.Group();
+  mainRotor.name = 'heli-rotor';
+  mainRotor.position.set(0, 0.67, 0.05);
+  const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.1, 10), hazard);
+  mainRotor.add(hub);
+  for (let i = 0; i < 4; i++) {
+    const blade = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.025, 0.12), dark);
+    blade.rotation.y = (i / 4) * Math.PI;
+    blade.position.y = 0.02;
+    mainRotor.add(blade);
+  }
+  group.add(mainRotor);
+
+  for (const side of [-1, 1]) {
+    const skid = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 1.2, 6), dark);
+    skid.rotation.x = Math.PI / 2;
+    skid.position.set(side * 0.38, -0.36, 0.02);
+    group.add(skid);
+    for (const z of [-0.35, 0.35]) {
+      const strut = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.3, 5), dark);
+      strut.position.set(side * 0.38, -0.22, z);
+      strut.rotation.z = side * 0.2;
+      group.add(strut);
+    }
+
+    const pod = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.5, 8), armor);
+    pod.rotation.x = Math.PI / 2;
+    pod.position.set(side * 0.55, -0.05, 0.15);
+    group.add(pod);
+    for (let i = 0; i < 3; i++) {
+      const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.08, 6), hazard);
+      tube.rotation.x = Math.PI / 2;
+      tube.position.set(side * 0.55, -0.05 + (i - 1) * 0.06, 0.42);
+      group.add(tube);
+    }
+    addGlow(group, 0xff8a3d, 0.35, new THREE.Vector3(side * 0.55, -0.05, 0.46), 0.35);
+  }
+
+  const spot = new THREE.Mesh(new THREE.SphereGeometry(0.055, 8, 6), hazard);
+  spot.position.set(0, 0.18, 0.92);
+  group.add(spot);
+  addGlow(group, 0xffc247, 0.4, new THREE.Vector3(0, 0.18, 0.96), 0.5);
+  addGlow(group, 0xff2f6d, 0.3, new THREE.Vector3(-0.42, 0.12, -1.9), 0.4);
+  addGlow(group, 0x57ffa8, 0.3, new THREE.Vector3(0.42, 0.12, -1.9), 0.4);
+
+  return { group, materials: collectMaterials(group), hitRadius: 1.25, hitOffset: 0, baseScale: 1 };
+}
+
+function buildJet(): Built {
+  const group = new THREE.Group();
+  const skin = mat(0x2b3a44, 0x000000, 0, 0.88, 0.28);
+  const dark = mat(0x0b1117, 0x000000, 0, 0.75, 0.5);
+  const glow = glowMat(0x43f3ff, 1.1);
+  const glass = new THREE.MeshPhysicalMaterial({
+    color: 0x0a2028,
+    emissive: 0x43f3ff,
+    emissiveIntensity: 0.4,
+    metalness: 0.2,
+    roughness: 0.06,
+    clearcoat: 1,
+    transparent: true,
+    opacity: 0.75,
+  });
+
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.34, 2.2, 12), skin);
+  body.rotation.x = Math.PI / 2;
+  body.position.z = 0;
+  group.add(body);
+
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.23, 0.9, 12), skin);
+  nose.rotation.x = -Math.PI / 2;
+  nose.position.z = 1.5;
+  group.add(nose);
+
+  const canopy = new THREE.Mesh(new THREE.SphereGeometry(0.23, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), glass);
+  canopy.position.set(0, 0.22, 0.55);
+  canopy.scale.set(0.8, 0.55, 1.6);
+  group.add(canopy);
+
+  for (const side of [-1, 1]) {
+    const wing = new THREE.Mesh(new RoundedBoxGeometry(1.2, 0.07, 0.9, 3, 0.03), skin);
+    wing.position.set(side * 0.7, -0.04, -0.1);
+    wing.rotation.y = side * 0.42;
+    group.add(wing);
+    const edge = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.09, 1.0), glow);
+    edge.position.set(side * 1.22, -0.04, -0.28);
+    edge.rotation.y = side * 0.42;
+    group.add(edge);
+
+    const tail = new THREE.Mesh(new RoundedBoxGeometry(0.06, 0.42, 0.55, 3, 0.02), dark);
+    tail.position.set(side * 0.32, 0.25, -0.95);
+    tail.rotation.z = side * 0.3;
+    group.add(tail);
+  }
+
+  const engine = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 0.32, 10), dark);
+  engine.rotation.x = Math.PI / 2;
+  engine.position.z = -1.2;
+  group.add(engine);
+  const flame = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.8, 10, 1, true), glowMat(0x43f3ff, 0.5));
+  flame.name = 'jet-flame';
+  flame.rotation.x = Math.PI / 2;
+  flame.position.z = -1.65;
+  group.add(flame);
+  addGlow(group, 0x43f3ff, 0.9, new THREE.Vector3(0, 0, -1.85), 0.5);
+
+  return { group, materials: collectMaterials(group), hitRadius: 1.05, hitOffset: 0, baseScale: 1.3 };
 }
 
 function buildAlien(): Built {
@@ -2061,7 +2257,7 @@ function buildWarlord(): Built {
   return { group, materials: collectMaterials(group), hitRadius: 1.4, hitOffset: 1.2, baseScale: 1.2 };
 }
 
-function buildWarden(color = 0xff2f6d, accent = 0x43f3ff): Built {  const group = new THREE.Group();
+function buildJailer(color = 0xff2f6d, accent = 0x43f3ff): Built {  const group = new THREE.Group();
   const dark = mat(0x120d17, color, 0.12, 0.9, 0.3);
 
   const core = new THREE.Mesh(new THREE.IcosahedronGeometry(1.15, 1), mat(color, color, 2.2, 0.3, 0.25));
@@ -2097,7 +2293,7 @@ function buildWarden(color = 0xff2f6d, accent = 0x43f3ff): Built {  const group 
   return { group, materials: collectMaterials(group), hitRadius: 2.5, hitOffset: 0, baseScale: 1 };
 }
 
-function buildHalo(): Built {
+function buildAureole(): Built {
   const group = new THREE.Group();
   const color = 0x43f3ff;
 
@@ -2438,12 +2634,19 @@ export class Enemy {
         return buildGlbModel('raptor', 1.62) ?? buildDino(false);
       case 'imp': return buildImp();
       case 'gingerbread': return buildGingerbread();
-      case 'siren': return buildSirenTower();
+      case 'spire': return buildSpire();
       case 'banshee': return buildBanshee();
       case 'scarecrow': return buildScarecrow();
       case 'mummy': return buildMummy();
       case 'pumpkin': return buildPumpkin();
       case 'wendigo': return buildWendigo();
+      case 'helicopter': return buildHelicopter();
+      case 'jet': return buildJet();
+      case 'striker': return buildGlbModel('shipStriker', 5.0, undefined, 1.8, 'longest', false) ?? buildJet();
+      case 'omen': return buildGlbModel('shipOmen', 4.6, undefined, 2.2, 'longest', false) ?? buildMothership(0x8f5cff, 0x43f3ff);
+      case 'phantom': return buildGlbModel('phantom', 1.8, undefined, 0.8) ?? buildBanshee();
+      case 'hexer': return buildGlbModel('hexerRpg', 1.9, undefined, 0.8) ?? buildScarecrow();
+      case 'yeti': return buildGlbModel('yeti', 2.25, undefined, 1.0) ?? buildWendigo();
       case 'voidling': return buildVoidling();
       case 'demon': return buildDemon();
       case 'mech':
@@ -2453,13 +2656,13 @@ export class Enemy {
       case 'jester': return buildJester();
       case 'titan': return buildTitan();
       case 'warlord': return buildWarlord();
-      case 'warden': return buildWarden();
-      case 'barrage': return buildMothership(0x57ffa8, 0xff2fa8);
-      case 'halo': return buildHalo();
-      case 'hydra': return buildHive();
-      case 'twins': return buildWarden(0xffc247, 0xffd76e);
-      case 'shade': return buildWarden(0x8f7dff, 0x6b4dff);
-      case 'hoarder': return buildMothership(0xffc247, 0x43f3ff);
+      case 'jailer': return buildJailer();
+      case 'rainmaker': return buildMothership(0x57ffa8, 0xff2fa8);
+      case 'aureole': return buildAureole();
+      case 'brood': return buildHive();
+      case 'mirrored': return buildJailer(0xffc247, 0xffd76e);
+      case 'umbra': return buildJailer(0x8f7dff, 0x6b4dff);
+      case 'collector': return buildMothership(0xffc247, 0x43f3ff);
     }
   }
 
@@ -2559,9 +2762,9 @@ export class Enemy {
         this.updateWalker(adt, ctx, 1.5);
         this.shootAtPlayer(ctx, manager, 7.2, 5, 3.4, 0.035);
         break;
-      case 'siren':
+      case 'spire':
         this.updateWalker(adt, ctx, 3.5);
-        this.updateSiren(ctx, manager);
+        this.updateSpire(ctx, manager);
         break;
       case 'banshee':
         this.updateFlyer(adt, ctx, 8.5, 0.8);
@@ -2581,6 +2784,33 @@ export class Enemy {
       case 'wendigo':
         this.updateWalker(adt, ctx, 1.0);
         break;
+      case 'helicopter':
+        this.updateFlyer(adt, ctx, 9.5, 0.7);
+        this.shootAtPlayer(ctx, manager, 8, 8, 3.1, 0.03, 2);
+        break;
+      case 'jet':
+        this.updateFlyer(adt, ctx, 11.5, 1.7);
+        this.shootAtPlayer(ctx, manager, 12, 5, 2.2, 0.022, 2);
+        break;
+      case 'striker':
+        this.updateFlyer(adt, ctx, 10, 1.0);
+        this.shootAtPlayer(ctx, manager, 10, 7, 2.7, 0.026, 3);
+        break;
+      case 'omen':
+        this.updateFlyer(adt, ctx, 12, 0.5, true);
+        this.updateOmen(ctx, manager);
+        break;
+      case 'phantom':
+        this.updateFlyer(adt, ctx, 8, 0.9);
+        this.shootAtPlayer(ctx, manager, 9, 6, 3.4, 0.03);
+        break;
+      case 'hexer':
+        this.updateWalker(adt, ctx, 2.3);
+        this.shootAtPlayer(ctx, manager, 8.5, 6, 3.6, 0.035);
+        break;
+      case 'yeti':
+        this.updateWalker(adt, ctx, 1.0);
+        break;
       case 'voidling':
         this.updateWalker(adt, ctx, 1.0);
         break;
@@ -2592,32 +2822,32 @@ export class Enemy {
         this.updateWalker(adt, ctx, 4.5);
         this.shootAtPlayer(ctx, manager, 12, 7, 2.8, 0.02, 3);
         break;
-      case 'warden':
+      case 'jailer':
         this.updateFlyer(adt, ctx, 12, 0.4, true);
-        this.updateWarden(ctx, manager);
+        this.updateJailer(ctx, manager);
         break;
-      case 'barrage':
+      case 'rainmaker':
         this.updateFlyer(adt, ctx, 14, 0.35, true);
-        this.updateBarrage(ctx, manager);
+        this.updateRainmaker(ctx, manager);
         break;
-      case 'halo':
+      case 'aureole':
         this.updateFlyer(adt, ctx, 10.5, 0.7, true);
-        this.updateHalo(ctx, manager);
+        this.updateAureole(ctx, manager);
         break;
-      case 'hydra':
-        this.updateHydra(ctx, manager, adt);
+      case 'brood':
+        this.updateBrood(ctx, manager, adt);
         break;
-      case 'twins':
+      case 'mirrored':
         this.updateFlyer(adt, ctx, 8.5, 1.5, true);
-        this.updateTwins(ctx, manager);
+        this.updateMirrored(ctx, manager);
         break;
-      case 'shade':
+      case 'umbra':
         this.updateFlyer(adt, ctx, 7.5, 2.0, true);
-        this.updateShade(ctx, manager);
+        this.updateUmbra(ctx, manager);
         break;
-      case 'hoarder':
+      case 'collector':
         this.updateFlyer(adt, ctx, 13, 0.4, true);
-        this.updateHoarder(ctx, manager);
+        this.updateCollector(ctx, manager);
         break;
       case 'rex':
         this.updateWalker(adt, ctx, 2.6);
@@ -2700,7 +2930,19 @@ export class Enemy {
     }
   }
 
-  private updateSiren(ctx: CombatContext, manager: EnemyManager): void {
+  private updateOmen(ctx: CombatContext, manager: EnemyManager): void {
+    if (this.spawnT < 0.55) return;
+    if (this.attackTimer <= 0) {
+      this.attackTimer = 3.4;
+      this.radialBarrage(ctx, manager, 14, 8, 8, 0.17);
+    }
+    if (this.specialTimer <= 0) {
+      this.specialTimer = 2.6;
+      this.fireAimed(ctx, manager, 3, 10, 7, 0.02, 0.2);
+    }
+  }
+
+  private updateSpire(ctx: CombatContext, manager: EnemyManager): void {
     if (this.spawnT < 0.6) return;
     if (this.attackTimer <= 0) {
       this.attackTimer = 4.2;
@@ -2712,7 +2954,7 @@ export class Enemy {
     }
   }
 
-  private updateWarden(ctx: CombatContext, manager: EnemyManager): void {
+  private updateJailer(ctx: CombatContext, manager: EnemyManager): void {
     if (this.spawnT < 0.55) return;
     if (this.attackTimer <= 0) {
       this.attackTimer = 3.1;
@@ -2724,7 +2966,7 @@ export class Enemy {
     }
   }
 
-  private updateBarrage(ctx: CombatContext, manager: EnemyManager): void {
+  private updateRainmaker(ctx: CombatContext, manager: EnemyManager): void {
     if (this.spawnT < 0.55) return;
     if (this.attackTimer <= 0) {
       this.attackTimer = 3.7;
@@ -2748,7 +2990,7 @@ export class Enemy {
     }
   }
 
-  private updateHalo(ctx: CombatContext, manager: EnemyManager): void {
+  private updateAureole(ctx: CombatContext, manager: EnemyManager): void {
     if (this.spawnT < 0.55) return;
     if (this.attackTimer <= 0) {
       this.attackTimer = 2.9;
@@ -2761,7 +3003,7 @@ export class Enemy {
     }
   }
 
-  private updateTwins(ctx: CombatContext, manager: EnemyManager): void {
+  private updateMirrored(ctx: CombatContext, manager: EnemyManager): void {
     if (this.spawnT < 0.5) return;
     if (this.specialTimer <= 0) {
       this.specialTimer = 1.15;
@@ -2773,7 +3015,7 @@ export class Enemy {
     }
   }
 
-  private updateShade(ctx: CombatContext, manager: EnemyManager): void {
+  private updateUmbra(ctx: CombatContext, manager: EnemyManager): void {
     if (this.spawnT < 0.45) return;
     if (this.specialTimer <= 0) {
       this.specialTimer = 0.95;
@@ -2781,7 +3023,7 @@ export class Enemy {
     }
   }
 
-  private updateHoarder(ctx: CombatContext, manager: EnemyManager): void {
+  private updateCollector(ctx: CombatContext, manager: EnemyManager): void {
     if (this.spawnT < 0.55) return;
     if (this.attackTimer <= 0) {
       this.attackTimer = 3.4;
@@ -2874,7 +3116,7 @@ export class Enemy {
     }
   }
 
-  private updateHydra(ctx: CombatContext, manager: EnemyManager, dt: number): void {
+  private updateBrood(ctx: CombatContext, manager: EnemyManager, dt: number): void {
     const dx = ctx.player.pos.x - this.group.position.x;
     const dz = ctx.player.pos.z - this.group.position.z;
     const distance = Math.hypot(dx, dz);
@@ -3044,7 +3286,7 @@ export class Enemy {
     if (this.kind === 'pumpkin') {
       this.group.rotation.z = Math.sin(this.age * 2.2) * 0.07;
     }
-    if (this.kind === 'siren') {
+    if (this.kind === 'spire') {
       this.group.rotation.z = Math.sin(this.age * 1.2) * 0.02;
     }
 
@@ -3063,13 +3305,19 @@ export class Enemy {
         child.rotation.y += dt * 19;
       } else if (child.name === 'drone-halo') {
         child.rotation.z += dt * 0.8;
+      } else if (child.name === 'heli-rotor') {
+        child.rotation.y += dt * 26;
+      } else if (child.name === 'tail-rotor') {
+        child.rotation.x += dt * 42;
+      } else if (child.name === 'jet-flame') {
+        child.scale.set(1 + Math.sin(this.age * 34) * 0.12, 1 + Math.sin(this.age * 27) * 0.18, 1);
       }
     }
 
     if (this.limbs) {
-      const swing = this.kind === 'hydra' ? 2.2 : 6.5;
+      const swing = this.kind === 'brood' ? 2.2 : 6.5;
       const speed = this.kind === 'brute' ? 0.6 : 1;
-      if (this.kind !== 'hydra') {
+      if (this.kind !== 'brood') {
         this.limbs.leftLeg.rotation.x = Math.sin(this.age * swing) * 0.55 * speed;
         this.limbs.rightLeg.rotation.x = -Math.sin(this.age * swing) * 0.55 * speed;
         this.limbs.leftArm.rotation.x = -1.1 + Math.sin(this.age * swing) * 0.12;

@@ -8,6 +8,11 @@ export type ModelKey =
   | 'shotgun'
   | 'sniper'
   | 'coil'
+  | 'shipStriker'
+  | 'shipOmen'
+  | 'phantom'
+  | 'hexerRpg'
+  | 'yeti'
   | 'zombie'
   | 'alien'
   | 'raptor'
@@ -39,6 +44,11 @@ const MODEL_URLS: Record<ModelKey, string> = {
   shotgun: `${base}models/shotgun.glb`,
   sniper: `${base}models/sniper.glb`,
   coil: `${base}models/coil.glb`,
+  shipStriker: `${base}models/ship-striker.glb`,
+  shipOmen: `${base}models/ship-omen.glb`,
+  phantom: `${base}models/phantom.glb`,
+  hexerRpg: `${base}models/hexer-rpg.glb`,
+  yeti: `${base}models/yeti.glb`,
   zombie: `${base}models/zombie.glb`,
   alien: `${base}models/alien.glb`,
   raptor: `${base}models/raptor.glb`,
@@ -208,5 +218,5 @@ export function getModelMetrics(key: ModelKey): ModelMetrics | null {
 }
 
 export function preloadGameAssets(): void {
-  preloadModels(['akm', 'rifle', 'smg', 'shotgun', 'sniper', 'coil', 'zombie', 'alien', 'raptor', 'trex', 'robot']);
+  preloadModels(['akm', 'rifle', 'smg', 'shotgun', 'sniper', 'coil', 'shipStriker', 'shipOmen', 'phantom', 'hexerRpg', 'yeti', 'zombie', 'alien', 'raptor', 'trex', 'robot']);
 }

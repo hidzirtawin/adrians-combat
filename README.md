@@ -2,7 +2,7 @@
 
 A camera-first AR shooter that runs in the phone browser. No keyboard, no controller: point your phone, hold **FIRE**, tap **RELOAD**, and walk around your room, garden or street. Hold **FIRE** to charge and throw your selected special bomb.
 
-Inspired by the solo mode of **Light Wars AR**. Not affiliated with it.
+An original camera-first AR shooter built for the phone browser.
 
 ---
 
@@ -15,9 +15,9 @@ Inspired by the solo mode of **Light Wars AR**. Not affiliated with it.
 - **Armory with 3D preview** — drag to rotate each weapon in a studio render. Six distinct authored gun models, not one tinted rifle.
 - **Special bombs** — hold **FIRE** for 0.9 s to charge a stronger Frag, Shock or Cryo blast. A ring fills around the button; the blast gets +35% damage and +18% radius.
 - **Progression** — earn Salvage from kills, waves and bosses. Locked weapons are greyed out until bought; the game-over screen shows your next unlock and progress. The first run each day pays 2× Salvage.
-- **Enemies** — drones, UFOs, zombies, brutes, three-eyed aliens, raptors, giggle imps, voidlings, hellbrutes, omega mechs, gingerbread men, scarecrows, banshees, mummies, jack-o'-lanterns, wendigos and Siren Towers, each with their own AI, voice and projectiles. Spawn pools are randomised every wave.
+- **Enemies** — Hellwasps, Grave Saucers, Gravewalkers, Gorehulks, Void Spawn, Ripclaws, Cacklers, Void Larvae, Hellbrutes, Iron Reapers, Cinderbread, Straw Reapers, Shriek Wraiths, Tomb Bound, Hell Lanterns, Frost Maws, Scream Spires, Rotor Reavers, Sky Shredders, Starfangs, Black Omens, Pale Phantoms, Hex Casters and Rime Terrors, each with their own AI, voice and projectiles. Spawn pools are randomised every wave.
 - **Four difficulty levels** — Easy / Normal / Hard / Insane. Scales enemy HP, damage, speed, horde size, shield regen and score. Pick it from the main menu or Settings; it persists.
-- **Eleven bosses** every five waves — Warden, Tyrant Rex, The Jester, Titan Zero, Warlord, Barrage, Halo, Hydra, Twins, Shade and Hoarder. Original dinosaur, cartoon, comic-cosmic, symbiote, fighting-game and arcade-robot homage archetypes, not licensed characters.
+- **Eleven bosses** every five waves — The Jailer, Bone Maw, The Grinning One, Void Colossus, The Butcher King, The Rainmaker, Aureole, The Brood Queen, The Mirrored, Umbra and The Collector. Original horror archetypes, not licensed characters.
 - **Waves, combo multiplier, power-ups** — repair, shield, overcharge, rapid fire, cryo field. Drops magnetise to the player.
 - **Squad rooms** — 4-letter codes and nearby-room discovery for phones on the same Wi-Fi.
   - **Free For All** — live score battle, 2–6 phones.
@@ -27,7 +27,7 @@ Inspired by the solo mode of **Light Wars AR**. Not affiliated with it.
 - **Realistic GLB weapon** — an authored AKM viewmodel with wood/metal materials, muzzle flash, live muzzle light, recoil, reload dip and idle sway.
 - **Realistic feedback** — camera recoil, damage-direction arrows, multi-kill callouts, haptics and positional 3D audio.
 - **AR calibration** — field-of-view slider to match your camera, optional camera torch, and aim-assist / haptics / spatial-audio toggles.
-- **PBR visual overhaul** — environment reflections, clearcoat armour, procedural surface detail, redesigned quadcopter drones, smooth UFOs, rounded zombies, dinosaurs, gingerbread, scarecrows, mummies, banshees, jack-o'-lanterns, wendigos and Siren Towers.
+- **PBR visual overhaul** — environment reflections, clearcoat armour, procedural surface detail, plus authored GLB starships and monsters from CC0 packs.
 - **Glow & shadows** — emissive cores, eyes and thrusters, plus ground/air contact shadows for every enemy.
 - **Enemy contact shadows** — flying drones, UFOs and bosses cast a grounding shadow on the floor.
 - **PWA manifest and icons** — add it to your home screen for a fuller view where supported.
@@ -41,6 +41,13 @@ Character models and the rifle are authored GLB assets; gunshots and reloads use
 The progression loop is built for retention and optional monetization: daily 2× runs, weapon unlock goals, next-unlock progress bars and a cosmetic-friendly economy. See [docs/MONETIZATION.md](docs/MONETIZATION.md) for the recommended store, rewarded-ad and IAP plan, plus Capacitor packaging steps for iOS and Android.
 
 A starter `capacitor.config.json` is included. The web build stays fully playable without any store/ads integration.
+
+## Live build
+
+- **Cloudflare:** https://adrians-combat.hidzir215.workers.dev
+- **GitHub:** https://github.com/hidzirtawin/adrians-combat
+- Deploy again with `npm run deploy` (Cloudflare Workers + static assets).
+- The Cloudflare build is solo-only because static hosting has no game WebSocket server. For same-Wi-Fi squad rooms, run `npm run party` and open the HTTPS LAN URL.
 
 ## Run it locally
 
@@ -96,7 +103,7 @@ Same Wi-Fi only, up to six phones. The room server keeps a scoreboard; it does n
 
 ### An honest limitation
 
-Light Wars AR uses ARKit/ARCore to share a physical world map between phones. Mobile browsers cannot do that reliably. ADRIAN'S COMBAT therefore delivers:
+Native AR games use ARKit/ARCore to share a physical world map between phones. Mobile browsers cannot do that reliably. ADRIAN'S COMBAT therefore delivers:
 
 - true camera + motion + GPS **solo** AR;
 - same-Wi-Fi **score rooms** for FFA and Teams;
@@ -176,23 +183,23 @@ Boss HP scales separately (70% / 100% / 135% / 190%). Enemy speed also rises sli
 
 ## The eleven bosses
 
-Boss order: 5 Warden, 10 Tyrant Rex, 15 The Jester, 20 Titan Zero, 25 Warlord, 30 Barrage, 35 Halo, 40 Hydra, 45 Twins, 50 Shade, 55 Hoarder, then the cycle repeats.
+Boss order: 5 The Jailer, 10 Bone Maw, 15 The Grinning One, 20 Void Colossus, 25 The Butcher King, 30 The Rainmaker, 35 Aureole, 40 The Brood Queen, 45 The Mirrored, 50 Umbra, 55 The Collector, then the cycle repeats.
 
 | Boss | Style |
 | --- | --- |
-| **Warden** | Orbiting drone fortress; radial barrage + aimed bursts. |
-| **Tyrant Rex** | Huge cartoon dinosaur; charges, bites and roars shockwave blasts. |
-| **The Jester** | Floating cartoon boss; confetti projectiles, mallet, summons giggle imps. |
-| **Titan Zero** | Cosmic armoured titan; dense energy fans and a summon phase. |
-| **Warlord** | Fast fighting-game dictator; rushdown bursts and psycho energy. |
-| **Barrage** | Heavy saucer; dense projectile fans, summons escorts at 50% HP. |
-| **Halo** | Ringed sentinel; twin expanding projectile rings + aimed fan. |
-| **Hydra** | Ground queen; closes in, summons zombies, radial fire. |
-| **Twins** | Two fast amber drone bosses at once. |
-| **Shade** | Fast, aggressive aimed bursts. Keep turning. |
-| **Hoarder** | Armoured saucer that keeps summoning UFOs. |
+| **The Jailer** | Orbiting sentinel fortress; radial barrage + aimed bursts. |
+| **Bone Maw** | Huge undead dinosaur; charges, bites and roars shockwave blasts. |
+| **The Grinning One** | Floating horror clown; confetti projectiles, mallet, summons Cacklers. |
+| **Void Colossus** | Cosmic armoured titan; dense energy fans and a summon phase. |
+| **The Butcher King** | Fast melee tyrant; rushdown bursts and brutal energy. |
+| **The Rainmaker** | Heavy saucer; dense projectile fans, summons escorts at 50% HP. |
+| **Aureole** | Ringed sentinel; twin expanding projectile rings + aimed fan. |
+| **The Brood Queen** | Ground queen; closes in, summons Gravewalkers, radial fire. |
+| **The Mirrored** | Two fast amber sentinels at once. |
+| **Umbra** | Fast, aggressive aimed bursts. Keep turning. |
+| **The Collector** | Armoured saucer that keeps summoning Grave Saucers. |
 
-Every fifth wave cycles through them. The new villains are original homage designs, not licensed Marvel, Capcom, Toy Story or other characters.
+Every fifth wave cycles through them. All villains are original designs, not licensed characters.
 
 ---
 
@@ -237,7 +244,6 @@ server/
 ## Credits
 
 - Built with [Three.js](https://threejs.org/) + Vite.
-- Design inspiration: [Light Wars AR](https://lightwarsar.com) — not affiliated.
 - **FPS rifle model**: “AKM” by **J-Toastie** via [Poly Pizza](https://poly.pizza/m/ZBBoDqAn0A), CC-BY.
 - **Characters**: Zombie, Alien, Velociraptor, T-Rex and Animated Robot by **Quaternius** via [Poly Pizza](https://poly.pizza/u/Quaternius), CC0.
 - **Gunshot recordings**: “Gunshot Sounds” by **Tabasco** via [OpenGameArt](https://opengameart.org/content/gunshot-sounds), CC0.
@@ -245,5 +251,13 @@ server/
 - UI, arena, bosses, effects and all remaining audio are generated in this project.
 
 See [CREDITS.md](CREDITS.md) for full asset links and license text.
+
+### Open asset sources used
+
+- [Papyszoo/CC0-Public-Domain-Models](https://github.com/Papyszoo/CC0-Public-Domain-Models) — the CC0 pack used for the Striker/Omen starships, Phantom, Hex Caster and Rime Terror.
+- [KhronosGroup/glTF-Sample-Assets](https://github.com/KhronosGroup/glTF-Sample-Assets) — PBR glTF reference models.
+- [olatunde85/3d-gen](https://github.com/olatunde85/3d-gen) — CC0 MakeHuman pipeline for realistic rigged humans.
+- [madjin/awesome-cc0](https://github.com/madjin/awesome-cc0) — curated CC0 art, 3D, texture and audio links.
+- Poly Haven, Kenney, Quaternius and KayKit for photoreal PBR and stylized CC0 packs.
 
 Have fun — and happy hunting.
