@@ -50,6 +50,7 @@ export class CameraAR {
   private watchId: number | null = null;
   private gyroTimer = 0;
   private wakeLock: { release: () => Promise<void> } | null = null;
+  private videoResumeBound = false;
 
   constructor(canvas: HTMLElement) {
     this.canvas = canvas;
@@ -82,6 +83,7 @@ export class CameraAR {
     // Kick off permission prompts inside the original user gesture.
     await this.requestOrientationPermission();
     await this.startCamera();
+    this.bindVideoResume();
 
     this.startGeo();
     void this.requestWakeLock();
@@ -204,8 +206,10 @@ export class CameraAR {
       this.showCameraOffline('camera-api-unavailable');
       return false;
     }
+
+    let stream: MediaStream | null = null;
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      stream = await navigator.mediaDevices.getUserMedia({
         audio: false,
         video: {
           facingMode: { ideal: 'environment' },
@@ -213,18 +217,111 @@ export class CameraAR {
           height: { ideal: 1080 },
         },
       });
-      this.stream = stream;
-      this.video.srcObject = stream;
-      this.video.classList.add('active');
-      await this.video.play().catch(() => {});
-      this.cameraOk = true;
-      if (settings.torch) void this.setTorch(true);
-      return true;
-    } catch (error) {
-      console.warn('[CameraAR] camera unavailable', error);
-      this.showCameraOffline('camera-permission');
-      return false;
+    } catch {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: { facingMode: 'environment' },
+        });
+      } catch {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
+        } catch (error) {
+          console.warn('[CameraAR] camera unavailable', error);
+          this.showCameraOffline('camera-permission');
+          return false;
+        }
+      }
     }
+
+    this.stream = stream;
+    this.video.muted = true;
+    this.video.playsInline = true;
+    this.video.autoplay = true;
+    this.video.setAttribute('playsinline', 'true');
+    this.video.setAttribute('webkit-playsinline', 'true');
+    this.video.setAttribute('autoplay', 'true');
+    this.video.classList.add('active');
+    this.video.srcObject = stream;
+
+    await this.waitForVideo();
+    const played = await this.playVideo();
+    if (!played || this.video.videoWidth <= 0) {
+      // Some Android browsers resolve play() before the first frame exists.
+      // Keep the element alive; the first tap/visibility change retries it.
+      window.setTimeout(() => {
+        void this.playVideo().then((ok) => {
+          if (ok) {
+            this.cameraOk = true;
+            this.video.classList.add('active');
+            this.onChange?.();
+          }
+        });
+      }, 450);
+    }
+
+    if (settings.torch) void this.setTorch(true);
+    this.onChange?.();
+    return this.cameraOk;
+  }
+
+  private waitForVideo(): Promise<void> {
+    if (this.video.readyState >= 2) return Promise.resolve();
+    return new Promise((resolve) => {
+      let settled = false;
+      const done = (): void => {
+        if (settled) return;
+        settled = true;
+        this.video.removeEventListener('loadedmetadata', done);
+        this.video.removeEventListener('canplay', done);
+        resolve();
+      };
+      this.video.addEventListener('loadedmetadata', done, { once: true });
+      this.video.addEventListener('canplay', done, { once: true });
+      window.setTimeout(done, 1400);
+    });
+  }
+
+  private async playVideo(): Promise<boolean> {
+    try {
+      await this.video.play();
+    } catch {
+      /* autoplay can be blocked on some Android builds */
+    }
+    const ready = this.video.videoWidth > 0 && !this.video.paused;
+    if (ready) {
+      this.cameraOk = true;
+      this.video.classList.add('active');
+      this.onChange?.();
+    }
+    return ready;
+  }
+
+  private bindVideoResume(): void {
+    if (this.videoResumeBound) return;
+    this.videoResumeBound = true;
+    const resume = (): void => {
+      if (!this.active || !this.video.srcObject) return;
+      if (this.video.paused || this.video.readyState < 2 || this.video.videoWidth === 0) {
+        void this.playVideo();
+      }
+    };
+    window.addEventListener('pointerdown', resume, true);
+    window.addEventListener('touchstart', resume, { capture: true, passive: true });
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) resume();
+    });
+  }
+
+  async retryCamera(): Promise<boolean> {
+    if (!this.active) return false;
+    if (this.cameraOk) return true;
+    if (this.stream) {
+      for (const track of this.stream.getTracks()) track.stop();
+      this.stream = null;
+    }
+    this.video.srcObject = null;
+    return this.startCamera();
   }
 
   private showCameraOffline(reason: string): void {

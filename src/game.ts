@@ -379,6 +379,7 @@ export class Game {
     });
     on('pauseBtn', 'click', () => this.togglePause());
     on('btnAim', 'click', () => this.toggleAim());
+    on('cameraRetry', 'click', () => void this.retryCamera());
 
     on('btnSquad', 'click', () => this.openSquad());
     on('btnSquadClose', 'click', () => this.setScreen('menu'));
@@ -1730,6 +1731,16 @@ export class Game {
   private refreshTracking(): void {
     const gear = this.cameraAR.gear;
     this.hud.setTracking(gear.camera, gear.gyro, gear.gps);
+    this.hud.setCameraRetry(this.cameraActive && !gear.camera);
+  }
+
+  private async retryCamera(): Promise<void> {
+    if (!this.cameraActive) return;
+    this.hud.toast('RETRYING CAMERA…', 1.2);
+    const ok = await this.cameraAR.retryCamera();
+    this.refreshTracking();
+    this.hud.setCameraRetry(!ok);
+    this.hud.toast(ok ? 'CAMERA ONLINE' : 'CAMERA BLOCKED · ALLOW ACCESS IN BROWSER', 2.4);
   }
 
   // ───────────────────────────── Weapons ─────────────────────────────
@@ -2116,6 +2127,7 @@ export class Game {
     this.audio.stopAmbience();
     this.hud.hide();
     this.hud.setCameraAR(false);
+    this.hud.setCameraRetry(false);
     this.hud.setTracking(false, false, false);
     this.hud.hideARHint();
     this.hud.setSquad(null);

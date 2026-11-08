@@ -3379,3 +3379,38 @@ body.aiming #crosshair {
 @media (max-width: 620px) {
   .track-volume { width: 64px; }
 }
+
+/* Force the camera video onto its own compositing layer on Android. */
+#arVideo {
+  background: transparent;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
+}
+
+#game-canvas {
+  background: transparent !important;
+}
+
+body.camera-ar #app {
+  background: transparent;
+}
+
+#cameraRetry {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 30;
+  pointer-events: auto;
+  padding: 12px 18px;
+  border: 1px solid rgba(255, 194, 71, 0.7);
+  background: rgba(20, 13, 3, 0.92);
+  color: #ffe3ad;
+  font-family: var(--display);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  box-shadow: 0 0 34px rgba(255, 194, 71, 0.25);
+}
+
+#cameraRetry.hidden { display: none; }

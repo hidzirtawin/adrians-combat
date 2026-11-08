@@ -45,6 +45,7 @@ export class HUD {
   private ammoMax = el<HTMLElement>('ammoMax');
   private ammoRow = el<HTMLElement>('ammoRow');
   private ammoPips = el<HTMLElement>('ammoPips');
+  private cameraRetry = el<HTMLButtonElement>('cameraRetry');
   private reloadBar = el<HTMLElement>('reloadBar');
   private reloadFill = this.reloadBar.querySelector('i') as HTMLElement;
   private weaponSlots: HTMLButtonElement[] = [];
@@ -169,6 +170,10 @@ export class HUD {
       this.shieldFill.style.transform = `scaleX(${Math.max(0, shield / player.maxShield)})`;
     }
     this.damageVignette.style.opacity = String(this.damageLevel);
+  }
+
+  setCameraRetry(show: boolean): void {
+    this.cameraRetry.classList.toggle('hidden', !show);
   }
 
   setWeapon(system: WeaponSystem): void {
