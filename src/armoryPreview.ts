@@ -128,9 +128,6 @@ export class ArmoryPreview {
           return;
         }
         const built = buildProceduralWeapon(id);
-        built.group.traverse((obj) => {
-          if (obj.name === 'viewmodel-hand') obj.visible = false;
-        });
         built.group.visible = false;
         this.root.add(built.group);
         this.models.set(id, built.group);
