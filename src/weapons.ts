@@ -259,19 +259,6 @@ function polymerMaterial(color = 0x151a1f, roughness = 0.72): THREE.MeshPhysical
   });
 }
 
-function gloveMaterial(): THREE.MeshPhysicalMaterial {
-  return new THREE.MeshPhysicalMaterial({
-    color: 0x1a232d,
-    metalness: 0.05,
-    roughness: 0.72,
-    clearcoat: 0.12,
-    clearcoatRoughness: 0.72,
-    sheen: 0.45,
-    sheenRoughness: 0.85,
-    sheenColor: new THREE.Color(0x3b4b59),
-  });
-}
-
 interface GunRig {
   mixer: THREE.AnimationMixer;
   idle: THREE.AnimationAction | null;
@@ -311,7 +298,6 @@ function buildRifleModel(style: RifleStyle): WeaponModel {
   const dark = gunMaterial(0x14181e, 0x000000, 0, 0.9, 0.4);
   const steel = gunMaterial(0x3b4550, 0x000000, 0, 0.96, 0.26);
   const polymer = polymerMaterial(0x1b2128, 0.74);
-  const glove = gloveMaterial();
   const accent = new THREE.MeshPhysicalMaterial({
     color: 0x101418,
     emissive: style.accent,
@@ -574,33 +560,6 @@ function buildRifleModel(style: RifleStyle): WeaponModel {
     group.add(vg);
   }
 
-  // ── Gloved hands ──
-  const addHand = (position: THREE.Vector3, rotation: THREE.Euler): THREE.Group => {
-    const hand = new THREE.Group();
-    hand.name = 'viewmodel-hand';
-    hand.position.copy(position);
-    hand.rotation.copy(rotation);
-    const palm = new THREE.Mesh(new RoundedBoxGeometry(0.062, 0.1, 0.085, 3, 0.022), glove);
-    hand.add(palm);
-    const thumb = new THREE.Mesh(new THREE.CapsuleGeometry(0.018, 0.045, 4, 8), glove);
-    thumb.position.set(-0.03, 0.035, 0.02);
-    thumb.rotation.z = 0.9;
-    hand.add(thumb);
-    for (let i = 0; i < 4; i++) {
-      const finger = new THREE.Mesh(new THREE.CapsuleGeometry(0.013, 0.05, 4, 8), glove);
-      finger.position.set(0, 0.042 - i * 0.022, -0.05);
-      finger.rotation.x = 1.35;
-      hand.add(finger);
-    }
-    group.add(hand);
-    return hand;
-  };
-
-  addHand(new THREE.Vector3(0.0, -0.19, 0.13), new THREE.Euler(0.05, 0.08, 0.06));
-  if (!style.verticalGrip) {
-    addHand(new THREE.Vector3(0, -0.1, hgZ + 0.06), new THREE.Euler(-0.15, 0, 0));
-  }
-
   group.position.set(0, 0.015, 0.03);
   return {
     group,
@@ -619,7 +578,6 @@ function buildPistolModel(style: RifleStyle, sciFi = false, auto = false): Weapo
   const dark = gunMaterial(0x14181e, 0x000000, 0, 0.88, 0.42);
   const steel = gunMaterial(0x59636f, 0x000000, 0, 0.96, 0.24);
   const polymer = polymerMaterial(0x1b2128, 0.72);
-  const glove = gloveMaterial();
   const accent = new THREE.MeshPhysicalMaterial({
     color: 0x101418,
     emissive: style.accent,
@@ -711,24 +669,6 @@ function buildPistolModel(style: RifleStyle, sciFi = false, auto = false): Weapo
     group.add(plate);
   }
 
-  const hand = new THREE.Group();
-  hand.name = 'viewmodel-hand';
-  hand.position.set(0.012, -0.18, 0.1);
-  hand.rotation.set(0.08, 0.04, 0.08);
-  const palm = new THREE.Mesh(new RoundedBoxGeometry(0.062, 0.1, 0.085, 3, 0.022), glove);
-  hand.add(palm);
-  const thumb = new THREE.Mesh(new THREE.CapsuleGeometry(0.018, 0.045, 4, 8), glove);
-  thumb.position.set(-0.03, 0.035, 0.02);
-  thumb.rotation.z = 0.9;
-  hand.add(thumb);
-  for (let i = 0; i < 4; i++) {
-    const finger = new THREE.Mesh(new THREE.CapsuleGeometry(0.013, 0.05, 4, 8), glove);
-    finger.position.set(0, 0.042 - i * 0.022, -0.05);
-    finger.rotation.x = 1.35;
-    hand.add(finger);
-  }
-  group.add(hand);
-
   group.position.set(0, 0.02, 0.02);
   return {
     group,
@@ -752,7 +692,6 @@ function buildRevolverModel(style: RifleStyle): WeaponModel {
     sheen: 0.2,
     sheenColor: new THREE.Color(0x8a5a34),
   });
-  const glove = gloveMaterial();
   const accent = new THREE.MeshPhysicalMaterial({
     color: 0x1a1206,
     emissive: style.accent,
@@ -810,24 +749,6 @@ function buildRevolverModel(style: RifleStyle): WeaponModel {
   trigger.position.set(0, -0.045, 0.05);
   trigger.rotation.x = 0.2;
   group.add(trigger);
-
-  const hand = new THREE.Group();
-  hand.name = 'viewmodel-hand';
-  hand.position.set(0.012, -0.16, 0.13);
-  hand.rotation.set(0.05, 0.04, 0.08);
-  const palm = new THREE.Mesh(new RoundedBoxGeometry(0.062, 0.1, 0.085, 3, 0.022), glove);
-  hand.add(palm);
-  const thumb = new THREE.Mesh(new THREE.CapsuleGeometry(0.018, 0.045, 4, 8), glove);
-  thumb.position.set(-0.03, 0.035, 0.02);
-  thumb.rotation.z = 0.9;
-  hand.add(thumb);
-  for (let i = 0; i < 4; i++) {
-    const finger = new THREE.Mesh(new THREE.CapsuleGeometry(0.013, 0.05, 4, 8), glove);
-    finger.position.set(0, 0.042 - i * 0.022, -0.05);
-    finger.rotation.x = 1.35;
-    hand.add(finger);
-  }
-  group.add(hand);
 
   group.position.set(0, 0.02, 0.02);
   return {
@@ -891,7 +812,7 @@ export class WeaponSystem {
   private swayY = 0;
   private bob = 0;
   private autoReload = -1;
-  private basePosition = new THREE.Vector3(0.3, -0.32, -0.84);
+  private basePosition = new THREE.Vector3(0.0, -0.3, -0.8);
   private idle = 0;
   private muzzleWorld = new THREE.Vector3();
   private muzzleFlashTex = makeFlashTexture();
@@ -991,71 +912,12 @@ export class WeaponSystem {
     holder.name = 'glb-gun';
     holder.add(built.root);
     model.group.add(holder);
-    model.group.add(this.buildViewmodelHands());
 
     model.rig = undefined;
     model.magazine = undefined;
     model.bolt = undefined;
     model.muzzle = new THREE.Vector3(...visual.muzzle);
     model.ejectPort = new THREE.Vector3(...visual.eject);
-  }
-
-  private buildViewmodelHands(): THREE.Group {
-    const group = new THREE.Group();
-    const glove = gloveMaterial();
-    const addHand = (
-      palmPosition: THREE.Vector3,
-      palmRotation: THREE.Euler,
-      curl: number,
-    ): void => {
-      const hand = new THREE.Group();
-      hand.position.copy(palmPosition);
-      hand.rotation.copy(palmRotation);
-      const palm = new THREE.Mesh(new RoundedBoxGeometry(0.09, 0.12, 0.11, 4, 0.025), glove);
-      hand.add(palm);
-      const thumb = new THREE.Mesh(new THREE.CapsuleGeometry(0.018, 0.055, 4, 8), glove);
-      thumb.position.set(-0.045, 0.03, 0.04);
-      thumb.rotation.z = 0.9;
-      hand.add(thumb);
-      for (let i = 0; i < 4; i++) {
-        const finger = new THREE.Mesh(new THREE.CapsuleGeometry(0.013, 0.055, 4, 8), glove);
-        finger.position.set(0, 0.045 - i * 0.023, -0.055);
-        finger.rotation.x = curl + i * 0.05;
-        hand.add(finger);
-      }
-      const cuff = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.07, 0.13, 8), glove);
-      cuff.position.set(0, -0.1, 0.06);
-      cuff.rotation.x = -0.25;
-      hand.add(cuff);
-      hand.scale.setScalar(1.6);
-      group.add(hand);
-    };
-
-    // Trigger hand and support hand, sized for the 1.75-unit viewmodel.
-    addHand(new THREE.Vector3(0.055, -0.08, 0.37), new THREE.Euler(0.1, 0, 0), 1.25);
-    addHand(new THREE.Vector3(0.0, 0.01, -0.38), new THREE.Euler(0.15, 0, 0), 1.45);
-
-    const forearm = new THREE.Mesh(new THREE.CapsuleGeometry(0.05, 0.3, 4, 10), glove);
-    forearm.position.set(0.14, -0.34, 0.4);
-    forearm.rotation.set(0.3, 0.1, -0.5);
-    forearm.scale.setScalar(1.6);
-    group.add(forearm);
-
-    const supportForearm = new THREE.Mesh(new THREE.CapsuleGeometry(0.05, 0.3, 4, 10), glove);
-    supportForearm.position.set(-0.06, -0.3, -0.24);
-    supportForearm.rotation.set(-0.55, 0, 0.5);
-    supportForearm.scale.setScalar(1.6);
-    group.add(supportForearm);
-
-    group.traverse((obj) => {
-      const mesh = obj as THREE.Mesh;
-      if (mesh.isMesh) {
-        mesh.castShadow = false;
-        mesh.receiveShadow = false;
-        mesh.frustumCulled = false;
-      }
-    });
-    return group;
   }
 
   private resetGunRig(model: WeaponModel): void {
@@ -1357,10 +1219,10 @@ export class WeaponSystem {
 
     // Weapon sway + walk bob.
     const portrait = window.innerHeight > window.innerWidth * 0.9;
-    const targetX = portrait ? 0.2 : 0.3;
-    const targetY = portrait ? -0.26 : -0.32;
-    const targetZ = portrait ? -0.76 : -0.84;
-    const targetScale = portrait ? 0.34 : 0.45;
+    const targetX = 0.0;
+    const targetY = portrait ? -0.25 : -0.3;
+    const targetZ = portrait ? -0.72 : -0.8;
+    const targetScale = portrait ? 0.4 : 0.5;
     const layoutBlend = 1 - Math.exp(-8 * dt);
     this.basePosition.x += (targetX - this.basePosition.x) * layoutBlend;
     this.basePosition.y += (targetY - this.basePosition.y) * layoutBlend;

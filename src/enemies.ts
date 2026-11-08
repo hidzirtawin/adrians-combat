@@ -1174,6 +1174,7 @@ function buildScarecrow(): Built {
   const group = new THREE.Group();
   const wood = mat(0x5a3c22, 0x000000, 0, 0.1, 0.85);
   const burlap = mat(0x9c7a4a, 0x000000, 0, 0.05, 0.82);
+  const burlapLight = mat(0xb38c58, 0x000000, 0, 0.04, 0.78);
   const dark = mat(0x1a1410, 0x000000, 0, 0.2, 0.75);
   const straw = mat(0xd8bf72, 0x000000, 0, 0.05, 0.75);
   const glow = mat(0xff8a3d, 0xff8a3d, 2.2, 0.2, 0.3);
@@ -1210,12 +1211,62 @@ function buildScarecrow(): Built {
     const sleeve = new THREE.Mesh(new RoundedBoxGeometry(0.55, 0.16, 0.22, 3, 0.04), burlap);
     sleeve.position.set(side * 0.45, 1.55, 0);
     group.add(sleeve);
-    for (let i = 0; i < 3; i++) {
-      const bit = new THREE.Mesh(new THREE.ConeGeometry(0.035, 0.35, 5), straw);
-      bit.position.set(side * 0.76, 1.55 + (i - 1) * 0.08, 0);
-      bit.rotation.z = side * (0.7 + i * 0.2);
-      group.add(bit);
+
+    const cuff = new THREE.Mesh(new THREE.CylinderGeometry(0.105, 0.125, 0.09, 10), burlap);
+    cuff.rotation.z = Math.PI / 2;
+    cuff.position.set(side * 0.74, 1.55, 0);
+    group.add(cuff);
+
+    const tie = new THREE.Mesh(new THREE.TorusGeometry(0.112, 0.015, 6, 14), dark);
+    tie.rotation.y = Math.PI / 2;
+    tie.position.set(side * 0.74, 1.55, 0);
+    group.add(tie);
+
+    const hand = new THREE.Group();
+    hand.position.set(side * 0.83, 1.5, 0.02);
+    hand.rotation.z = side * 0.18;
+
+    const palm = new THREE.Mesh(new RoundedBoxGeometry(0.22, 0.18, 0.19, 3, 0.05), burlapLight);
+    hand.add(palm);
+
+    const thumb = new THREE.Mesh(new THREE.CapsuleGeometry(0.03, 0.09, 4, 8), burlapLight);
+    thumb.position.set(side * 0.02, 0.09, 0.1);
+    thumb.rotation.set(0.5, 0, side * 0.9);
+    hand.add(thumb);
+    const thumbTip = new THREE.Mesh(new THREE.ConeGeometry(0.022, 0.08, 5), straw);
+    thumbTip.position.set(side * 0.06, 0.12, 0.15);
+    thumbTip.rotation.set(1.1, 0, side * 1.1);
+    hand.add(thumbTip);
+
+    for (let i = 0; i < 4; i++) {
+      const finger = new THREE.Mesh(new THREE.CapsuleGeometry(0.028, 0.11, 4, 8), burlapLight);
+      finger.position.set(side * 0.12, 0.055 - i * 0.05, 0.035 - i * 0.005);
+      finger.rotation.z = side * -Math.PI / 2;
+      finger.rotation.y = (i - 1.5) * 0.1;
+      hand.add(finger);
+
+      const tip = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.09, 5), straw);
+      tip.position.set(side * 0.22, 0.055 - i * 0.05, 0.035 - i * 0.005);
+      tip.rotation.z = side * -Math.PI / 2;
+      tip.rotation.x = (i - 1.5) * 0.12;
+      hand.add(tip);
     }
+
+    for (let i = 0; i < 3; i++) {
+      const stitch = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.09, 0.012), dark);
+      stitch.position.set((i - 1) * 0.05, 0, 0.106);
+      stitch.rotation.z = (i % 2 === 0 ? 1 : -1) * 0.5;
+      hand.add(stitch);
+    }
+
+    for (let i = 0; i < 3; i++) {
+      const strawBit = new THREE.Mesh(new THREE.ConeGeometry(0.025, 0.18, 5), straw);
+      strawBit.position.set(side * (0.02 + i * 0.04), -0.12 - i * 0.02, 0.02);
+      strawBit.rotation.z = side * (0.3 + i * 0.25);
+      hand.add(strawBit);
+    }
+
+    group.add(hand);
   }
 
   const head = new THREE.Mesh(new THREE.SphereGeometry(0.31, 18, 14), burlap);
