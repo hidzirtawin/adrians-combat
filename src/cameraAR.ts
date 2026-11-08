@@ -45,6 +45,7 @@ export class CameraAR {
 
   private target = new THREE.Vector3(0, 1.6, 0);
   private position = new THREE.Vector3(0, 1.6, 0);
+  private walkOffset = new THREE.Vector3();
   private geoOrigin: { lat: number; lon: number } | null = null;
   private lastFix: { lat: number; lon: number; accuracy: number } | null = null;
   private watchId: number | null = null;
@@ -72,6 +73,7 @@ export class CameraAR {
     this.dragPitch = 0;
     this.target.set(0, 1.6, 0);
     this.position.set(0, 1.6, 0);
+    this.walkOffset.set(0, 0, 0);
     this.geoOrigin = null;
     this.lastFix = null;
 
@@ -144,7 +146,11 @@ export class CameraAR {
     if (!this.active) return;
 
     this.position.lerp(this.target, 1 - Math.exp(-7 * dt));
-    camera.position.copy(this.position);
+    camera.position.set(
+      this.position.x + this.walkOffset.x,
+      this.position.y,
+      this.position.z + this.walkOffset.z,
+    );
 
     if (this.gyroActive && this.hasOrientation) {
       // Standard device-orientation → camera quaternion mapping.
@@ -161,6 +167,12 @@ export class CameraAR {
       this.dragEuler.set(this.dragPitch, this.dragYaw, 0, 'YXZ');
       camera.quaternion.setFromEuler(this.dragEuler);
     }
+  }
+
+  moveBy(dx: number, dz: number): void {
+    const max = 12;
+    this.walkOffset.x = THREE.MathUtils.clamp(this.walkOffset.x + dx, -max, max);
+    this.walkOffset.z = THREE.MathUtils.clamp(this.walkOffset.z + dz, -max, max);
   }
 
   get gear(): { camera: boolean; gyro: boolean; gps: boolean } {

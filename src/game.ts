@@ -1609,6 +1609,7 @@ export class Game {
       this.player.pos.copy(this.camera.position);
       this.camera.getWorldDirection(this.camDir);
       this.player.yaw = Math.atan2(-this.camDir.x, -this.camDir.z);
+      this.applyARRoam(dt);
 
       this.player.shake *= Math.exp(-6 * dt);
       if (this.player.shake > 0.002 && !settings.reducedMotion) {
@@ -1750,6 +1751,25 @@ export class Game {
         child.rotation.z += dt * 0.05;
       }
     }
+  }
+
+  private applyARRoam(dt: number): void {
+    if (this.state !== 'playing') return;
+    const mx = this.input.moveX;
+    const my = this.input.moveY;
+    if (Math.hypot(mx, my) < 0.08) return;
+    const yaw = this.player.yaw;
+    const forwardX = -Math.sin(yaw);
+    const forwardZ = -Math.cos(yaw);
+    const rightX = Math.cos(yaw);
+    const rightZ = -Math.sin(yaw);
+    const speed = 2.8;
+    const dx = (forwardX * my + rightX * mx) * speed * dt;
+    const dz = (forwardZ * my + rightZ * mx) * speed * dt;
+    this.cameraAR.moveBy(dx, dz);
+    this.camera.position.x += dx;
+    this.camera.position.z += dz;
+    this.player.pos.copy(this.camera.position);
   }
 
   private tickPlayerPassive(dt: number): void {

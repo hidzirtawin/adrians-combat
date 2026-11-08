@@ -184,11 +184,59 @@ export class Input {
 export function bindMobileControls(input: Input): void {
   const stick = document.getElementById('stickL');
   const knob = stick?.querySelector('i') as HTMLElement | null;
+  const moveStick = document.getElementById('moveStick');
+  const moveKnob = moveStick?.querySelector('i') as HTMLElement | null;
   const lookZone = document.getElementById('lookZone');
   const fireBtn = document.getElementById('btnFire');
   const dashBtn = document.getElementById('btnDash');
   const reloadBtn = document.getElementById('btnReload');
   const swapBtn = document.getElementById('btnSwap');
+
+  if (moveStick && moveKnob) {
+    let activeId: number | null = null;
+    const radius = 34;
+    const update = (e: PointerEvent) => {
+      const rect = moveStick.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      let dx = e.clientX - cx;
+      let dy = e.clientY - cy;
+      const len = Math.hypot(dx, dy);
+      if (len > radius) {
+        dx = (dx / len) * radius;
+        dy = (dy / len) * radius;
+      }
+      moveKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+      input.moveX = dx / radius;
+      input.moveY = -dy / radius;
+    };
+    moveStick.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      activeId = e.pointerId;
+      moveStick.setPointerCapture(e.pointerId);
+      update(e);
+    });
+    moveStick.addEventListener('pointermove', (e) => {
+      if (activeId !== e.pointerId) return;
+      e.preventDefault();
+      update(e);
+    });
+    const endMove = (e: PointerEvent) => {
+      if (activeId !== e.pointerId) return;
+      activeId = null;
+      input.moveX = 0;
+      input.moveY = 0;
+      moveKnob.style.transform = 'translate(0px, 0px)';
+      try {
+        moveStick.releasePointerCapture(e.pointerId);
+      } catch {
+        /* ignore */
+      }
+    };
+    moveStick.addEventListener('pointerup', endMove);
+    moveStick.addEventListener('pointercancel', endMove);
+    moveStick.addEventListener('pointerleave', endMove);
+  }
 
   if (stick && knob) {
     let activeId: number | null = null;
