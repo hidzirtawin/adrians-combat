@@ -1,0 +1,11 @@
+{
+  "appId": "com.adrianscombat.ar",
+  "appName": "ADRIAN'S COMBAT",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "always"
+  }
+}
