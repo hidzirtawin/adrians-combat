@@ -83,6 +83,13 @@ export class Game {
   private composer: EffectComposer;
   private bloom: UnrealBloomPass;
   private lastTime = performance.now();
+  private basePixelRatio = 1;
+  private qualityScale = 1;
+  private fpsAccum = 0;
+  private fpsFrames = 0;
+  private slowSeconds = 0;
+  private fastSeconds = 0;
+  private performanceModeAnnounced = false;
   private worldRoot = new THREE.Group();
 
   private arena: Arena;
@@ -850,9 +857,9 @@ export class Game {
 
   private applyQuality(): void {
     const dpr = window.devicePixelRatio || 1;
-    const ratio = settings.quality === 'low' ? 1 : settings.quality === 'high' ? Math.min(dpr, 2) : Math.min(dpr, 1.6);
-    this.renderer.setPixelRatio(ratio);
-    this.composer.setPixelRatio(ratio);
+    this.basePixelRatio = settings.quality === 'low' ? 1 : settings.quality === 'high' ? Math.min(dpr, 2) : Math.min(dpr, 1.6);
+    this.qualityScale = 1;
+    this.applyPixelRatio();
     this.bloom.strength = settings.quality === 'low' ? 0 : settings.quality === 'high' ? 0.85 : 0.62;
     this.composer.setSize(window.innerWidth, window.innerHeight);
   }
@@ -1616,8 +1623,51 @@ export class Game {
     else if (this.state === 'menu') this.updateMenu(dt);
     else this.fx.update(Math.min(dt, 0.016));
 
+    this.monitorPerformance(dt);
     this.render();
   };
+
+  private monitorPerformance(dt: number): void {
+    if (!this.cameraActive) return;
+    this.fpsAccum += dt;
+    this.fpsFrames++;
+    if (this.fpsAccum < 2) return;
+
+    const fps = this.fpsFrames / this.fpsAccum;
+    this.fpsAccum = 0;
+    this.fpsFrames = 0;
+
+    if (fps < 40) {
+      this.fastSeconds = 0;
+      this.slowSeconds += 2;
+      if (this.slowSeconds >= 4 && this.qualityScale > 0.7) {
+        this.qualityScale = Math.max(0.7, this.qualityScale - 0.1);
+        this.applyPixelRatio();
+        this.slowSeconds = 0;
+        if (!this.performanceModeAnnounced) {
+          this.performanceModeAnnounced = true;
+          this.hud.toast('PERFORMANCE MODE · SHARPER AIM, SMOOTHER FRAMES', 2.2);
+        }
+      }
+    } else if (fps > 55) {
+      this.slowSeconds = 0;
+      this.fastSeconds += 2;
+      if (this.fastSeconds >= 8 && this.qualityScale < 1) {
+        this.qualityScale = Math.min(1, this.qualityScale + 0.05);
+        this.applyPixelRatio();
+        this.fastSeconds = 0;
+      }
+    } else {
+      this.slowSeconds = 0;
+      this.fastSeconds = 0;
+    }
+  }
+
+  private applyPixelRatio(): void {
+    const ratio = this.basePixelRatio * this.qualityScale;
+    this.renderer.setPixelRatio(ratio);
+    this.composer.setPixelRatio(ratio);
+  }
 
   private updatePlaying(dt: number): void {
     if (!this.cameraReady) {
