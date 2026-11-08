@@ -175,14 +175,14 @@ function polymerMaterial(color = 0x151a1f, roughness = 0.72): THREE.MeshPhysical
 
 function gloveMaterial(): THREE.MeshPhysicalMaterial {
   return new THREE.MeshPhysicalMaterial({
-    color: 0x0c1117,
+    color: 0x1a232d,
     metalness: 0.05,
-    roughness: 0.82,
-    clearcoat: 0.08,
-    clearcoatRoughness: 0.8,
-    sheen: 0.35,
-    sheenRoughness: 0.9,
-    sheenColor: new THREE.Color(0x26333f),
+    roughness: 0.72,
+    clearcoat: 0.12,
+    clearcoatRoughness: 0.72,
+    sheen: 0.45,
+    sheenRoughness: 0.85,
+    sheenColor: new THREE.Color(0x3b4b59),
   });
 }
 
@@ -342,12 +342,71 @@ export class WeaponSystem {
     holder.name = 'glb-gun';
     holder.add(built.root);
     model.group.add(holder);
+    model.group.add(this.buildViewmodelHands());
 
     model.rig = undefined;
     model.magazine = undefined;
     model.bolt = undefined;
     model.muzzle = new THREE.Vector3(...GUN_VISUALS[id].muzzle);
     model.ejectPort = new THREE.Vector3(...GUN_VISUALS[id].eject);
+  }
+
+  private buildViewmodelHands(): THREE.Group {
+    const group = new THREE.Group();
+    const glove = gloveMaterial();
+    const addHand = (
+      palmPosition: THREE.Vector3,
+      palmRotation: THREE.Euler,
+      curl: number,
+    ): void => {
+      const hand = new THREE.Group();
+      hand.position.copy(palmPosition);
+      hand.rotation.copy(palmRotation);
+      const palm = new THREE.Mesh(new RoundedBoxGeometry(0.09, 0.12, 0.11, 4, 0.025), glove);
+      hand.add(palm);
+      const thumb = new THREE.Mesh(new THREE.CapsuleGeometry(0.018, 0.055, 4, 8), glove);
+      thumb.position.set(-0.045, 0.03, 0.04);
+      thumb.rotation.z = 0.9;
+      hand.add(thumb);
+      for (let i = 0; i < 4; i++) {
+        const finger = new THREE.Mesh(new THREE.CapsuleGeometry(0.013, 0.055, 4, 8), glove);
+        finger.position.set(0, 0.045 - i * 0.023, -0.055);
+        finger.rotation.x = curl + i * 0.05;
+        hand.add(finger);
+      }
+      const cuff = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.07, 0.13, 8), glove);
+      cuff.position.set(0, -0.1, 0.06);
+      cuff.rotation.x = -0.25;
+      hand.add(cuff);
+      hand.scale.setScalar(1.6);
+      group.add(hand);
+    };
+
+    // Trigger hand and support hand, sized for the 1.75-unit viewmodel.
+    addHand(new THREE.Vector3(0.055, -0.08, 0.37), new THREE.Euler(0.1, 0, 0), 1.25);
+    addHand(new THREE.Vector3(0.0, 0.01, -0.38), new THREE.Euler(0.15, 0, 0), 1.45);
+
+    const forearm = new THREE.Mesh(new THREE.CapsuleGeometry(0.05, 0.3, 4, 10), glove);
+    forearm.position.set(0.14, -0.34, 0.4);
+    forearm.rotation.set(0.3, 0.1, -0.5);
+    forearm.scale.setScalar(1.6);
+    group.add(forearm);
+
+    const supportForearm = new THREE.Mesh(new THREE.CapsuleGeometry(0.05, 0.3, 4, 10), glove);
+    supportForearm.position.set(-0.06, -0.3, -0.24);
+    supportForearm.rotation.set(-0.55, 0, 0.5);
+    supportForearm.scale.setScalar(1.6);
+    group.add(supportForearm);
+
+    group.traverse((obj) => {
+      const mesh = obj as THREE.Mesh;
+      if (mesh.isMesh) {
+        mesh.castShadow = false;
+        mesh.receiveShadow = false;
+        mesh.frustumCulled = false;
+      }
+    });
+    return group;
   }
 
   private resetGunRig(model: WeaponModel): void {

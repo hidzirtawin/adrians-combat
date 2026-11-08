@@ -1504,10 +1504,10 @@ export class Game {
       'drone', 'zombie', 'gingerbread', 'alien', 'imp', 'scarecrow', 'pumpkin',
     ];
     const wave4: EnemyKind[] = [
-      ...wave2, 'raptor', 'ufo', 'banshee',
+      ...wave2, 'raptor', 'ufo', 'banshee', 'clown',
     ];
     const wave7: EnemyKind[] = [
-      ...wave4, 'voidling', 'mummy', 'demon', 'wendigo',
+      ...wave4, 'voidling', 'mummy', 'demon', 'wendigo', 'reaper',
     ];
     const late: EnemyKind[] = [
       ...wave7, 'mech', 'brute', 'spire',

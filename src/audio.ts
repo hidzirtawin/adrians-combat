@@ -680,6 +680,19 @@ export class AudioEngine {
         this.noise(t, 0.6, 0.08, bus, 'lowpass', 420, 70);
         this.tone(140, t + 0.2, 0.35, 'sine', 0.07, bus, 500, 0.001, 40);
         break;
+      case 'reaper':
+        this.tone(84, t, 1.1, 'sine', 0.1, bus, 700, 0.04, 42);
+        this.tone(126, t + 0.12, 0.9, 'triangle', 0.055, bus, 900, 0.03, 64);
+        this.noise(t, 0.85, 0.028, bus, 'highpass', 1800, 500);
+        this.tone(560, t + 0.4, 0.5, 'sine', 0.03, bus, 3000, 0.02, 210);
+        break;
+      case 'clown':
+        this.tone(880, t, 0.09, 'square', 0.05, bus, 4000, 0.001, 1320);
+        this.tone(1180, t + 0.1, 0.08, 'square', 0.045, bus, 4200, 0.001, 660);
+        this.tone(1480, t + 0.19, 0.12, 'triangle', 0.04, bus, 4800, 0.001, 1960);
+        this.tone(220, t + 0.22, 0.3, 'sawtooth', 0.045, bus, 1200, 0.01, 160);
+        this.noise(t + 0.24, 0.22, 0.03, bus, 'bandpass', 2400, 900);
+        break;
       case 'rex':
         this.tone(74, t, 0.78, 'sawtooth', 0.2, bus, 360, 0.01, 32);
         this.tone(44, t + 0.04, 0.65, 'triangle', 0.12, bus, 240, 0.01, 24);

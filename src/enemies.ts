@@ -16,7 +16,8 @@ export type EnemyKind =
   | 'jailer' | 'rainmaker' | 'aureole' | 'brood' | 'mirrored' | 'umbra' | 'collector'
   | 'rex' | 'jester' | 'titan' | 'warlord'
   | 'helicopter' | 'jet' | 'striker' | 'omen' | 'phantom' | 'hexer' | 'yeti'
-  | 'tank' | 'apc' | 'artillery';
+  | 'tank' | 'apc' | 'artillery'
+  | 'reaper' | 'clown';
 
 export interface EnemyStats {
   hp: number;
@@ -129,6 +130,14 @@ const STATS: Record<EnemyKind, EnemyStats> = {
   artillery: {
     hp: 520, speed: 0.95, hitRadius: 1.35, hitOffset: 1.25, baseScale: 1, score: 760,
     contact: 24, hover: 0, isBoss: false, name: 'GRAVE ARTILLERY', color: 0xb08a5a, projectileColor: 0xff8a3d,
+  },
+  reaper: {
+    hp: 520, speed: 2.35, hitRadius: 1.0, hitOffset: 0.1, baseScale: 1, score: 620,
+    contact: 20, hover: 1.15, isBoss: false, name: 'GRIM REAPER', color: 0x9f7dff, projectileColor: 0xc08bff,
+  },
+  clown: {
+    hp: 230, speed: 2.7, hitRadius: 0.8, hitOffset: 1.15, baseScale: 1, score: 320,
+    contact: 14, hover: 0, isBoss: false, name: 'EVIL CLOWN', color: 0xff2fa8, projectileColor: 0xffd75e,
   },
   voidling: {
     hp: 95, speed: 3.2, hitRadius: 0.8, hitOffset: 0.7, baseScale: 1, score: 210,
@@ -1882,6 +1891,246 @@ function buildJet(): Built {
   return { group, materials: collectMaterials(group), hitRadius: 1.05, hitOffset: 0, baseScale: 1.3 };
 }
 
+function buildReaper(): Built {
+  const group = new THREE.Group();
+  const cloth = mat(0x150e20, 0x000000, 0, 0.15, 0.78);
+  const clothLight = mat(0x2a1c3a, 0x000000, 0, 0.12, 0.7);
+  const bone = mat(0xd9cfb6, 0x1a1206, 0.05, 0.05, 0.55);
+  const metal = mat(0x6a7078, 0x000000, 0, 0.95, 0.26);
+  const glow = mat(0xd6a6ff, 0xc08bff, 3.4, 0.1, 0.2);
+  const dark = new THREE.MeshBasicMaterial({ color: 0x05030a });
+
+  const cloak = new THREE.Mesh(new THREE.ConeGeometry(0.62, 1.7, 20, 1, true), cloth);
+  cloak.position.y = -0.08;
+  group.add(cloak);
+
+  const mantle = new THREE.Mesh(new THREE.ConeGeometry(0.54, 0.6, 18, 1, true), clothLight);
+  mantle.position.y = 0.42;
+  group.add(mantle);
+
+  for (let i = 0; i < 9; i++) {
+    const tatter = new THREE.Mesh(new THREE.ConeGeometry(0.1 + (i % 2) * 0.035, 0.55 + (i % 3) * 0.09, 5, 1, true), clothLight);
+    const a = (i / 9) * Math.PI * 2;
+    tatter.position.set(Math.cos(a) * 0.43, -0.84, Math.sin(a) * 0.43);
+    tatter.rotation.x = Math.PI;
+    tatter.rotation.z = Math.cos(a) * 0.22;
+    group.add(tatter);
+  }
+
+  const hood = new THREE.Mesh(new THREE.SphereGeometry(0.36, 20, 14), cloth);
+  hood.position.y = 0.66;
+  hood.scale.set(1, 1.12, 1.04);
+  group.add(hood);
+
+  const recess = new THREE.Mesh(new THREE.CircleGeometry(0.28, 24), dark);
+  recess.position.set(0, 0.63, 0.372);
+  group.add(recess);
+
+  const skull = new THREE.Mesh(new THREE.SphereGeometry(0.23, 18, 14), bone);
+  skull.position.set(0, 0.64, 0.3);
+  skull.scale.set(0.92, 1.06, 0.62);
+  group.add(skull);
+
+  for (const side of [-1, 1]) {
+    const socket = new THREE.Mesh(new THREE.SphereGeometry(0.063, 10, 8), dark);
+    socket.position.set(side * 0.088, 0.695, 0.435);
+    socket.scale.set(1, 1.08, 0.4);
+    group.add(socket);
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.021, 8, 6), glow);
+    eye.position.set(side * 0.088, 0.697, 0.463);
+    group.add(eye);
+    addGlow(group, 0xc08bff, 0.22, new THREE.Vector3(side * 0.088, 0.697, 0.47), 0.7);
+  }
+
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.032, 0.07, 3), dark);
+  nose.position.set(0, 0.6, 0.445);
+  nose.rotation.x = Math.PI / 2;
+  group.add(nose);
+
+  const jaw = new THREE.Mesh(new RoundedBoxGeometry(0.2, 0.085, 0.1, 3, 0.025), bone);
+  jaw.position.set(0, 0.5, 0.43);
+  group.add(jaw);
+  for (let i = 0; i < 6; i++) {
+    const tooth = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.045, 0.02), bone);
+    tooth.position.set(-0.075 + i * 0.03, 0.535, 0.452);
+    group.add(tooth);
+  }
+
+  for (const side of [-1, 1]) {
+    const brow = new THREE.Mesh(new RoundedBoxGeometry(0.15, 0.05, 0.06, 3, 0.015), dark);
+    brow.position.set(side * 0.09, 0.795, 0.42);
+    brow.rotation.z = side * 0.34;
+    group.add(brow);
+  }
+
+  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.03, 2.45, 8), metal);
+  shaft.position.set(0.56, 0.16, 0);
+  shaft.rotation.z = -0.12;
+  group.add(shaft);
+
+  const bladeShape = new THREE.Shape();
+  bladeShape.moveTo(0, -0.16);
+  bladeShape.quadraticCurveTo(0.5, 0.26, 0.9, 0.6);
+  bladeShape.quadraticCurveTo(0.42, 0.14, 0.05, 0.02);
+  bladeShape.lineTo(0, -0.16);
+  const bladeGeo = new THREE.ExtrudeGeometry(bladeShape, {
+    depth: 0.05,
+    bevelEnabled: true,
+    bevelSize: 0.012,
+    bevelThickness: 0.012,
+    bevelSegments: 2,
+  });
+  bladeGeo.translate(0, 0, -0.025);
+  const blade = new THREE.Mesh(bladeGeo, new THREE.MeshStandardMaterial({
+    color: 0xc3cbd6,
+    metalness: 0.96,
+    roughness: 0.2,
+    side: THREE.DoubleSide,
+    envMapIntensity: 1.4,
+  }));
+  blade.position.set(0.58, 1.32, 0);
+  blade.rotation.z = 0.12;
+  group.add(blade);
+
+  const arm = new THREE.Mesh(new THREE.CapsuleGeometry(0.04, 0.42, 4, 8), bone);
+  arm.position.set(0.24, 0.44, 0.16);
+  arm.rotation.z = -1.25;
+  group.add(arm);
+
+  const wrist = new THREE.Mesh(new THREE.CapsuleGeometry(0.032, 0.2, 4, 8), bone);
+  wrist.position.set(0.47, 0.4, 0.08);
+  wrist.rotation.z = -1.05;
+  group.add(wrist);
+
+  const hand = new THREE.Mesh(new THREE.SphereGeometry(0.075, 8, 6), bone);
+  hand.position.set(0.56, 0.38, 0.03);
+  hand.scale.set(0.85, 1.1, 0.8);
+  group.add(hand);
+  for (let i = 0; i < 4; i++) {
+    const finger = new THREE.Mesh(new THREE.CapsuleGeometry(0.016, 0.08, 3, 6), bone);
+    finger.position.set(0.6, 0.405 - i * 0.038, 0.045);
+    finger.rotation.z = -0.6;
+    finger.rotation.x = 0.5;
+    group.add(finger);
+  }
+
+  addGlow(group, 0x9f7dff, 2.2, new THREE.Vector3(0, 0.16, 0.05), 0.22);
+
+  return { group, materials: collectMaterials(group), hitRadius: 1.0, hitOffset: 0.1, baseScale: 1 };
+}
+
+function buildClown(): Built & { limbs: ZombieLimbs } {
+  const group = new THREE.Group();
+  const white = mat(0xf2ead9, 0xffffff, 0.12, 0.05, 0.55);
+  const red = mat(0xe3264f, 0xe3264f, 0.25, 0.2, 0.5);
+  const purple = mat(0x6a2c91, 0x000000, 0, 0.2, 0.62);
+  const green = mat(0x4b9b45, 0x000000, 0, 0.2, 0.62);
+  const dark = mat(0x1b1218, 0x000000, 0, 0.2, 0.75);
+  const glow = mat(0xff3b5c, 0xff3b5c, 2.2, 0.2, 0.25);
+
+  const shadow = new THREE.Mesh(
+    new THREE.CircleGeometry(0.65, 22),
+    new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.3, depthWrite: false }),
+  );
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.position.y = 0.02;
+  group.add(shadow);
+
+  const torso = new THREE.Mesh(new RoundedBoxGeometry(0.58, 0.86, 0.36, 4, 0.08), purple);
+  torso.position.y = 1.06;
+  group.add(torso);
+
+  for (let i = 0; i < 5; i++) {
+    const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.84, 0.02), i % 2 === 0 ? green : red);
+    stripe.position.set((i - 2) * 0.115, 1.06, 0.19);
+    group.add(stripe);
+  }
+
+  const collar = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.09, 6, 16), white);
+  collar.position.y = 1.53;
+  collar.rotation.x = Math.PI / 2;
+  group.add(collar);
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.31, 18, 14), white);
+  head.position.y = 1.78;
+  group.add(head);
+
+  const nose = new THREE.Mesh(new THREE.SphereGeometry(0.075, 10, 8), red);
+  nose.position.set(0, 1.76, 0.3);
+  group.add(nose);
+
+  const grin = new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.025, 6, 18, Math.PI), red);
+  grin.position.set(0, 1.68, 0.28);
+  grin.rotation.z = Math.PI;
+  group.add(grin);
+
+  for (const side of [-1, 1]) {
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 6), dark);
+    eye.position.set(side * 0.11, 1.84, 0.28);
+    group.add(eye);
+    addGlow(group, 0xff3b5c, 0.2, new THREE.Vector3(side * 0.11, 1.84, 0.31), 0.35);
+    for (let i = 0; i < 3; i++) {
+      const tuft = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.4, 5), i % 2 === 0 ? red : green);
+      tuft.position.set(side * (0.28 + i * 0.08), 1.98 + i * 0.06, -0.02);
+      tuft.rotation.z = side * (0.8 + i * 0.25);
+      group.add(tuft);
+    }
+  }
+
+  const hat = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.35, 10), red);
+  hat.position.set(0, 2.2, 0);
+  hat.rotation.z = 0.12;
+  group.add(hat);
+  const hatPom = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), green);
+  hatPom.position.set(0.04, 2.39, 0);
+  group.add(hatPom);
+
+  const makeArm = (side: number): THREE.Group => {
+    const pivot = new THREE.Group();
+    pivot.position.set(side * 0.36, 1.42, 0);
+    const sleeve = new THREE.Mesh(new THREE.CapsuleGeometry(0.08, 0.46, 4, 8), purple);
+    sleeve.position.y = -0.27;
+    pivot.add(sleeve);
+    const cuff = new THREE.Mesh(new THREE.TorusGeometry(0.085, 0.02, 6, 12), white);
+    cuff.rotation.x = Math.PI / 2;
+    cuff.position.y = -0.5;
+    pivot.add(cuff);
+    const hand = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 8), white);
+    hand.position.y = -0.6;
+    pivot.add(hand);
+    pivot.rotation.z = side * 0.08;
+    group.add(pivot);
+    return pivot;
+  };
+
+  const makeLeg = (side: number): THREE.Group => {
+    const pivot = new THREE.Group();
+    pivot.position.set(side * 0.17, 0.66, 0);
+    const leg = new THREE.Mesh(new THREE.CapsuleGeometry(0.09, 0.38, 4, 8), green);
+    leg.position.y = -0.23;
+    pivot.add(leg);
+    const shoe = new THREE.Mesh(new RoundedBoxGeometry(0.3, 0.16, 0.52, 3, 0.06), red);
+    shoe.position.set(0, -0.5, 0.12);
+    pivot.add(shoe);
+    group.add(pivot);
+    return pivot;
+  };
+
+  const leftArm = makeArm(-1);
+  const rightArm = makeArm(1);
+  const leftLeg = makeLeg(-1);
+  const rightLeg = makeLeg(1);
+
+  return {
+    group,
+    materials: collectMaterials(group),
+    hitRadius: 0.8,
+    hitOffset: 1.15,
+    baseScale: 1,
+    limbs: { leftArm, rightArm, leftLeg, rightLeg },
+  };
+}
+
 function buildAlien(): Built {
   const group = new THREE.Group();
   const skin = mat(0x86e07a, 0x5aff7a, 0.55, 0.15, 0.45);
@@ -2983,6 +3232,8 @@ export class Enemy {
       case 'tank': return buildTank();
       case 'apc': return buildApc();
       case 'artillery': return buildArtillery();
+      case 'reaper': return buildReaper();
+      case 'clown': return buildClown();
       case 'voidling': return buildVoidling();
       case 'demon': return buildDemon();
       case 'mech':
@@ -3157,6 +3408,15 @@ export class Enemy {
       case 'artillery':
         this.updateTank(adt, ctx, manager, 15, 4.8, 32, 6.5, 1);
         break;
+      case 'reaper':
+        this.updateFlyer(adt, ctx, 8, 0.9);
+        this.shootAtPlayer(ctx, manager, 9, 10, 3.3, 0.025);
+        this.updateReaper(ctx, manager);
+        break;
+      case 'clown':
+        this.updateWalker(adt, ctx, 2.4);
+        this.shootAtPlayer(ctx, manager, 8.5, 6, 2.8, 0.045, 3);
+        break;
       case 'voidling':
         this.updateWalker(adt, ctx, 1.0);
         break;
@@ -3293,6 +3553,26 @@ export class Enemy {
       const target = ctx.player.pos;
       const angle = Math.atan2(target.x - this.group.position.x, target.z - this.group.position.z);
       turret.rotation.y = angle - this.group.rotation.y;
+    }
+  }
+
+  private updateReaper(ctx: CombatContext, manager: EnemyManager): void {
+    if (this.spawnT < 0.6) return;
+    if (this.specialTimer <= 0) {
+      this.specialTimer = 7;
+      const angle = Math.random() * Math.PI * 2;
+      const radius = 6 + Math.random() * 3;
+      const from = this.group.position.clone();
+      this.group.position.set(
+        ctx.player.pos.x + Math.cos(angle) * radius,
+        this.hoverHeight,
+        ctx.player.pos.z + Math.sin(angle) * radius,
+      );
+      ctx.fx.ring(from, 0x9f7dff, 2.4, 0.6, 0.5);
+      ctx.fx.ring(from, 0xffffff, 1.2, 0.4, 0.4);
+      ctx.fx.burst(this.group.position.clone(), 0x9f7dff, 18, 5, 0.7);
+      ctx.playSpatial('enemyShot', this.group.position, 0.7);
+      this.fireAimed(ctx, manager, 2, 9, 8, 0.03);
     }
   }
 

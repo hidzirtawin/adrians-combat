@@ -90,6 +90,38 @@ export const GUN_VISUALS: Record<GunId, GunVisual> = {
   },
 };
 
+function makeGunDetail(): THREE.CanvasTexture {
+  const size = 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  ctx.fillStyle = '#a8a8a8';
+  ctx.fillRect(0, 0, size, size);
+  for (let i = 0; i < 1400; i++) {
+    const shade = 80 + Math.floor(Math.random() * 150);
+    ctx.fillStyle = `rgba(${shade},${shade},${shade},0.7)`;
+    ctx.fillRect(Math.random() * size, Math.random() * size, 1, 1 + Math.random() * 2);
+  }
+  for (let i = 0; i < 30; i++) {
+    ctx.strokeStyle = `rgba(230,230,230,${0.05 + Math.random() * 0.12})`;
+    ctx.lineWidth = 0.6;
+    ctx.beginPath();
+    const x = Math.random() * size;
+    const y = Math.random() * size;
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + (Math.random() - 0.5) * 46, y + (Math.random() - 0.5) * 10);
+    ctx.stroke();
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(2, 2);
+  return tex;
+}
+
+const gunDetail = makeGunDetail();
+
 export interface BuiltGun {
   root: THREE.Group;
   materials: Array<{ material: THREE.MeshStandardMaterial; name: string; base: THREE.Color }>;
@@ -129,18 +161,45 @@ export function createGunModel(id: GunId, tint = true): BuiltGun | null {
     const cloned = entries.map((entry) => {
       const material = (entry as THREE.MeshStandardMaterial).clone();
       const name = (entry.name || '').toLowerCase();
-      material.envMapIntensity = 1.3;
+      material.envMapIntensity = 1.45;
+      if ('clearcoat' in material) {
+        const physical = material as THREE.MeshPhysicalMaterial;
+        physical.clearcoat = Math.max(physical.clearcoat ?? 0, 0.42);
+        physical.clearcoatRoughness = 0.28;
+      }
+      if ((material.metalness ?? 0) > 0.35) {
+        material.roughnessMap = gunDetail;
+        material.bumpMap = gunDetail;
+        material.bumpScale = 0.006;
+      }
       if (tint) {
-        if (
+        if (name.includes('dark')) {
+          material.color.setHex(0x15181c);
+          material.metalness = 0.72;
+          material.roughness = 0.44;
+        } else if (name.includes('light') || name.includes('accent')) {
+          material.color.copy(accent).multiplyScalar(0.72);
+          material.metalness = 0.45;
+          material.roughness = 0.34;
+          material.emissive.copy(accent).multiplyScalar(0.1);
+          material.emissiveIntensity = 1;
+        } else if (
+          name.includes('main') ||
+          name.includes('body') ||
+          name.includes('metal') ||
+          name.includes('receiver')
+        ) {
+          material.color.setHex(0x30353b);
+          material.color.lerp(accent, 0.1);
+          material.metalness = 0.78;
+          material.roughness = 0.36;
+        } else if (
           name.includes('wood') ||
           name.includes('bakelite') ||
           name.includes('plastic') ||
-          name.includes('mag') ||
-          name.includes('main') ||
-          name.includes('grey') ||
-          name.includes('metal')
+          name.includes('mag')
         ) {
-          material.color.lerp(accent, 0.34);
+          material.color.lerp(accent, 0.22);
         }
       }
       materials.push({ material, name, base: material.color.clone() });
