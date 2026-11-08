@@ -3363,3 +3363,19 @@ body.aiming #crosshair {
   #menuTrackName { max-width: 100%; }
   .menu-track-note { display: none; }
 }
+
+.track-volume {
+  width: 86px;
+  height: 18px;
+  accent-color: var(--cyan);
+  cursor: pointer;
+}
+
+#btnMenuTrackNext:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+@media (max-width: 620px) {
+  .track-volume { width: 64px; }
+}

@@ -1,21 +1,33 @@
 /**
- * Local soundtrack player for the main menu.
+ * Background soundtrack player.
  *
- * The selected file is loaded from the player's own device with a file picker and
- * played from an object URL. It is never uploaded, bundled or committed — which is
- * the only safe way to use a commercial track without a distribution licence.
+ * Users can add one or more local audio files from their device. The playlist is
+ * stored in the browser (IndexedDB), plays through menu and gameplay, and is never
+ * uploaded, committed or deployed. The bundled default is the app owner's AI
+ * homage track.
  */
+interface Track {
+  name: string;
+  url: string;
+  blob: Blob;
+}
+
 export class MenuMusic {
   private audio = new Audio();
   private fileInput: HTMLInputElement;
   private toggleBtn: HTMLButtonElement;
   private pickBtn: HTMLButtonElement;
+  private nextBtn: HTMLButtonElement;
+  private volumeInput: HTMLInputElement;
   private nameEl: HTMLElement;
-  private objectUrl: string | null = null;
-  private suspended = false;
-  private dbPromise: Promise<IDBDatabase | null> | null = null;
+  private playlist: Track[] = [];
+  private index = 0;
+  private objectUrls: string[] = [];
   private usingDefault = false;
   private wantsPlay = true;
+  private inGame = false;
+  private baseVolume = 0.55;
+  private dbPromise: Promise<IDBDatabase | null> | null = null;
   private autoplayArmed = false;
   private readonly defaultTrack = new URL('audio/menu.mp3', document.baseURI).href;
 
@@ -23,12 +35,21 @@ export class MenuMusic {
     this.fileInput = document.getElementById('menuTrackFile') as HTMLInputElement;
     this.toggleBtn = document.getElementById('btnMenuTrack') as HTMLButtonElement;
     this.pickBtn = document.getElementById('btnMenuTrackPick') as HTMLButtonElement;
+    this.nextBtn = document.getElementById('btnMenuTrackNext') as HTMLButtonElement;
+    this.volumeInput = document.getElementById('menuTrackVolume') as HTMLInputElement;
     this.nameEl = document.getElementById('menuTrackName') as HTMLElement;
     if (!this.fileInput || !this.toggleBtn || !this.pickBtn || !this.nameEl) return;
 
-    this.audio.loop = true;
     this.audio.preload = 'auto';
-    this.audio.volume = 0.55;
+    this.audio.loop = true;
+    try {
+      const savedVolume = Number(localStorage.getItem('adrianscombat.trackVolume'));
+      if (Number.isFinite(savedVolume) && savedVolume >= 0 && savedVolume <= 1) this.baseVolume = savedVolume;
+    } catch {
+      /* storage unavailable */
+    }
+    if (this.volumeInput) this.volumeInput.value = String(this.baseVolume);
+    this.applyVolume();
 
     this.toggleBtn.addEventListener('click', () => {
       if (!this.audio.src) {
@@ -44,15 +65,42 @@ export class MenuMusic {
       }
     });
     this.pickBtn.addEventListener('click', () => this.fileInput.click());
-    this.fileInput.addEventListener('change', () => this.loadFile());
+    this.nextBtn?.addEventListener('click', () => this.next());
+    this.volumeInput?.addEventListener('input', () => {
+      this.baseVolume = Math.max(0, Math.min(1, Number(this.volumeInput.value)));
+      this.applyVolume();
+      try {
+        localStorage.setItem('adrianscombat.trackVolume', String(this.baseVolume));
+      } catch {
+        /* storage unavailable */
+      }
+    });
+    this.fileInput.addEventListener('change', () => this.loadFiles());
     this.audio.addEventListener('play', () => this.updateUI());
     this.audio.addEventListener('pause', () => this.updateUI());
     this.audio.addEventListener('error', () => this.error());
+    this.audio.addEventListener('ended', () => this.next());
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && this.wantsPlay && this.audio.paused && this.audio.src) {
+        void this.audio.play().catch(() => this.armAutoplay());
+      }
+    });
 
     const saved = localStorage.getItem('adrianscombat.trackName');
     if (saved) this.nameEl.textContent = `LAST: ${saved}`;
     this.updateUI();
-    void this.restoreTrack();
+    void this.restorePlaylist();
+  }
+
+  private applyVolume(): void {
+    this.audio.volume = this.baseVolume * (this.inGame ? 0.52 : 1);
+  }
+
+  /** Called when entering/leaving a run. The track keeps playing, just quieter. */
+  setGameplay(active: boolean): void {
+    this.inGame = active;
+    this.applyVolume();
   }
 
   private openDb(): Promise<IDBDatabase | null> {
@@ -72,18 +120,18 @@ export class MenuMusic {
     return this.dbPromise;
   }
 
-  private async saveTrack(file: File): Promise<void> {
+  private async savePlaylist(files: File[]): Promise<void> {
     const db = await this.openDb();
     if (!db) return;
     try {
       const tx = db.transaction('files', 'readwrite');
-      tx.objectStore('files').put(file, 'menuTrack');
+      tx.objectStore('files').put(files, 'menuPlaylist');
     } catch {
       /* storage unavailable or full */
     }
   }
 
-  private async restoreTrack(): Promise<void> {
+  private async restorePlaylist(): Promise<void> {
     const db = await this.openDb();
     if (!db) {
       this.useDefault();
@@ -91,29 +139,102 @@ export class MenuMusic {
     }
     try {
       const tx = db.transaction('files', 'readonly');
-      const request = tx.objectStore('files').get('menuTrack');
-      request.onsuccess = () => {
-        const file = request.result as File | undefined;
-        if (!file) {
-          this.useDefault();
+      const store = tx.objectStore('files');
+      const listRequest = store.get('menuPlaylist');
+      listRequest.onsuccess = () => {
+        const list = listRequest.result as File[] | undefined;
+        if (Array.isArray(list) && list.length) {
+          this.setPlaylist(list);
           return;
         }
-        this.usingDefault = false;
-        this.objectUrl = URL.createObjectURL(file);
-        this.audio.src = this.objectUrl;
-        this.nameEl.textContent = file.name;
-        this.updateUI();
-        this.tryPlay();
+        const singleRequest = store.get('menuTrack');
+        singleRequest.onsuccess = () => {
+          const file = singleRequest.result as File | undefined;
+          if (file) this.setPlaylist([file]);
+          else this.useDefault();
+        };
+        singleRequest.onerror = () => this.useDefault();
       };
-      request.onerror = () => this.useDefault();
+      listRequest.onerror = () => this.useDefault();
     } catch {
       this.useDefault();
     }
   }
 
+  private setPlaylist(files: File[]): void {
+    this.revokeUrls();
+    this.usingDefault = false;
+    this.audio.loop = false;
+    this.playlist = files.map((file) => ({
+      name: file.name,
+      url: URL.createObjectURL(file),
+      blob: file,
+    }));
+    this.objectUrls = this.playlist.map((track) => track.url);
+    this.index = 0;
+    this.playCurrent();
+  }
+
+  private playCurrent(): void {
+    const track = this.playlist[this.index];
+    if (!track) {
+      this.useDefault();
+      return;
+    }
+    this.audio.src = track.url;
+    this.nameEl.textContent = this.playlist.length > 1
+      ? `${this.index + 1}/${this.playlist.length} · ${track.name}`
+      : track.name;
+    this.wantsPlay = true;
+    this.updateUI();
+    this.tryPlay();
+  }
+
+  private next(): void {
+    if (this.playlist.length > 1) {
+      this.index = (this.index + 1) % this.playlist.length;
+      this.playCurrent();
+      return;
+    }
+    if (this.playlist.length === 1) {
+      this.audio.currentTime = 0;
+      this.wantsPlay = true;
+      this.tryPlay();
+      return;
+    }
+    this.audio.currentTime = 0;
+    this.wantsPlay = true;
+    this.tryPlay();
+  }
+
+  private loadFiles(): void {
+    const files = Array.from(this.fileInput.files ?? []);
+    if (!files.length) return;
+    this.setPlaylist(files);
+    this.audio.loop = false;
+    try {
+      localStorage.setItem('adrianscombat.trackName', files.length > 1 ? `${files.length} TRACKS` : files[0].name);
+    } catch {
+      /* storage unavailable */
+    }
+    void this.savePlaylist(files);
+  }
+
+  private revokeUrls(): void {
+    for (const url of this.objectUrls) {
+      try {
+        URL.revokeObjectURL(url);
+      } catch {
+        /* ignore */
+      }
+    }
+    this.objectUrls = [];
+  }
+
   private useDefault(): void {
-    if (this.audio.src) return;
+    if (this.playlist.length > 0) return;
     this.usingDefault = true;
+    this.audio.loop = true;
     this.audio.src = this.defaultTrack;
     this.nameEl.textContent = 'DAMN IT FEELS GOOD · AI HOMAGE';
     this.updateUI();
@@ -138,32 +259,12 @@ export class MenuMusic {
       cleanup();
       this.autoplayArmed = false;
       const target = event.target as HTMLElement | null;
-      if (target?.closest('.menu-track')) return;
+      if (target?.closest('#btnMenuTrack, #btnMenuTrackPick, #btnMenuTrackNext')) return;
       this.tryPlay();
     };
     window.addEventListener('pointerdown', start, { once: true, capture: true });
     window.addEventListener('touchstart', start, { once: true, capture: true, passive: true });
     window.addEventListener('keydown', start, { once: true, capture: true });
-  }
-
-  private loadFile(): void {
-    const file = this.fileInput.files?.[0];
-    if (!file) return;
-    if (this.objectUrl) URL.revokeObjectURL(this.objectUrl);
-    this.usingDefault = false;
-    this.wantsPlay = true;
-    this.objectUrl = URL.createObjectURL(file);
-    this.audio.src = this.objectUrl;
-    this.suspended = false;
-    this.nameEl.textContent = file.name;
-    try {
-      localStorage.setItem('adrianscombat.trackName', file.name);
-    } catch {
-      /* storage unavailable */
-    }
-    void this.audio.play().catch(() => this.error());
-    void this.saveTrack(file);
-    this.updateUI();
   }
 
   private error(): void {
@@ -174,26 +275,13 @@ export class MenuMusic {
   private updateUI(): void {
     if (!this.nameEl) return;
     const ready = !!this.audio.src;
-    const playLabel = this.usingDefault ? '▶ PLAY HOMAGE' : '▶ PLAY YOUR TRACK';
+    const playLabel = this.usingDefault ? '▶ PLAY HOMAGE' : '▶ PLAY TRACK';
     const pauseLabel = this.usingDefault ? '❚❚ PAUSE HOMAGE' : '❚❚ PAUSE TRACK';
     const resumeLabel = this.usingDefault ? '▶ RESUME HOMAGE' : '▶ RESUME TRACK';
     const pausedLabel = this.audio.currentTime > 0 ? resumeLabel : playLabel;
     this.toggleBtn.textContent = !ready ? playLabel : this.audio.paused ? pausedLabel : pauseLabel;
     this.pickBtn.disabled = false;
+    if (this.nextBtn) this.nextBtn.disabled = this.playlist.length < 2;
     if (!ready && !this.nameEl.textContent) this.nameEl.textContent = 'NO LOCAL TRACK';
-  }
-
-  /** Called when a run starts so the menu track does not bleed into gameplay. */
-  suspend(): void {
-    this.wantsPlay = false;
-    this.suspended = true;
-    if (!this.audio.paused) this.audio.pause();
-  }
-
-  /** Called when returning to the main menu. */
-  resume(): void {
-    this.suspended = false;
-    this.wantsPlay = true;
-    this.tryPlay();
   }
 }

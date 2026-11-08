@@ -1262,7 +1262,7 @@ export class Game {
     this.audio.startMusic();
     this.audio.setPaused(false);
     this.audio.startAmbience();
-    this.menuMusic.suspend();
+    this.menuMusic.setGameplay(true);
     this.audio.play('hyperspace', { volume: 0.55 });
 
     this.worldRoot.position.set(0, 0, 0);
@@ -2118,7 +2118,7 @@ export class Game {
     this.hud.hideARHint();
     this.hud.setSquad(null);
     this.hud.showSquadFinal(null);
-    this.menuMusic.resume();
+    this.menuMusic.setGameplay(false);
     this.hud.setTagPrompt(null);
     this.enemies.clear();
     this.pickups.clear();
