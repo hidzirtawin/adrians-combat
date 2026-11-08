@@ -27,6 +27,11 @@ this project.
 
 | Asset | Author | Source | License |
 |---|---|---|---|
+| Homepage track “Damn It Feels Good to Be a Gangsta (AI homage)” (`public/audio/menu.mp3`) | Project owner | Supplied by the app owner; AI-generated homage, not the original commercial recording | Used with owner permission |
+
+
+| Asset | Author | Source | License |
+|---|---|---|---|
 | Gunshot recordings (`public/audio/pulse.wav`, `arx.wav`, `viper.wav`, `scatter.wav`, `longshot.wav`, `rail.wav`) | Tabasco | [OpenGameArt: Gunshot Sounds](https://opengameart.org/content/gunshot-sounds) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
 | Reload and pump recordings (`public/audio/reload.wav`, `pump.wav`) | SpringySpringo | [OpenGameArt: Gun reload sounds](https://opengameart.org/content/gun-reload-sounds) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
 

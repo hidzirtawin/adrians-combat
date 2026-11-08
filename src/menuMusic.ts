@@ -14,6 +14,8 @@ export class MenuMusic {
   private objectUrl: string | null = null;
   private suspended = false;
   private dbPromise: Promise<IDBDatabase | null> | null = null;
+  private usingDefault = false;
+  private readonly defaultTrack = new URL('audio/menu.mp3', document.baseURI).href;
 
   constructor() {
     this.fileInput = document.getElementById('menuTrackFile') as HTMLInputElement;
@@ -80,27 +82,44 @@ export class MenuMusic {
 
   private async restoreTrack(): Promise<void> {
     const db = await this.openDb();
-    if (!db) return;
+    if (!db) {
+      this.useDefault();
+      return;
+    }
     try {
       const tx = db.transaction('files', 'readonly');
       const request = tx.objectStore('files').get('menuTrack');
       request.onsuccess = () => {
         const file = request.result as File | undefined;
-        if (!file || this.audio.src) return;
+        if (!file) {
+          this.useDefault();
+          return;
+        }
+        this.usingDefault = false;
         this.objectUrl = URL.createObjectURL(file);
         this.audio.src = this.objectUrl;
         this.nameEl.textContent = file.name;
         this.updateUI();
       };
+      request.onerror = () => this.useDefault();
     } catch {
-      /* ignore */
+      this.useDefault();
     }
+  }
+
+  private useDefault(): void {
+    if (this.audio.src) return;
+    this.usingDefault = true;
+    this.audio.src = this.defaultTrack;
+    this.nameEl.textContent = 'DAMN IT FEELS GOOD · AI HOMAGE';
+    this.updateUI();
   }
 
   private loadFile(): void {
     const file = this.fileInput.files?.[0];
     if (!file) return;
     if (this.objectUrl) URL.revokeObjectURL(this.objectUrl);
+    this.usingDefault = false;
     this.objectUrl = URL.createObjectURL(file);
     this.audio.src = this.objectUrl;
     this.suspended = false;
@@ -123,7 +142,11 @@ export class MenuMusic {
   private updateUI(): void {
     if (!this.nameEl) return;
     const ready = !!this.audio.src;
-    this.toggleBtn.textContent = !ready ? '▶ PLAY YOUR TRACK' : this.audio.paused ? '▶ RESUME TRACK' : '❚❚ PAUSE TRACK';
+    const playLabel = this.usingDefault ? '▶ PLAY HOMAGE' : '▶ PLAY YOUR TRACK';
+    const pauseLabel = this.usingDefault ? '❚❚ PAUSE HOMAGE' : '❚❚ PAUSE TRACK';
+    const resumeLabel = this.usingDefault ? '▶ RESUME HOMAGE' : '▶ RESUME TRACK';
+    const pausedLabel = this.audio.currentTime > 0 ? resumeLabel : playLabel;
+    this.toggleBtn.textContent = !ready ? playLabel : this.audio.paused ? pausedLabel : pauseLabel;
     this.pickBtn.disabled = false;
     if (!ready && !this.nameEl.textContent) this.nameEl.textContent = 'NO LOCAL TRACK';
   }
