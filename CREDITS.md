@@ -20,7 +20,7 @@ this project.
 | T-Rex (`public/models/trex.glb`) | Quaternius | [Poly Pizza](https://poly.pizza/m/UYtneO5FpF) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
 | Animated Robot (`public/models/robot.glb`) | Quaternius | [Poly Pizza](https://poly.pizza/m/QCm7qe9uNJ) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
 | Starships Striker/Omen (`public/models/ship-striker.glb`, `ship-omen.glb`) | Quaternius | [CC0 Public Domain Models](https://github.com/Papyszoo/CC0-Public-Domain-Models) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
-| Phantom, Rime Terror (`public/models/phantom.glb`, `yeti.glb`) | Quaternius | [CC0 Public Domain Models](https://github.com/Papyszoo/CC0-Public-Domain-Models) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| Phantom, Rime Terror (`public/models/phantom.glb`, `rime.glb`) | Quaternius | [CC0 Public Domain Models](https://github.com/Papyszoo/CC0-Public-Domain-Models) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
 | Hex Caster (`public/models/hexer-rpg.glb`) | Quaternius RPG Characters | [CC0 Public Domain Models](https://github.com/Papyszoo/CC0-Public-Domain-Models) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
 
 ## Audio

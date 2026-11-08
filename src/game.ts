@@ -106,6 +106,8 @@ export class Game {
   private bestScore = 0;
   private score = 0;
   private wave = 0;
+  private waveModifier: 'standard' | 'armored' | 'air' | 'horde' | 'elite' = 'standard';
+  private waveHpMul = 1;
   private kills = 0;
   private shotsFired = 0;
   private shotsHit = 0;
@@ -193,6 +195,11 @@ export class Game {
     this.torchLight = new THREE.PointLight(0xffe6c4, 0, 14, 2);
     this.torchLight.position.set(0, 0, -0.1);
     this.camera.add(this.torchLight);
+
+    // Cool fill light for skin, cloth and armour detail on nearby enemies.
+    const characterLight = new THREE.PointLight(0xbfeaff, 0.85, 9, 2);
+    characterLight.position.set(0.35, 0.25, 0.15);
+    this.camera.add(characterLight);
 
     try {
       const pmrem = new THREE.PMREMGenerator(this.renderer);
@@ -1366,6 +1373,8 @@ export class Game {
     this.spawnQueue = [];
     this.spawnClock = 0;
     this.waveActive = false;
+    this.waveModifier = 'standard';
+    this.waveHpMul = 1;
     this.intermission = 0;
     this.triggerLatch = false;
     this.radarAccumulator = 0;
@@ -1395,6 +1404,11 @@ export class Game {
     this.spawnQueue = [];
     this.spawnClock = 0;
     this.hud.setWave(n);
+    const modRoll = Math.random();
+    this.waveModifier = n >= 4 && n % 3 === 0
+      ? (modRoll < 0.3 ? 'armored' : modRoll < 0.55 ? 'air' : modRoll < 0.8 ? 'horde' : 'elite')
+      : 'standard';
+    this.waveHpMul = this.waveModifier === 'elite' ? 1.5 : 1;
 
     const isBoss = n % 5 === 0;
     if (isBoss) {
@@ -1414,16 +1428,38 @@ export class Game {
       this.audio.play('klaxon', { volume: 0.7 });
       this.audio.play('boss');
     } else {
-      const count = Math.max(2, Math.min(16, Math.round((3 + (n - 1) * 1.1) * currentDifficulty().count)));
+      const modifierCount = this.waveModifier === 'horde' ? 1.45 : this.waveModifier === 'elite' ? 0.8 : this.waveModifier === 'armored' ? 0.9 : 1;
+      const count = Math.max(2, Math.min(22, Math.round((3 + (n - 1) * 1.1) * currentDifficulty().count * modifierCount)));
       for (let i = 0; i < count; i++) {
         this.spawnQueue.push({ kind: this.pickKind(n), at: 0.8 + i * 0.6, scale: 1 });
       }
-      this.hud.showBanner('INCOMING', `WAVE ${String(n).padStart(2, '0')}`, WAVE_TAGS[n % WAVE_TAGS.length], 2.6);
+      const sub = this.waveModifier === 'armored'
+        ? 'ARMORED COLUMN · TANKS INBOUND'
+        : this.waveModifier === 'air'
+          ? 'AIR SUPERIORITY · FIGHTERS INBOUND'
+          : this.waveModifier === 'horde'
+            ? 'HORDE SURGE · HOLD THE LINE'
+            : this.waveModifier === 'elite'
+              ? 'ELITE GUARD · HARDER TARGETS'
+              : WAVE_TAGS[n % WAVE_TAGS.length];
+      this.hud.showBanner('INCOMING', `WAVE ${String(n).padStart(2, '0')}`, sub, 2.6);
       this.audio.play('wave');
     }
   }
 
   private pickKind(wave: number): EnemyKind {
+    if (this.waveModifier === 'armored') {
+      const pool: EnemyKind[] = ['tank', 'apc', 'artillery', 'brute', 'mech', 'tank', 'apc'];
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+    if (this.waveModifier === 'air') {
+      const pool: EnemyKind[] = ['helicopter', 'jet', 'striker', 'omen', 'ufo', 'drone', 'phantom', 'helicopter', 'jet'];
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+    if (this.waveModifier === 'horde') {
+      const pool: EnemyKind[] = ['zombie', 'gingerbread', 'imp', 'alien', 'zombie', 'gingerbread', 'raptor'];
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
     const early: EnemyKind[] = ['drone', 'zombie', 'gingerbread'];
     const wave2: EnemyKind[] = [
       'drone', 'zombie', 'gingerbread', 'alien', 'imp', 'scarecrow', 'pumpkin',
@@ -1486,7 +1522,7 @@ export class Game {
   }
 
   private spawnSpecific(kind: EnemyKind, position: THREE.Vector3, scale = 1): void {
-    const enemy = this.enemies.spawn(kind, this.wave, position, scale);
+    const enemy = this.enemies.spawn(kind, this.wave, position, scale, this.waveHpMul);
     this.enemyVoice(kind, 'spawn', position.clone().setY(enemy.stats.hover > 0 ? enemy.stats.hover : 1.1));
     const ringPos = position.clone().setY(0.08);
     this.fx.ring(ringPos, enemy.stats.color, enemy.isBoss ? 4 : 1.8, enemy.isBoss ? 0.8 : 0.45);

@@ -70,7 +70,7 @@ export class SquadClient {
           if (settled) return;
           settled = true;
           this.connecting = null;
-          this.onStatus?.('SQUAD SERVER OFFLINE · START THE DEV SERVER', false);
+          this.onStatus?.('SQUAD SERVER OFFLINE · CHECK CONNECTION', false);
           try {
             ws.close();
           } catch {
@@ -117,7 +117,7 @@ export class SquadClient {
           if (!settled) {
             settled = true;
             this.connecting = null;
-            this.onStatus?.('SQUAD SERVER OFFLINE · START THE DEV SERVER', false);
+            this.onStatus?.('SQUAD SERVER OFFLINE · CHECK CONNECTION', false);
             resolve(false);
           }
         };

@@ -15,11 +15,12 @@ An original camera-first AR shooter built for the phone browser.
 - **Armory with 3D preview** — drag to rotate each weapon in a studio render. Six distinct authored gun models, not one tinted rifle.
 - **Special bombs** — hold **FIRE** for 0.9 s to charge a stronger Frag, Shock or Cryo blast. A ring fills around the button; the blast gets +35% damage and +18% radius.
 - **Progression** — earn Salvage from kills, waves and bosses. Locked weapons are greyed out until bought; the game-over screen shows your next unlock and progress. The first run each day pays 2× Salvage.
-- **Enemies** — Hellwasps, Grave Saucers, Gravewalkers, Gorehulks, Void Spawn, Ripclaws, Cacklers, Void Larvae, Hellbrutes, Iron Reapers, Cinderbread, Straw Reapers, Shriek Wraiths, Tomb Bound, Hell Lanterns, Frost Maws, Scream Spires, Rotor Reavers, Sky Shredders, Starfangs, Black Omens, Pale Phantoms, Hex Casters and Rime Terrors, each with their own AI, voice and projectiles. Spawn pools are randomised every wave.
+- **Enemies** — Hellwasps, Grave Saucers, Gravewalkers, Gorehulks, Void Spawn, Ripclaws, Cacklers, Void Larvae, Hellbrutes, Iron Reapers, Cinderbread, Straw Reapers, Shriek Wraiths, Tomb Bound, Hell Lanterns, Frost Maws, Scream Spires, Rotor Reavers, Sky Shredders, Starfangs, Black Omens, Pale Phantoms, Hex Casters, Rime Terrors, Siege Tanks, Iron Carriers and Grave Artillery, each with their own AI, voice and projectiles. Spawn pools are randomised every wave.
 - **Four difficulty levels** — Easy / Normal / Hard / Insane. Scales enemy HP, damage, speed, horde size, shield regen and score. Pick it from the main menu or Settings; it persists.
 - **Eleven bosses** every five waves — The Jailer, Bone Maw, The Grinning One, Void Colossus, The Butcher King, The Rainmaker, Aureole, The Brood Queen, The Mirrored, Umbra and The Collector. Original horror archetypes, not licensed characters.
+- **Armoured wave modifiers** — every third wave can roll **Armoured Column** (tanks/APCs), **Air Superiority** (fighters/starships), **Horde Surge** (more, faster mobs) or **Elite Guard** (fewer, tougher enemies).
 - **Waves, combo multiplier, power-ups** — repair, shield, overcharge, rapid fire, cryo field. Drops magnetise to the player.
-- **Squad rooms** — 4-letter codes and nearby-room discovery for phones on the same Wi-Fi.
+- **Squad rooms** — 4-letter codes and nearby-room discovery. Works online through the Cloudflare Durable Object server, or on the same Wi-Fi with `npm run party`.
   - **Free For All** — live score battle, 2–6 phones.
   - **Teams** — auto-balanced 3v3 team score battle.
   - **GPS Tag (experimental)** — outdoors, walk within 15 m of a rival and hold FIRE to tag.
@@ -48,7 +49,7 @@ A starter `capacitor.config.json` is included. The web build stays fully playabl
 - **Cloudflare:** https://adrians-combat.hidzir215.workers.dev
 - **GitHub:** https://github.com/hidzirtawin/adrians-combat
 - Deploy again with `npm run deploy` (Cloudflare Workers + static assets).
-- The Cloudflare build is solo-only because static hosting has no game WebSocket server. For same-Wi-Fi squad rooms, run `npm run party` and open the HTTPS LAN URL.
+- Cloudflare runs a Durable Object squad server at `/ws`, so four-letter rooms work online too. The LAN `npm run party` server is still available for local matches.
 
 ## Run it locally
 
@@ -251,7 +252,7 @@ server/
 - **Reload / pump recordings**: “Gun reload sounds” by **SpringySpringo** via [OpenGameArt](https://opengameart.org/content/gun-reload-sounds), CC0.
 - UI, arena, bosses, effects and all remaining audio are generated in this project.
 
-See [CREDITS.md](CREDITS.md) for full asset links and license text.
+See [CREDITS.md](CREDITS.md) for full asset links and license text, and [docs/REALISM.md](docs/REALISM.md) for the photoreal-asset tradeoffs and upgrade path.
 
 ### Open asset sources used
 

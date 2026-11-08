@@ -662,6 +662,24 @@ export class AudioEngine {
         this.noise(t, 0.5, 0.07, bus, 'lowpass', 700, 150);
         this.tone(190, t + 0.12, 0.25, 'square', 0.04, bus, 900, 0.01, 90);
         break;
+      case 'tank':
+        this.tone(58, t, 0.55, 'sawtooth', 0.14, bus, 320, 0.01, 34);
+        this.tone(92, t + 0.04, 0.4, 'square', 0.05, bus, 500, 0.01, 48);
+        this.noise(t, 0.4, 0.06, bus, 'lowpass', 500, 90);
+        this.tone(180, t + 0.18, 0.22, 'sine', 0.08, bus, 600, 0.001, 42);
+        break;
+      case 'apc':
+        this.tone(110, t, 0.35, 'sawtooth', 0.08, bus, 600, 0.01, 70);
+        this.noise(t, 0.3, 0.04, bus, 'bandpass', 700, 300);
+        [0, 0.12, 0.24].forEach((offset) => {
+          this.tone(1100, t + offset, 0.05, 'square', 0.045, bus, 3000, 0.001, 320);
+        });
+        break;
+      case 'artillery':
+        this.tone(46, t, 0.75, 'sawtooth', 0.16, bus, 280, 0.01, 26);
+        this.noise(t, 0.6, 0.08, bus, 'lowpass', 420, 70);
+        this.tone(140, t + 0.2, 0.35, 'sine', 0.07, bus, 500, 0.001, 40);
+        break;
       case 'rex':
         this.tone(74, t, 0.78, 'sawtooth', 0.2, bus, 360, 0.01, 32);
         this.tone(44, t + 0.04, 0.65, 'triangle', 0.12, bus, 240, 0.01, 24);

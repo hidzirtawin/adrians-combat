@@ -14,7 +14,8 @@ export type EnemyKind =
   | 'spire' | 'banshee' | 'scarecrow' | 'mummy' | 'pumpkin' | 'wendigo'
   | 'jailer' | 'rainmaker' | 'aureole' | 'brood' | 'mirrored' | 'umbra' | 'collector'
   | 'rex' | 'jester' | 'titan' | 'warlord'
-  | 'helicopter' | 'jet' | 'striker' | 'omen' | 'phantom' | 'hexer' | 'yeti';
+  | 'helicopter' | 'jet' | 'striker' | 'omen' | 'phantom' | 'hexer' | 'yeti'
+  | 'tank' | 'apc' | 'artillery';
 
 export interface EnemyStats {
   hp: number;
@@ -115,6 +116,18 @@ const STATS: Record<EnemyKind, EnemyStats> = {
   yeti: {
     hp: 390, speed: 1.8, hitRadius: 1.0, hitOffset: 1.2, baseScale: 1, score: 390,
     contact: 20, hover: 0, isBoss: false, name: 'RIME TERROR', color: 0xd8f4ff, projectileColor: 0xcfefff,
+  },
+  tank: {
+    hp: 620, speed: 1.25, hitRadius: 1.3, hitOffset: 1.15, baseScale: 1, score: 700,
+    contact: 26, hover: 0, isBoss: false, name: 'SIEGE TANK', color: 0x8a9a6a, projectileColor: 0xffc247,
+  },
+  apc: {
+    hp: 360, speed: 2.1, hitRadius: 1.1, hitOffset: 1.05, baseScale: 1, score: 480,
+    contact: 18, hover: 0, isBoss: false, name: 'IRON CARRIER', color: 0x9fb7c9, projectileColor: 0x8ff8ff,
+  },
+  artillery: {
+    hp: 520, speed: 0.95, hitRadius: 1.35, hitOffset: 1.25, baseScale: 1, score: 760,
+    contact: 24, hover: 0, isBoss: false, name: 'GRAVE ARTILLERY', color: 0xb08a5a, projectileColor: 0xff8a3d,
   },
   voidling: {
     hp: 95, speed: 3.2, hitRadius: 0.8, hitOffset: 0.7, baseScale: 1, score: 210,
@@ -273,7 +286,12 @@ function mat(
   } else if (metalness <= 0.35) {
     material.roughnessMap = skinTexture;
     material.bumpMap = skinTexture;
-    material.bumpScale = 0.005;
+    material.bumpScale = 0.004;
+    material.sheen = 0.22;
+    material.sheenRoughness = 0.8;
+    material.sheenColor = new THREE.Color(0xffffff);
+    material.clearcoat = Math.max(material.clearcoat, 0.1);
+    material.clearcoatRoughness = 0.65;
   }
   return material;
 }
@@ -1455,6 +1473,216 @@ function buildWendigo(): Built & { limbs: ZombieLimbs } {
   };
 }
 
+function buildTank(): Built {
+  const group = new THREE.Group();
+  const armor = mat(0x4d5a3a, 0x000000, 0, 0.72, 0.52);
+  const dark = mat(0x181d15, 0x000000, 0, 0.62, 0.65);
+  const track = mat(0x10120f, 0x000000, 0, 0.45, 0.82);
+  const glow = glowMat(0xffc247, 0.9);
+
+  const shadow = new THREE.Mesh(
+    new THREE.CircleGeometry(1.6, 26),
+    new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.35, depthWrite: false }),
+  );
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.position.y = 0.02;
+  group.add(shadow);
+
+  const hull = new THREE.Mesh(new RoundedBoxGeometry(1.45, 0.5, 2.2, 4, 0.08), armor);
+  hull.position.y = 0.72;
+  group.add(hull);
+
+  const glacis = new THREE.Mesh(new RoundedBoxGeometry(1.2, 0.32, 0.55, 3, 0.06), armor);
+  glacis.position.set(0, 0.66, 1.15);
+  glacis.rotation.x = -0.28;
+  group.add(glacis);
+
+  for (const side of [-1, 1]) {
+    const tread = new THREE.Mesh(new RoundedBoxGeometry(0.34, 0.46, 2.35, 3, 0.08), track);
+    tread.position.set(side * 0.82, 0.34, 0);
+    group.add(tread);
+    for (let i = 0; i < 5; i++) {
+      const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.38, 10), dark);
+      wheel.name = 'tank-wheel';
+      wheel.rotation.z = Math.PI / 2;
+      wheel.position.set(side * 0.82, 0.33, -0.82 + i * 0.41);
+      group.add(wheel);
+    }
+    const skirt = new THREE.Mesh(new RoundedBoxGeometry(0.08, 0.3, 1.8, 2, 0.02), armor);
+    skirt.position.set(side * 0.64, 0.63, 0);
+    group.add(skirt);
+  }
+
+  const turret = new THREE.Group();
+  turret.name = 'tank-turret';
+  turret.position.set(0, 1.02, -0.18);
+  const turretBody = new THREE.Mesh(new RoundedBoxGeometry(0.9, 0.38, 0.95, 3, 0.1), armor);
+  turretBody.position.y = 0.18;
+  turret.add(turretBody);
+  const mantlet = new THREE.Mesh(new RoundedBoxGeometry(0.46, 0.26, 0.4, 3, 0.05), dark);
+  mantlet.position.set(0, 0.18, 0.5);
+  turret.add(mantlet);
+  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.09, 1.3, 10), dark);
+  barrel.rotation.x = Math.PI / 2;
+  barrel.position.set(0, 0.2, 1.15);
+  turret.add(barrel);
+  const brake = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.1, 0.22, 10), armor);
+  brake.rotation.x = Math.PI / 2;
+  brake.position.set(0, 0.2, 1.82);
+  turret.add(brake);
+  addGlow(group, 0xffc247, 0.6, new THREE.Vector3(0, 1.22, 1.95), 0.35);
+  const hatch = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.08, 10), dark);
+  hatch.position.set(0.2, 0.4, -0.1);
+  turret.add(hatch);
+  const antenna = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.015, 0.8, 5), dark);
+  antenna.position.set(-0.36, 0.7, -0.15);
+  turret.add(antenna);
+  group.add(turret);
+
+  for (const side of [-1, 1]) {
+    const light = new THREE.Mesh(new THREE.SphereGeometry(0.055, 8, 6), glow);
+    light.position.set(side * 0.48, 0.72, 1.38);
+    group.add(light);
+    addGlow(group, 0xffc247, 0.28, new THREE.Vector3(side * 0.48, 0.72, 1.42), 0.4);
+  }
+
+  const exhaust = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 0.3, 8), dark);
+  exhaust.position.set(0.5, 0.95, -1.1);
+  exhaust.rotation.x = Math.PI / 2;
+  group.add(exhaust);
+
+  return { group, materials: collectMaterials(group), hitRadius: 1.4, hitOffset: 1.15, baseScale: 1 };
+}
+
+function buildApc(): Built {
+  const group = new THREE.Group();
+  const armor = mat(0x5a6268, 0x000000, 0, 0.7, 0.48);
+  const dark = mat(0x15191c, 0x000000, 0, 0.6, 0.65);
+  const glass = new THREE.MeshPhysicalMaterial({
+    color: 0x10232b,
+    emissive: 0x43f3ff,
+    emissiveIntensity: 0.3,
+    metalness: 0.2,
+    roughness: 0.08,
+    clearcoat: 1,
+    transparent: true,
+    opacity: 0.7,
+  });
+
+  const shadow = new THREE.Mesh(
+    new THREE.CircleGeometry(1.35, 24),
+    new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.33, depthWrite: false }),
+  );
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.position.y = 0.02;
+  group.add(shadow);
+
+  const hull = new THREE.Mesh(new RoundedBoxGeometry(1.25, 0.55, 2.15, 4, 0.1), armor);
+  hull.position.y = 0.62;
+  group.add(hull);
+
+  const nose = new THREE.Mesh(new RoundedBoxGeometry(1.1, 0.42, 0.55, 3, 0.06), armor);
+  nose.position.set(0, 0.54, 1.02);
+  nose.rotation.x = -0.32;
+  group.add(nose);
+
+  const windshield = new THREE.Mesh(new RoundedBoxGeometry(0.7, 0.24, 0.05, 3, 0.02), glass);
+  windshield.position.set(0, 0.72, 1.3);
+  windshield.rotation.x = -0.28;
+  group.add(windshield);
+
+  for (const side of [-1, 1]) {
+    for (const z of [-0.72, 0, 0.72]) {
+      const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.26, 12), dark);
+      wheel.name = 'tank-wheel';
+      wheel.rotation.z = Math.PI / 2;
+      wheel.position.set(side * 0.68, 0.3, z);
+      group.add(wheel);
+    }
+  }
+
+  const turret = new THREE.Group();
+  turret.name = 'tank-turret';
+  turret.position.set(0, 0.92, -0.32);
+  const turretBody = new THREE.Mesh(new RoundedBoxGeometry(0.62, 0.28, 0.6, 3, 0.06), armor);
+  turretBody.position.y = 0.12;
+  turret.add(turretBody);
+  const gun = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.055, 0.8, 8), dark);
+  gun.rotation.x = Math.PI / 2;
+  gun.position.set(0, 0.16, 0.55);
+  turret.add(gun);
+  addGlow(group, 0x43f3ff, 0.32, new THREE.Vector3(0, 1.05, 0.95), 0.35);
+  group.add(turret);
+
+  for (const side of [-1, 1]) {
+    const light = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 6), glowMat(0x8ff8ff, 0.9));
+    light.position.set(side * 0.5, 0.6, 1.36);
+    group.add(light);
+  }
+
+  return { group, materials: collectMaterials(group), hitRadius: 1.2, hitOffset: 1.05, baseScale: 1 };
+}
+
+function buildArtillery(): Built {
+  const group = new THREE.Group();
+  const armor = mat(0x6b5a3a, 0x000000, 0, 0.68, 0.55);
+  const dark = mat(0x1a1710, 0x000000, 0, 0.6, 0.68);
+  const track = mat(0x0e0f0b, 0x000000, 0, 0.4, 0.85);
+  const glow = glowMat(0xff8a3d, 0.9);
+
+  const shadow = new THREE.Mesh(
+    new THREE.CircleGeometry(1.7, 26),
+    new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.35, depthWrite: false }),
+  );
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.position.y = 0.02;
+  group.add(shadow);
+
+  const hull = new THREE.Mesh(new RoundedBoxGeometry(1.4, 0.42, 2.6, 4, 0.08), armor);
+  hull.position.y = 0.62;
+  group.add(hull);
+
+  for (const side of [-1, 1]) {
+    const tread = new THREE.Mesh(new RoundedBoxGeometry(0.34, 0.44, 2.7, 3, 0.07), track);
+    tread.position.set(side * 0.82, 0.3, 0);
+    group.add(tread);
+    for (let i = 0; i < 6; i++) {
+      const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.36, 10), dark);
+      wheel.name = 'tank-wheel';
+      wheel.rotation.z = Math.PI / 2;
+      wheel.position.set(side * 0.82, 0.3, -1.0 + i * 0.4);
+      group.add(wheel);
+    }
+  }
+
+  const turret = new THREE.Group();
+  turret.name = 'tank-turret';
+  turret.position.set(0, 0.95, -0.35);
+  const turretBody = new THREE.Mesh(new RoundedBoxGeometry(1.0, 0.38, 1.0, 3, 0.08), armor);
+  turretBody.position.y = 0.18;
+  turret.add(turretBody);
+
+  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.11, 2.0, 10), dark);
+  barrel.rotation.x = Math.PI / 2 - 0.18;
+  barrel.position.set(0, 0.45, 1.2);
+  turret.add(barrel);
+  const muzzle = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.1, 0.22, 10), dark);
+  muzzle.rotation.x = Math.PI / 2 - 0.18;
+  muzzle.position.set(0, 0.63, 2.12);
+  turret.add(muzzle);
+  addGlow(group, 0xff8a3d, 0.7, new THREE.Vector3(0, 1.62, 2.2), 0.35);
+
+  for (const side of [-1, 1]) {
+    const spade = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.5, 0.7), dark);
+    spade.position.set(side * 0.6, 0.3, -1.55);
+    spade.rotation.x = 0.3;
+    group.add(spade);
+  }
+  group.add(turret);
+
+  return { group, materials: collectMaterials(group), hitRadius: 1.45, hitOffset: 1.25, baseScale: 1 };
+}
+
 function buildHelicopter(): Built {
   const group = new THREE.Group();
   const armor = mat(0x25292e, 0x000000, 0, 0.78, 0.46);
@@ -1519,6 +1747,13 @@ function buildHelicopter(): Built {
     blade.position.y = 0.02;
     mainRotor.add(blade);
   }
+  const blur = new THREE.Mesh(
+    new THREE.CircleGeometry(1.62, 40),
+    new THREE.MeshBasicMaterial({ color: 0x9fb7c9, transparent: true, opacity: 0.1, side: THREE.DoubleSide, depthWrite: false }),
+  );
+  blur.rotation.x = -Math.PI / 2;
+  blur.position.y = 0.03;
+  mainRotor.add(blur);
   group.add(mainRotor);
 
   for (const side of [-1, 1]) {
@@ -2574,7 +2809,7 @@ export class Enemy {
   private tmp = new THREE.Vector3();
   private tmp2 = new THREE.Vector3();
 
-  constructor(kind: EnemyKind, wave: number, position: THREE.Vector3, scaleMul = 1) {
+  constructor(kind: EnemyKind, wave: number, position: THREE.Vector3, scaleMul = 1, hpMul = 1) {
     this.kind = kind;
     this.stats = STATS[kind];
     this.name = this.stats.name;
@@ -2595,7 +2830,7 @@ export class Enemy {
     const difficulty = this.isBoss
       ? 1 + Math.max(0, wave - 5) * 0.055
       : 1 + Math.max(0, wave - 1) * 0.13;
-    this.maxHp = Math.round(this.stats.hp * difficulty * (this.isBoss ? cfg.bossHp : cfg.hp));
+    this.maxHp = Math.round(this.stats.hp * difficulty * (this.isBoss ? cfg.bossHp : cfg.hp) * Math.max(1, hpMul));
     this.hp = this.maxHp;
 
     this.group.position.copy(position);
@@ -2644,9 +2879,52 @@ export class Enemy {
       case 'jet': return buildJet();
       case 'striker': return buildGlbModel('shipStriker', 5.0, undefined, 1.8, 'longest', false) ?? buildJet();
       case 'omen': return buildGlbModel('shipOmen', 4.6, undefined, 2.2, 'longest', false) ?? buildMothership(0x8f5cff, 0x43f3ff);
-      case 'phantom': return buildGlbModel('phantom', 1.8, undefined, 0.8) ?? buildBanshee();
-      case 'hexer': return buildGlbModel('hexerRpg', 1.9, undefined, 0.8) ?? buildScarecrow();
-      case 'yeti': return buildGlbModel('yeti', 2.25, undefined, 1.0) ?? buildWendigo();
+      case 'phantom': {
+        const built = buildGlbModel('phantom', 1.9, undefined, 0.8);
+        if (built) {
+          const cloakMat = new THREE.MeshPhysicalMaterial({
+            color: 0x9fc8dc,
+            emissive: 0x3d6f88,
+            emissiveIntensity: 0.45,
+            transparent: true,
+            opacity: 0.55,
+            roughness: 0.3,
+            clearcoat: 0.4,
+            side: THREE.DoubleSide,
+            depthWrite: false,
+          });
+          const cloak = new THREE.Mesh(new THREE.ConeGeometry(0.52, 1.35, 16, 1, true), cloakMat);
+          cloak.position.set(0, 0.05, 0);
+          built.group.add(cloak);
+          for (let i = 0; i < 5; i++) {
+            const tatter = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.5, 5, 1, true), cloakMat);
+            const a = (i / 5) * Math.PI * 2;
+            tatter.position.set(Math.cos(a) * 0.34, -0.58, Math.sin(a) * 0.34);
+            tatter.rotation.x = Math.PI;
+            built.group.add(tatter);
+          }
+          addGlow(built.group, 0x8fd4ff, 1.2, new THREE.Vector3(0, 0.4, 0), 0.18);
+        }
+        return built ?? buildBanshee();
+      }
+      case 'hexer': {
+        const built = buildGlbModel('hexerRpg', 2.2, undefined, 0.8);
+        if (built) {
+          const staff = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.03, 1.8, 8), mat(0x3a2a1a, 0x000000, 0, 0.2, 0.75));
+          staff.position.set(0.42, 1.0, 0.1);
+          staff.rotation.z = -0.08;
+          built.group.add(staff);
+          const orb = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 8), mat(0xc08bff, 0xc08bff, 2.6, 0.2, 0.2));
+          orb.position.set(0.5, 1.92, 0.1);
+          built.group.add(orb);
+          addGlow(built.group, 0xc08bff, 0.5, new THREE.Vector3(0.5, 1.92, 0.12), 0.55);
+        }
+        return built ?? buildScarecrow();
+      }
+      case 'yeti': return buildGlbModel('rime', 2.4, undefined, 1.1) ?? buildWendigo();
+      case 'tank': return buildTank();
+      case 'apc': return buildApc();
+      case 'artillery': return buildArtillery();
       case 'voidling': return buildVoidling();
       case 'demon': return buildDemon();
       case 'mech':
@@ -2811,6 +3089,15 @@ export class Enemy {
       case 'yeti':
         this.updateWalker(adt, ctx, 1.0);
         break;
+      case 'tank':
+        this.updateTank(adt, ctx, manager, 8.5, 3.2, 24, 8.5, 1);
+        break;
+      case 'apc':
+        this.updateTank(adt, ctx, manager, 6.5, 2.1, 7, 12, 3);
+        break;
+      case 'artillery':
+        this.updateTank(adt, ctx, manager, 15, 4.8, 32, 6.5, 1);
+        break;
       case 'voidling':
         this.updateWalker(adt, ctx, 1.0);
         break;
@@ -2927,6 +3214,26 @@ export class Enemy {
       ctx.enemyVoice?.(this.kind, 'attack', this.group.position);
       ctx.damagePlayer(this.stats.contact, this.group.position.clone().add(new THREE.Vector3(0, 1, 0)));
       ctx.fx.burst(this.group.position.clone().add(new THREE.Vector3(0, 1.1, 0)), 0xff3355, 8, 4, 0.35);
+    }
+  }
+
+  private updateTank(
+    dt: number,
+    ctx: CombatContext,
+    manager: EnemyManager,
+    stopRange: number,
+    interval: number,
+    damage: number,
+    speed: number,
+    count: number,
+  ): void {
+    this.updateWalker(dt, ctx, stopRange);
+    this.shootAtPlayer(ctx, manager, speed, damage, interval, 0.015, count);
+    const turret = this.group.getObjectByName('tank-turret');
+    if (turret) {
+      const target = ctx.player.pos;
+      const angle = Math.atan2(target.x - this.group.position.x, target.z - this.group.position.z);
+      turret.rotation.y = angle - this.group.rotation.y;
     }
   }
 
@@ -3311,6 +3618,8 @@ export class Enemy {
         child.rotation.x += dt * 42;
       } else if (child.name === 'jet-flame') {
         child.scale.set(1 + Math.sin(this.age * 34) * 0.12, 1 + Math.sin(this.age * 27) * 0.18, 1);
+      } else if (child.name === 'tank-wheel') {
+        child.rotation.x += dt * (2.5 + this.moveSpeed * 2.2);
       }
     }
 
@@ -3355,8 +3664,8 @@ export class EnemyManager {
     this.projectiles = new ProjectilePool(this.root);
   }
 
-  spawn(kind: EnemyKind, wave: number, position: THREE.Vector3, scaleMul = 1): Enemy {
-    const enemy = new Enemy(kind, wave, position, scaleMul);
+  spawn(kind: EnemyKind, wave: number, position: THREE.Vector3, scaleMul = 1, hpMul = 1): Enemy {
+    const enemy = new Enemy(kind, wave, position, scaleMul, hpMul);
     this.enemies.push(enemy);
     this.root.add(enemy.group);
     return enemy;
