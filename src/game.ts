@@ -163,6 +163,15 @@ export class Game {
   private bombHold = 0;
   private bombHoldLatched = false;
   private bombs: Array<{ mesh: THREE.Mesh; velocity: THREE.Vector3; life: number; def: BombDef; charged?: boolean }> = [];
+  private fireFields: Array<{
+    mesh: THREE.Mesh;
+    material: THREE.MeshBasicMaterial;
+    position: THREE.Vector3;
+    radius: number;
+    dps: number;
+    remaining: number;
+    tick: number;
+  }> = [];
   private readonly bombGeo = new THREE.SphereGeometry(0.14, 12, 10);
   private readonly bombMats = new Map<number, THREE.MeshBasicMaterial>();
   private lastBombText = '';
@@ -1143,7 +1152,11 @@ export class Game {
         <div class="armory-stats">
           ${bar('DMG', def.damage, 220, String(def.damage))}
           ${bar('RADIUS', def.radius, 9, `${def.radius}m`)}
-          ${bar('FREEZE', def.freeze, 5, def.freeze > 0 ? `${def.freeze}s` : '—')}
+          ${def.burnDps
+            ? bar('BURN', def.burnDps, 80, `${def.burnDps}/s · ${def.burnDuration ?? 0}s`)
+            : def.pull
+              ? bar('PULL', def.pull, 4, `${def.pull}m`)
+              : bar('FREEZE', def.freeze, 5, def.freeze > 0 ? `${def.freeze}s` : '—')}
         </div>
       </button>`;
     }).join('');
@@ -1297,6 +1310,22 @@ export class Game {
     pos.y = Math.max(0.15, pos.y);
     this.worldRoot.remove(bomb.mesh);
 
+    if (def.pull) {
+      for (const enemy of this.enemies.enemies) {
+        if (enemy.dead) continue;
+        const dx = pos.x - enemy.group.position.x;
+        const dz = pos.z - enemy.group.position.z;
+        const distance = Math.hypot(dx, dz);
+        if (distance < radius * 1.7 && distance > 0.05) {
+          const amount = Math.min(def.pull, distance * 0.65);
+          enemy.group.position.x += (dx / distance) * amount;
+          enemy.group.position.z += (dz / distance) * amount;
+          this.fx.ring(enemy.group.position.clone(), def.color, 1.1, 0.3);
+        }
+      }
+      this.fx.ring(pos, def.color, radius * 1.7, 1.1, 0.55);
+    }
+
     let kills = 0;
     for (const enemy of this.enemies.enemies) {
       if (enemy.dead) continue;
@@ -1311,6 +1340,32 @@ export class Game {
         kills++;
         this.handleKill(enemy, center);
       }
+    }
+
+    if (def.burnDps && def.burnDuration) {
+      const material = new THREE.MeshBasicMaterial({
+        color: def.color,
+        transparent: true,
+        opacity: 0.2,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+      });
+      const field = new THREE.Mesh(new THREE.CircleGeometry(radius * 0.92, 32), material);
+      field.rotation.x = -Math.PI / 2;
+      field.position.set(pos.x, 0.055, pos.z);
+      field.frustumCulled = false;
+      this.worldRoot.add(field);
+      this.fireFields.push({
+        mesh: field,
+        material,
+        position: pos.clone().setY(0),
+        radius,
+        dps: def.burnDps,
+        remaining: def.burnDuration,
+        tick: 0.1,
+      });
+      this.fx.ring(pos, def.color, radius, 1.2, 0.5);
     }
 
     this.fx.burst(pos, def.color, bomb.charged ? 110 : 70, bomb.charged ? 16 : 13, 1.2);
@@ -1329,9 +1384,46 @@ export class Game {
     }
   }
 
+  private updateFireFields(dt: number): void {
+    for (let i = this.fireFields.length - 1; i >= 0; i--) {
+      const field = this.fireFields[i];
+      field.remaining -= dt;
+      field.tick -= dt;
+      field.material.opacity = 0.14 + Math.max(0, Math.sin(field.remaining * 11)) * 0.1;
+
+      if (field.tick <= 0) {
+        field.tick = 0.5;
+        for (const enemy of this.enemies.enemies) {
+          if (enemy.dead) continue;
+          const center = enemy.hitCenter(new THREE.Vector3());
+          const distance = center.distanceTo(field.position);
+          if (distance > field.radius) continue;
+          const falloff = 1 - Math.min(1, distance / field.radius) * 0.35;
+          const damage = field.dps * 0.5 * falloff;
+          const died = enemy.takeDamage(damage);
+          this.fx.damageNumber(center, Math.round(damage), '#ffb36b', false);
+          if (died) this.handleKill(enemy, center);
+        }
+      }
+
+      if (field.remaining <= 0) {
+        this.worldRoot.remove(field.mesh);
+        field.mesh.geometry.dispose();
+        field.material.dispose();
+        this.fireFields.splice(i, 1);
+      }
+    }
+  }
+
   private clearBombs(): void {
     for (const bomb of this.bombs) this.worldRoot.remove(bomb.mesh);
     this.bombs.length = 0;
+    for (const field of this.fireFields) {
+      this.worldRoot.remove(field.mesh);
+      field.mesh.geometry.dispose();
+      field.material.dispose();
+    }
+    this.fireFields.length = 0;
   }
 
   // ───────────────────────────── Flow ─────────────────────────────
@@ -1802,6 +1894,7 @@ export class Game {
 
     this.bombCooldown = Math.max(0, this.bombCooldown - dt);
     this.updateBombs(dt);
+    this.updateFireFields(dt);
     this.updateBombUI();
 
     this.ctx.freezeFactor = this.freezeTimer > 0 ? 0.45 : 1;

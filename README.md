@@ -1,6 +1,6 @@
 # ADRIAN'S COMBAT MISSION — AR Invasion
 
-A camera-first AR shooter that runs in the phone browser. No keyboard, no controller: point your phone, hold **FIRE**, tap **RELOAD**, and walk around your room, garden or street. Hold **FIRE** to charge and throw your selected special bomb.
+A camera-first AR shooter that runs in the phone browser. No keyboard, no controller: point your phone, hold **FIRE**, tap **RELOAD**, and walk around your room, garden or street. Tap **BOMB** to throw your selected special bomb, or hold **FIRE** to charge a stronger one.
 
 An original camera-first AR shooter built for the phone browser.
 
@@ -13,7 +13,7 @@ An original camera-first AR shooter built for the phone browser.
 - **Location** — GPS moves you through the real world so enemies and pickups stay anchored around you. GPS is also used for the experimental tag mode.
 - **Three touch controls** — FIRE, RELOAD and BOMB. Tap BOMB to throw your equipped explosive, or hold FIRE for 0.9 s to charge a stronger blast. Auto-reload tops up after a short pause or an empty magazine.
 - **Armory with 3D preview** — drag to rotate each weapon in a studio render. Six authored GLB guns plus twelve procedural rifles, pistols, revolvers, an LMG and sci-fi blasters.
-- **Special bombs** — tap **BOMB** to throw your equipped Frag, Shock, Cryo, Plasma, Cluster or EMP bomb. Hold **FIRE** for 0.9 s to charge a stronger version: +35% damage and +18% radius.
+- **Special bombs** — tap **BOMB** to throw your equipped Frag, Shock, Cryo, Plasma, Cluster, EMP, Incendiary, Acid, Flashbang, Graviton or Nuke bomb. Hold **FIRE** for 0.9 s to charge a stronger version: +35% damage and +18% radius. Incendiary and Acid leave burning pools; Graviton pulls enemies into the blast.
 - **Sector levels** — eight named levels of ten waves each, with unique accents, enemy rosters, sector bosses and escalating multipliers. Levels loop with harder modifiers after the eighth sector.
 - **Progression** — seven starter weapons are unlocked immediately: Pulse Rifle, Viper SMG, Vanguard AR, Scatter Blaster, Sidearm 9, Magnum 44 and Wasp 93. Earn Salvage from kills, waves and bosses for the rest; the game-over screen shows your next unlock. The first run each day pays 2× Salvage.
 - **Enemies** — Hellwasps, Grave Saucers, Gravewalkers, Gorehulks, Void Spawn, Ripclaws, Cacklers, Void Larvae, Hellbrutes, Iron Reapers, Cinderbread, Straw Reapers, Shriek Wraiths, Tomb Bound, Hell Lanterns, Frost Maws, Scream Spires, Rotor Reavers, Sky Shredders, Starfangs, Black Omens, Pale Phantoms, Hex Casters, Rime Terrors, Siege Tanks, Iron Carriers, Grave Artillery, Grim Reapers, Evil Clowns, Abyssal Krakens, Emerald Harriers, Void Symbiotes, Hell Monkeys, Ironhide Rhinos and Crimson Maelstroms, each with their own AI, voice and projectiles. Spawn pools are randomised every wave.
@@ -25,7 +25,7 @@ An original camera-first AR shooter built for the phone browser.
   - **Free For All** — live score battle, 2–6 phones.
   - **Teams** — auto-balanced 3v3 team score battle.
   - **GPS Tag (experimental)** — outdoors, walk within 15 m of a rival and hold FIRE to tag.
-- **Visible LIFE bar** — shield + life with current/max values, green/amber/red health states and a critical low-health pulse. Now shown on phones too.
+- **Visible health bar** — shield + health with current/max values, green/amber/red health states and a critical low-health pulse. Now shown on phones too.
 - **Realistic GLB weapon** — an authored AKM viewmodel with wood/metal materials, muzzle flash, live muzzle light, recoil, reload dip and idle sway.
 - **Realistic feedback** — camera recoil, damage-direction arrows, multi-kill callouts, haptics and positional 3D audio.
 - **Space-opera SFX** — original synthesized blaster bolts, TIE-style fighter screech, X-wing whine, hyperspace whoosh, Imperial klaxon, droid chirps, lightsaber ignition and a Force-like rumble. These are inspired by the genre, not licensed Star Wars recordings.
@@ -168,8 +168,13 @@ There are no movement keys. The AR **EVADE** stick lets you sidestep incoming fi
 | Plasma | 340 damage in a 7 m blast | 18 s |
 | Cluster | 150 damage in an 11 m blast | 17 s |
 | EMP | 90 damage, 10 m, long freeze | 15 s |
+| Incendiary | 140 damage, 8 m + burning pool | 16 s |
+| Acid | 100 damage, 7 m + stronger burning pool | 15 s |
+| Flashbang | 35 damage, 10 m, long stun | 14 s |
+| Graviton | 260 damage, 7 m, pulls enemies in | 19 s |
+| Nuke | 800 damage in a 14 m blast | 35 s |
 
-The Armory shows damage, rate, magazine, range, radius and freeze values on each card. Seven starter weapons are unlocked from the first run; the rest are bought with Salvage. Loadout persists between runs and squad sessions.
+The Armory shows damage, rate, magazine, range, radius, freeze, burn and pull values on each card. Seven starter weapons are unlocked from the first run; the rest are bought with Salvage. Loadout persists between runs and squad sessions.
 
 ### Realism settings
 
@@ -249,7 +254,7 @@ src/
   cameraAR.ts           camera stream, gyro/compass aim, GPS tracking
   enemies.ts            animated GLB enemies + procedural bosses
   weapons.ts            eighteen primaries, procedural gun builders + AKM viewmodel
-  bombs.ts              Frag / Shock / Cryo bomb definitions
+  bombs.ts              eleven bomb definitions and effects
   pickups.ts            power-ups and magnet collection
   hud.ts                HUD, radar, squad board, tag prompt
   fx.ts                 pooled tracers, sparks, shockwaves, damage numbers

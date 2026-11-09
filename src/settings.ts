@@ -68,7 +68,7 @@ const PRIMARY_IDS = [
 if (!PRIMARY_IDS.includes(settings.primary)) {
   settings.primary = 'pulse';
 }
-if (!['frag', 'shock', 'cryo', 'plasma', 'cluster', 'emp'].includes(settings.bomb)) {
+if (!['frag', 'shock', 'cryo', 'plasma', 'cluster', 'emp', 'incendiary', 'acid', 'flash', 'graviton', 'nuke'].includes(settings.bomb)) {
   settings.bomb = 'frag';
 }
 if (!Number.isFinite(settings.fov)) settings.fov = 68;
