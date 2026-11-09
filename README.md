@@ -11,11 +11,11 @@ An original camera-first AR shooter built for the phone browser.
 - **Live camera AR** — the rear camera is the game view, with a transparent neon HUD and contact shadows on the floor.
 - **Motion aim** — gyroscope + compass turn your phone into the gun; drag anywhere to fine-tune. If motion is denied, drag-to-aim still works.
 - **Location** — GPS moves you through the real world so enemies and pickups stay anchored around you. GPS is also used for the experimental tag mode.
-- **Two touch controls** — FIRE and RELOAD, both the same size like a native AR shooter. Hold FIRE to charge a stronger special bomb. Auto-reload tops up after a short pause or an empty magazine.
+- **Three touch controls** — FIRE, RELOAD and BOMB. Tap BOMB to throw your equipped explosive, or hold FIRE for 0.9 s to charge a stronger blast. Auto-reload tops up after a short pause or an empty magazine.
 - **Armory with 3D preview** — drag to rotate each weapon in a studio render. Six authored GLB guns plus twelve procedural rifles, pistols, revolvers, an LMG and sci-fi blasters.
-- **Special bombs** — hold **FIRE** for 0.9 s to charge a stronger blast with your equipped Frag, Shock, Cryo, Plasma, Cluster or EMP bomb. A ring fills around the button; the blast gets +35% damage and +18% radius.
+- **Special bombs** — tap **BOMB** to throw your equipped Frag, Shock, Cryo, Plasma, Cluster or EMP bomb. Hold **FIRE** for 0.9 s to charge a stronger version: +35% damage and +18% radius.
 - **Sector levels** — eight named levels of ten waves each, with unique accents, enemy rosters, sector bosses and escalating multipliers. Levels loop with harder modifiers after the eighth sector.
-- **Progression** — earn Salvage from kills, waves and bosses. Locked weapons are greyed out until bought; the game-over screen shows your next unlock and progress. The first run each day pays 2× Salvage.
+- **Progression** — seven starter weapons are unlocked immediately: Pulse Rifle, Viper SMG, Vanguard AR, Scatter Blaster, Sidearm 9, Magnum 44 and Wasp 93. Earn Salvage from kills, waves and bosses for the rest; the game-over screen shows your next unlock. The first run each day pays 2× Salvage.
 - **Enemies** — Hellwasps, Grave Saucers, Gravewalkers, Gorehulks, Void Spawn, Ripclaws, Cacklers, Void Larvae, Hellbrutes, Iron Reapers, Cinderbread, Straw Reapers, Shriek Wraiths, Tomb Bound, Hell Lanterns, Frost Maws, Scream Spires, Rotor Reavers, Sky Shredders, Starfangs, Black Omens, Pale Phantoms, Hex Casters, Rime Terrors, Siege Tanks, Iron Carriers, Grave Artillery, Grim Reapers and Evil Clowns, each with their own AI, voice and projectiles. Spawn pools are randomised every wave.
 - **Four difficulty levels** — Easy / Normal / Hard / Insane. Scales enemy HP, damage, speed, horde size, shield regen and score. Pick it from the main menu or Settings; it persists.
 - **Eleven bosses** every five waves — The Jailer, Bone Maw, The Grinning One, Void Colossus, The Butcher King, The Rainmaker, Aureole, The Brood Queen, The Mirrored, Umbra and The Collector. Original horror archetypes, not licensed characters.
@@ -126,7 +126,8 @@ Browser camera AR also has no depth sensing or room occlusion. Holograms can app
 | Aim | Turn the phone (gyro) or drag anywhere |
 | Fire | Hold **FIRE** |
 | Reload | **RELOAD** (auto-reloads when empty or below 30%) |
-| Special bomb | Hold **FIRE** for 0.9 s, then the charged bomb is thrown |
+| Bomb | Tap **BOMB** to throw the equipped bomb |
+| Charged bomb | Hold **FIRE** for 0.9 s, then release for a stronger blast |
 | Change loadout | **ARMORY** on the main menu |
 | Pause / exit | Small pause icon, top-right |
 
@@ -168,7 +169,7 @@ There are no movement keys. The AR **EVADE** stick lets you sidestep incoming fi
 | Cluster | 150 damage in an 11 m blast | 17 s |
 | EMP | 90 damage, 10 m, long freeze | 15 s |
 
-The Armory shows damage, rate, magazine, range, radius and freeze values on each card. Loadout persists between runs and squad sessions.
+The Armory shows damage, rate, magazine, range, radius and freeze values on each card. Seven starter weapons are unlocked from the first run; the rest are bought with Salvage. Loadout persists between runs and squad sessions.
 
 ### Realism settings
 

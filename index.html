@@ -110,6 +110,7 @@
         <div id="moveStick" class="ar-move-stick"><i></i><span>EVADE</span></div>
         <button id="btnAim" aria-pressed="false"><span>AIM</span></button>
         <div id="actionButtons">
+          <button id="btnBomb">BOMB</button>
           <button id="btnReload">RELOAD</button>
           <button id="btnFire">FIRE</button>
         </div>
@@ -180,7 +181,7 @@
     <div id="armory" class="screen modal hidden">
       <div class="panel wide">
         <div class="panel-head"><small>LOADOUT</small><h2>ARMORY</h2></div>
-        <p class="armory-help">Pick one primary and one bomb. Your loadout saves automatically. Hold FIRE to charge and throw a special bomb. New weapons unlock with Salvage.</p>
+        <p class="armory-help">Pick one primary and one bomb. Seven starter weapons are already unlocked; earn Salvage for the rest. Tap BOMB to throw, or hold FIRE for 0.9 s to charge a stronger blast.</p>
         <div id="loadoutSummary" class="loadout-summary"></div>
         <div class="armory-wallet"><span>AVAILABLE SALVAGE</span><b id="armorySalvage">0</b></div>
 
@@ -399,7 +400,8 @@
               <li><kbd>AIM</kbd><span>Center an enemy in the crosshair</span></li>
               <li><kbd>FIRE</kbd><span>Hold to shoot</span></li>
               <li><kbd>RELOAD</kbd><span>Refill the magazine</span></li>
-              <li><kbd>HOLD FIRE</kbd><span>Charge the ring, then release the special bomb</span></li>
+              <li><kbd>BOMB</kbd><span>Tap to throw your equipped bomb</span></li>
+              <li><kbd>HOLD FIRE</kbd><span>Charge the ring, then release a stronger bomb blast</span></li>
               <li><kbd>WALK</kbd><span>Move in the real world</span></li>
               <li><kbd>DRAG</kbd><span>Fine-tune your aim</span></li>
               <li><kbd>EVADE</kbd><span>Use the left stick to sidestep incoming fire</span></li>

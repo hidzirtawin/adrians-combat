@@ -32,6 +32,10 @@ export const WEAPON_PRICES: Record<WeaponId, number> = {
   disruptor: 4500,
 };
 
+export const STARTER_WEAPONS: WeaponId[] = [
+  'pulse', 'sidearm', 'viper', 'vanguard', 'scatter', 'magnum', 'wasp',
+];
+
 export const WEAPON_ORDER: WeaponId[] = [
   'pulse', 'sidearm', 'viper', 'vanguard', 'vector', 'arx', 'magnum', 'warlord',
   'scatter', 'wasp', 'ion', 'sentinel', 'breacher', 'longshot', 'plasma', 'vulcan',
@@ -42,7 +46,7 @@ const KEY = 'adrianscombat.progress.v1';
 
 const defaults: ProgressState = {
   salvage: 0,
-  unlocked: ['pulse'],
+  unlocked: [...STARTER_WEAPONS],
   lifetimeSalvage: 0,
   totalKills: 0,
   runs: 0,
@@ -65,7 +69,7 @@ function normalize(raw: Partial<ProgressState> | null): ProgressState {
   const unlocked = Array.isArray(raw?.unlocked) ? raw!.unlocked.filter((id): id is WeaponId => WEAPON_ORDER.includes(id)) : [];
   return {
     salvage: Math.max(0, Number(raw?.salvage) || 0),
-    unlocked: Array.from(new Set<WeaponId>(['pulse', ...unlocked])),
+    unlocked: Array.from(new Set<WeaponId>([...STARTER_WEAPONS, ...unlocked])),
     lifetimeSalvage: Math.max(0, Number(raw?.lifetimeSalvage) || 0),
     totalKills: Math.max(0, Number(raw?.totalKills) || 0),
     runs: Math.max(0, Number(raw?.runs) || 0),
