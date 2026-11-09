@@ -750,6 +750,52 @@ export class AudioEngine {
         this.noise(t, 0.7, 0.05, bus, 'bandpass', 1400, 300);
         [880, 1180, 660].forEach((f, i) => this.tone(f, t + 0.18 + i * 0.07, 0.15, 'sawtooth', 0.03, bus, 5000, 0.01, f * 0.6));
         break;
+      case 'arachno':
+        [2400, 3100, 2700, 3600, 2200].forEach((f, i) => this.tone(f, t + i * 0.025, 0.018, 'square', 0.02, bus, 8000, 0.001, f * 1.1));
+        this.noise(t, 0.1, 0.02, bus, 'highpass', 3000);
+        break;
+      case 'ophidia':
+        this.noise(t, 0.55, 0.05, bus, 'highpass', 2200, 900);
+        this.tone(340, t, 0.5, 'sawtooth', 0.035, bus, 2600, 0.04, 180);
+        break;
+      case 'vertigo':
+        this.tone(1800, t, 0.55, 'sine', 0.045, bus, 7000, 0.02, 220);
+        this.noise(t, 0.5, 0.04, bus, 'highpass', 1200, 3200);
+        break;
+      case 'nycto':
+        this.noise(t, 0.45, 0.03, bus, 'highpass', 2400, 700);
+        this.tone(130, t, 0.5, 'sine', 0.045, bus, 600, 0.03, 70);
+        this.tone(520, t + 0.2, 0.2, 'triangle', 0.02, bus, 3000, 0.01, 260);
+        break;
+      case 'trypa':
+        this.tone(1800, t, 0.05, 'square', 0.05, bus, 9000, 0.001, 2400);
+        this.tone(900, t + 0.06, 0.22, 'sine', 0.04, bus, 5000, 0.01, 300);
+        break;
+      case 'hemogoblin':
+        this.tone(90, t, 0.6, 'sawtooth', 0.1, bus, 500, 0.03, 45);
+        this.noise(t, 0.45, 0.07, bus, 'lowpass', 900, 200);
+        this.tone(220, t + 0.1, 0.3, 'triangle', 0.04, bus, 900, 0.02, 120);
+        break;
+      case 'storm':
+        this.noise(t, 0.35, 0.12, bus, 'highpass', 1200, 4000);
+        this.tone(60, t, 0.5, 'sawtooth', 0.14, bus, 400, 0.01, 30);
+        this.noise(t + 0.18, 0.3, 0.06, bus, 'lowpass', 700, 120);
+        break;
+      case 'hound':
+        this.tone(120, t, 0.18, 'sawtooth', 0.1, bus, 700, 0.01, 70);
+        this.noise(t, 0.22, 0.05, bus, 'bandpass', 900, 400);
+        this.tone(180, t + 0.2, 0.16, 'square', 0.05, bus, 900, 0.01, 120);
+        break;
+      case 'commitment':
+        [880, 1108, 1318].forEach((f, i) => this.tone(f, t + i * 0.12, 0.6, 'sine', 0.04, bus, 5000, 0.02));
+        this.noise(t + 0.1, 0.4, 0.025, bus, 'bandpass', 2600, 900);
+        this.tone(90, t, 0.7, 'sawtooth', 0.06, bus, 500, 0.02, 40);
+        break;
+      case 'stagefright':
+        this.noise(t, 0.6, 0.035, bus, 'bandpass', 1200, 500);
+        [440, 554, 659, 880].forEach((f, i) => this.tone(f, t + i * 0.08, 0.3, 'triangle', 0.025, bus, 3000, 0.02));
+        this.tone(120, t + 0.3, 0.4, 'sine', 0.05, bus, 600, 0.02, 60);
+        break;
       case 'rex':
         this.tone(74, t, 0.78, 'sawtooth', 0.2, bus, 360, 0.01, 32);
         this.tone(44, t + 0.04, 0.65, 'triangle', 0.12, bus, 240, 0.01, 24);

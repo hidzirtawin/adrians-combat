@@ -50,10 +50,12 @@ const BOSS_CYCLE: Array<{ kind: EnemyKind; name: string; scale: number }> = [
   { kind: 'rex', name: 'BONE MAW', scale: 1 },
   { kind: 'jester', name: 'THE GRINNING ONE', scale: 0.9 },
   { kind: 'kraken', name: 'ABYSSAL KRAKEN', scale: 1 },
+  { kind: 'commitment', name: 'THE COMMITMENT', scale: 1 },
   { kind: 'titan', name: 'VOID COLOSSUS', scale: 0.7 },
   { kind: 'warlord', name: 'THE BUTCHER KING', scale: 0.85 },
   { kind: 'carnage', name: 'CRIMSON MAELSTROM', scale: 0.95 },
   { kind: 'rainmaker', name: 'THE RAINMAKER', scale: 0.58 },
+  { kind: 'stagefright', name: 'STAGE FRIGHT', scale: 1 },
   { kind: 'aureole', name: 'AUREOLE', scale: 0.58 },
   { kind: 'brood', name: 'THE BROOD QUEEN', scale: 0.58 },
   { kind: 'mirrored', name: 'THE MIRRORED', scale: 0.58 },
@@ -1660,11 +1662,11 @@ export class Game {
       return pool[Math.floor(Math.random() * pool.length)];
     }
     if (this.waveModifier === 'air') {
-      const pool: EnemyKind[] = ['helicopter', 'jet', 'striker', 'omen', 'ufo', 'drone', 'phantom', 'goblin', 'helicopter', 'jet'];
+      const pool: EnemyKind[] = ['helicopter', 'jet', 'striker', 'omen', 'ufo', 'drone', 'phantom', 'goblin', 'vertigo', 'storm', 'helicopter', 'jet'];
       return pool[Math.floor(Math.random() * pool.length)];
     }
     if (this.waveModifier === 'horde') {
-      const pool: EnemyKind[] = ['zombie', 'gingerbread', 'imp', 'alien', 'monkey', 'zombie', 'gingerbread', 'raptor', 'monkey'];
+      const pool: EnemyKind[] = ['zombie', 'gingerbread', 'imp', 'alien', 'monkey', 'arachno', 'hound', 'zombie', 'gingerbread', 'raptor', 'monkey'];
       return pool[Math.floor(Math.random() * pool.length)];
     }
     const early: EnemyKind[] = ['drone', 'zombie', 'gingerbread'];
@@ -1672,13 +1674,13 @@ export class Game {
       'drone', 'zombie', 'gingerbread', 'alien', 'imp', 'scarecrow', 'pumpkin',
     ];
     const wave4: EnemyKind[] = [
-      ...wave2, 'raptor', 'ufo', 'banshee', 'clown', 'goblin', 'monkey',
+      ...wave2, 'raptor', 'ufo', 'banshee', 'clown', 'goblin', 'monkey', 'arachno', 'hound', 'trypa',
     ];
     const wave7: EnemyKind[] = [
-      ...wave4, 'voidling', 'mummy', 'demon', 'wendigo', 'reaper', 'symbiote', 'rhino',
+      ...wave4, 'voidling', 'mummy', 'demon', 'wendigo', 'reaper', 'symbiote', 'rhino', 'ophidia', 'nycto', 'vertigo', 'storm', 'hemogoblin',
     ];
     const late: EnemyKind[] = [
-      ...wave7, 'mech', 'brute', 'spire', 'symbiote', 'rhino', 'goblin', 'monkey',
+      ...wave7, 'mech', 'brute', 'spire', 'symbiote', 'rhino', 'goblin', 'monkey', 'ophidia', 'nycto', 'vertigo', 'storm', 'hemogoblin', 'arachno', 'hound', 'trypa',
     ];
     const pool = wave < 2 ? early : wave < 4 ? wave2 : wave < 7 ? wave4 : wave < 11 ? wave7 : late;
     return pool[Math.floor(Math.random() * pool.length)];
@@ -1711,6 +1713,16 @@ export class Game {
         new THREE.Vector3((Math.random() - 0.5) * 1.8, 0, (Math.random() - 0.5) * 1.8),
       );
       this.spawnSpecific(kind, extra, scale);
+      return;
+    }
+
+    if (kind === 'arachno' || kind === 'hound') {
+      for (let i = 0; i < 2; i++) {
+        const at = position.clone().add(
+          new THREE.Vector3((Math.random() - 0.5) * 2.4, 0, (Math.random() - 0.5) * 2.4),
+        );
+        this.spawnSpecific(kind, at, scale);
+      }
       return;
     }
 

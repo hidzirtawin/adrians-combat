@@ -16,9 +16,10 @@ An original camera-first AR shooter built for the phone browser.
 - **Special bombs** — tap **BOMB** to throw your equipped Frag, Shock, Cryo, Plasma, Cluster, EMP, Incendiary, Acid, Flashbang, Graviton or Nuke bomb. Hold **FIRE** for 0.9 s to charge a stronger version: +35% damage and +18% radius. Incendiary and Acid leave burning pools; Graviton pulls enemies into the blast.
 - **Sector levels** — eight named levels of ten waves each, with unique accents, enemy rosters, sector bosses and escalating multipliers. Levels loop with harder modifiers after the eighth sector.
 - **Progression** — seven starter weapons are unlocked immediately: Pulse Rifle, Viper SMG, Vanguard AR, Scatter Blaster, Sidearm 9, Magnum 44 and Wasp 93. Earn Salvage from kills, waves and bosses for the rest; the game-over screen shows your next unlock. The first run each day pays 2× Salvage.
-- **Enemies** — Hellwasps, Grave Saucers, Gravewalkers, Gorehulks, Void Spawn, Ripclaws, Cacklers, Void Larvae, Hellbrutes, Iron Reapers, Cinderbread, Straw Reapers, Shriek Wraiths, Tomb Bound, Hell Lanterns, Frost Maws, Scream Spires, Rotor Reavers, Sky Shredders, Starfangs, Black Omens, Pale Phantoms, Hex Casters, Rime Terrors, Siege Tanks, Iron Carriers, Grave Artillery, Grim Reapers, Evil Clowns, Abyssal Krakens, Emerald Harriers, Void Symbiotes, Hell Monkeys, Ironhide Rhinos and Crimson Maelstroms, each with their own AI, voice and projectiles. Spawn pools are randomised every wave.
+- **Enemies** — Hellwasps, Grave Saucers, Gravewalkers, Gorehulks, Void Spawn, Ripclaws, Cacklers, Void Larvae, Hellbrutes, Iron Reapers, Cinderbread, Straw Reapers, Shriek Wraiths, Tomb Bound, Hell Lanterns, Frost Maws, Scream Spires, Rotor Reavers, Sky Shredders, Starfangs, Black Omens, Pale Phantoms, Hex Casters, Rime Terrors, Siege Tanks, Iron Carriers, Grave Artillery, Grim Reapers, Evil Clowns, Abyssal Krakens, Emerald Harriers, Void Symbiotes, Hell Monkeys, Ironhide Rhinos, Crimson Maelstroms, Arachnos, Ophidias, Vertigos, Nyctos, Trypas, Hemogoblins, Storm Maws, Hellhounds, The Commitment and Stage Fright, each with their own AI, voice and projectiles. Spawn pools are randomised every wave.
 - **Four difficulty levels** — Easy / Normal / Hard / Insane. Scales enemy HP, damage, speed, horde size, shield regen and score. Pick it from the main menu or Settings; it persists.
-- **Thirteen bosses** every five waves — The Jailer, Bone Maw, The Grinning One, Abyssal Kraken, Void Colossus, The Butcher King, Crimson Maelstrom, The Rainmaker, Aureole, The Brood Queen, The Mirrored, Umbra and The Collector. Original creature designs, not licensed characters.
+- **Phobia Pack** — Arachno (spiders), Ophidia (snakes), Vertigo (heights), Nycto (darkness), Trypa (needles), Hemogoblin (blood), Storm Maw (thunder), Hellhound (dogs), The Commitment and Stage Fright turn common fears into evil cartoons.
+- **Fifteen bosses** every five waves — The Jailer, Bone Maw, The Grinning One, Abyssal Kraken, The Commitment, Void Colossus, The Butcher King, Crimson Maelstrom, The Rainmaker, Stage Fright, Aureole, The Brood Queen, The Mirrored, Umbra and The Collector. Original creature designs, not licensed characters.
 - **Armoured wave modifiers** — every third wave can roll **Armoured Column** (tanks/APCs), **Air Superiority** (fighters/starships), **Horde Surge** (more, faster mobs) or **Elite Guard** (fewer, tougher enemies).
 - **Waves, combo multiplier, power-ups** — repair, shield, overcharge, rapid fire, cryo field. Drops magnetise to the player.
 - **Squad rooms** — 4-letter codes and nearby-room discovery. Works online through the Cloudflare Durable Object server, or on the same Wi-Fi with `npm run party`.
@@ -206,9 +207,9 @@ Boss HP scales separately (70% / 100% / 135% / 190%). Enemy speed also rises sli
 
 ---
 
-## The thirteen bosses
+## The fifteen bosses
 
-Boss order: 5 The Jailer, 10 Bone Maw, 15 The Grinning One, 20 Abyssal Kraken, 25 Void Colossus, 30 The Butcher King, 35 Crimson Maelstrom, 40 The Rainmaker, 45 Aureole, 50 The Brood Queen, 55 The Mirrored, 60 Umbra, 65 The Collector, then the cycle repeats.
+Boss order: 5 The Jailer, 10 Bone Maw, 15 The Grinning One, 20 Abyssal Kraken, 25 The Commitment, 30 Void Colossus, 35 The Butcher King, 40 Crimson Maelstrom, 45 The Rainmaker, 50 Stage Fright, 55 Aureole, 60 The Brood Queen, 65 The Mirrored, 70 Umbra, 75 The Collector, then the cycle repeats.
 
 | Boss | Style |
 | --- | --- |
@@ -216,9 +217,11 @@ Boss order: 5 The Jailer, 10 Bone Maw, 15 The Grinning One, 20 Abyssal Kraken, 2
 | **Bone Maw** | Huge undead dinosaur; charges, bites and roars shockwave blasts. |
 | **The Grinning One** | Floating horror clown; confetti projectiles, mallet, summons Cacklers. |
 | **Abyssal Kraken** | Giant tentacled horror; radial ink bolts and summoned Hell Monkeys. |
+| **The Commitment** | Wedding-ring tyrant; chain barrages and summoned Hellhounds. |
 | **Void Colossus** | Cosmic armoured titan; dense energy fans and a summon phase. |
 | **The Butcher King** | Fast melee tyrant; rushdown bursts and brutal energy. |
 | **Crimson Maelstrom** | Red symbiote boss; tendril rings, lunges and monkey summons. |
+| **Stage Fright** | Spotlight eye horror; gaze beams, summoned Trypas and Nyctos. |
 | **The Rainmaker** | Heavy saucer; dense projectile fans, summons escorts at 50% HP. |
 | **Aureole** | Ringed sentinel; twin expanding projectile rings + aimed fan. |
 | **The Brood Queen** | Ground queen; closes in, summons Gravewalkers, radial fire. |
