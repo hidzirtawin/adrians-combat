@@ -306,6 +306,13 @@ export class Game {
     });
 
     this.menuMusic = new MenuMusic();
+    this.menuMusic.onTrackChange = (hasLocal) => {
+      if (hasLocal) {
+        this.audio.stopMusic();
+      } else if (settings.music) {
+        this.audio.startMusic();
+      }
+    };
     this.renderer.setAnimationLoop(this.loop);
   }
 
@@ -505,8 +512,13 @@ export class Game {
       this.audio.play('ui');
     });
 
-    window.addEventListener('pointerdown', () => this.audio.init(), { once: true });
-    window.addEventListener('keydown', () => this.audio.init(), { once: true });
+    const startMenuAudio = (): void => {
+      this.audio.init();
+      this.audio.setVolume(settings.volume);
+      this.audio.setMusicEnabled(settings.music, !this.menuMusic.hasLocalTrack);
+    };
+    window.addEventListener('pointerdown', startMenuAudio, { once: true });
+    window.addEventListener('keydown', startMenuAudio, { once: true });
 
     const sensitivity = document.getElementById('sense') as HTMLInputElement | null;
     const senseVal = document.getElementById('senseVal');
@@ -540,7 +552,7 @@ export class Game {
       music.checked = settings.music;
       music.addEventListener('change', () => {
         settings.music = music.checked;
-        this.audio.setMusicEnabled(settings.music);
+        this.audio.setMusicEnabled(settings.music, !this.menuMusic.hasLocalTrack);
         saveSettings();
       });
     }
@@ -1337,8 +1349,8 @@ export class Game {
 
     this.audio.init();
     this.audio.setVolume(settings.volume);
-    this.audio.setMusicEnabled(settings.music);
-    this.audio.startMusic();
+    this.audio.setMusicEnabled(settings.music, !this.menuMusic.hasLocalTrack);
+    if (!this.menuMusic.hasLocalTrack) this.audio.startMusic();
     this.audio.setPaused(false);
     this.audio.startAmbience();
     this.menuMusic.setGameplay(true);

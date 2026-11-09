@@ -31,7 +31,6 @@ in `src/weapons.ts` and use no third-party models.
 
 | Asset | Author | Source | License |
 |---|---|---|---|
-| Homepage track “Damn It Feels Good to Be a Gangsta (AI homage)” (`public/audio/menu.mp3`) | Project owner | Supplied by the app owner; AI-generated homage, not the original commercial recording | Used with owner permission |
 
 
 | Asset | Author | Source | License |

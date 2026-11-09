@@ -146,12 +146,13 @@ export class AudioEngine {
     }
   }
 
-  setMusicEnabled(on: boolean): void {
+  setMusicEnabled(on: boolean, start = true): void {
     this.musicOn = on;
     if (this.musicBus && this.ctx) {
       this.musicBus.gain.setTargetAtTime(on && !this.paused ? 0.2 : 0, this.ctx.currentTime, 0.1);
     }
-    if (on) this.startMusic();
+    if (on && start) this.startMusic();
+    if (!on) this.stopMusic();
   }
 
   setPaused(paused: boolean): void {
