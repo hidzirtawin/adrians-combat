@@ -49,8 +49,10 @@ const BOSS_CYCLE: Array<{ kind: EnemyKind; name: string; scale: number }> = [
   { kind: 'jailer', name: 'THE JAILER', scale: 0.58 },
   { kind: 'rex', name: 'BONE MAW', scale: 1 },
   { kind: 'jester', name: 'THE GRINNING ONE', scale: 0.9 },
+  { kind: 'kraken', name: 'ABYSSAL KRAKEN', scale: 1 },
   { kind: 'titan', name: 'VOID COLOSSUS', scale: 0.7 },
   { kind: 'warlord', name: 'THE BUTCHER KING', scale: 0.85 },
+  { kind: 'carnage', name: 'CRIMSON MAELSTROM', scale: 0.95 },
   { kind: 'rainmaker', name: 'THE RAINMAKER', scale: 0.58 },
   { kind: 'aureole', name: 'AUREOLE', scale: 0.58 },
   { kind: 'brood', name: 'THE BROOD QUEEN', scale: 0.58 },
@@ -1562,15 +1564,15 @@ export class Game {
       if (bias.length > 0) return bias[Math.floor(Math.random() * bias.length)];
     }
     if (this.waveModifier === 'armored') {
-      const pool: EnemyKind[] = ['tank', 'apc', 'artillery', 'brute', 'mech', 'tank', 'apc'];
+      const pool: EnemyKind[] = ['tank', 'apc', 'artillery', 'brute', 'mech', 'rhino', 'tank', 'apc'];
       return pool[Math.floor(Math.random() * pool.length)];
     }
     if (this.waveModifier === 'air') {
-      const pool: EnemyKind[] = ['helicopter', 'jet', 'striker', 'omen', 'ufo', 'drone', 'phantom', 'helicopter', 'jet'];
+      const pool: EnemyKind[] = ['helicopter', 'jet', 'striker', 'omen', 'ufo', 'drone', 'phantom', 'goblin', 'helicopter', 'jet'];
       return pool[Math.floor(Math.random() * pool.length)];
     }
     if (this.waveModifier === 'horde') {
-      const pool: EnemyKind[] = ['zombie', 'gingerbread', 'imp', 'alien', 'zombie', 'gingerbread', 'raptor'];
+      const pool: EnemyKind[] = ['zombie', 'gingerbread', 'imp', 'alien', 'monkey', 'zombie', 'gingerbread', 'raptor', 'monkey'];
       return pool[Math.floor(Math.random() * pool.length)];
     }
     const early: EnemyKind[] = ['drone', 'zombie', 'gingerbread'];
@@ -1578,13 +1580,13 @@ export class Game {
       'drone', 'zombie', 'gingerbread', 'alien', 'imp', 'scarecrow', 'pumpkin',
     ];
     const wave4: EnemyKind[] = [
-      ...wave2, 'raptor', 'ufo', 'banshee', 'clown',
+      ...wave2, 'raptor', 'ufo', 'banshee', 'clown', 'goblin', 'monkey',
     ];
     const wave7: EnemyKind[] = [
-      ...wave4, 'voidling', 'mummy', 'demon', 'wendigo', 'reaper',
+      ...wave4, 'voidling', 'mummy', 'demon', 'wendigo', 'reaper', 'symbiote', 'rhino',
     ];
     const late: EnemyKind[] = [
-      ...wave7, 'mech', 'brute', 'spire',
+      ...wave7, 'mech', 'brute', 'spire', 'symbiote', 'rhino', 'goblin', 'monkey',
     ];
     const pool = wave < 2 ? early : wave < 4 ? wave2 : wave < 7 ? wave4 : wave < 11 ? wave7 : late;
     return pool[Math.floor(Math.random() * pool.length)];
@@ -1620,7 +1622,7 @@ export class Game {
       return;
     }
 
-    if (kind === 'imp') {
+    if (kind === 'imp' || kind === 'monkey') {
       // Minion-style troublemakers always arrive in a pack.
       for (let i = 0; i < 3; i++) {
         const at = position.clone().add(

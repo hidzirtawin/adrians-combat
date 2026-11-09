@@ -17,7 +17,8 @@ export type EnemyKind =
   | 'rex' | 'jester' | 'titan' | 'warlord'
   | 'helicopter' | 'jet' | 'striker' | 'omen' | 'phantom' | 'hexer' | 'yeti'
   | 'tank' | 'apc' | 'artillery'
-  | 'reaper' | 'clown';
+  | 'reaper' | 'clown'
+  | 'kraken' | 'goblin' | 'symbiote' | 'monkey' | 'rhino' | 'carnage';
 
 export interface EnemyStats {
   hp: number;
@@ -138,6 +139,30 @@ const STATS: Record<EnemyKind, EnemyStats> = {
   clown: {
     hp: 230, speed: 2.7, hitRadius: 0.8, hitOffset: 1.15, baseScale: 1, score: 320,
     contact: 14, hover: 0, isBoss: false, name: 'EVIL CLOWN', color: 0xff2fa8, projectileColor: 0xffd75e,
+  },
+  kraken: {
+    hp: 2600, speed: 1.15, hitRadius: 2.9, hitOffset: 1.6, baseScale: 1, score: 4600,
+    contact: 26, hover: 1.4, isBoss: true, name: 'ABYSSAL KRAKEN', color: 0x1fbfc9, projectileColor: 0x5ffcff,
+  },
+  goblin: {
+    hp: 330, speed: 3.4, hitRadius: 1.0, hitOffset: 0.2, baseScale: 1.05, score: 420,
+    contact: 14, hover: 2.3, isBoss: false, name: 'EMERALD HARRIER', color: 0x57ff8a, projectileColor: 0xffb347,
+  },
+  symbiote: {
+    hp: 760, speed: 2.9, hitRadius: 1.15, hitOffset: 1.15, baseScale: 1.1, score: 650,
+    contact: 24, hover: 0, isBoss: false, name: 'VOID SYMBIOTE', color: 0x9f7dff, projectileColor: 0xc08bff,
+  },
+  monkey: {
+    hp: 60, speed: 4.2, hitRadius: 0.6, hitOffset: 0.65, baseScale: 0.85, score: 130,
+    contact: 8, hover: 0, isBoss: false, name: 'HELL MONKEY', color: 0xff8a3d, projectileColor: 0xffc247,
+  },
+  rhino: {
+    hp: 1050, speed: 2.1, hitRadius: 1.35, hitOffset: 1.25, baseScale: 1.25, score: 900,
+    contact: 32, hover: 0, isBoss: false, name: 'IRONHIDE RHINO', color: 0xb08a5a, projectileColor: 0xffc247,
+  },
+  carnage: {
+    hp: 2100, speed: 3.1, hitRadius: 1.5, hitOffset: 1.5, baseScale: 1.1, score: 4800,
+    contact: 28, hover: 0, isBoss: true, name: 'CRIMSON MAELSTROM', color: 0xff2f4f, projectileColor: 0xff5a6e,
   },
   voidling: {
     hp: 95, speed: 3.2, hitRadius: 0.8, hitOffset: 0.7, baseScale: 1, score: 210,
@@ -1942,6 +1967,690 @@ function buildJet(): Built {
   return { group, materials: collectMaterials(group), hitRadius: 1.05, hitOffset: 0, baseScale: 1.3 };
 }
 
+function addEnemyShadow(group: THREE.Object3D, radius: number): void {
+  const shadow = new THREE.Mesh(
+    new THREE.CircleGeometry(radius, 24),
+    new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.3, depthWrite: false }),
+  );
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.position.y = 0.02;
+  group.add(shadow);
+}
+
+function buildKraken(): Built {
+  const group = new THREE.Group();
+  const skin = mat(0x0f4b58, 0x000000, 0, 0.25, 0.5);
+  const skinDark = mat(0x072a34, 0x000000, 0, 0.2, 0.58);
+  const belly = mat(0x2f8f8f, 0x000000, 0, 0.1, 0.48);
+  const glow = mat(0x9ffff8, 0x5ffcff, 3.2, 0.2, 0.2);
+  const bone = mat(0xe7d8b0, 0x000000, 0, 0.05, 0.55);
+
+  const mantle = new THREE.Mesh(new THREE.SphereGeometry(1.35, 26, 20), skin);
+  mantle.position.y = 1.9;
+  mantle.scale.set(1.15, 1.3, 1.08);
+  group.add(mantle);
+
+  const crown = new THREE.Mesh(new THREE.ConeGeometry(0.9, 1.5, 16), skinDark);
+  crown.position.y = 3.3;
+  crown.rotation.z = 0.04;
+  group.add(crown);
+
+  const bellyMesh = new THREE.Mesh(new THREE.SphereGeometry(0.9, 20, 14), belly);
+  bellyMesh.position.set(0, 1.45, 0.6);
+  bellyMesh.scale.set(0.9, 0.8, 0.45);
+  group.add(bellyMesh);
+
+  for (const side of [-1, 1]) {
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.26, 14, 10), glow);
+    eye.position.set(side * 0.62, 2.12, 1.28);
+    eye.scale.set(1, 0.72, 0.55);
+    group.add(eye);
+    const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.085, 8, 6), mat(0x061014, 0x000000, 0, 0.1, 0.4));
+    pupil.position.set(side * 0.62, 2.12, 1.43);
+    pupil.scale.set(0.5, 1, 0.4);
+    group.add(pupil);
+    addGlow(group, 0x5ffcff, 1.05, new THREE.Vector3(side * 0.62, 2.12, 1.48), 0.65);
+  }
+
+  const beak = new THREE.Mesh(new THREE.ConeGeometry(0.26, 0.55, 6), bone);
+  beak.position.set(0, 1.5, 1.42);
+  beak.rotation.x = Math.PI / 2;
+  group.add(beak);
+
+  for (const side of [-1, 1]) {
+    for (let i = 0; i < 3; i++) {
+      const fin = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.95, 4), skinDark);
+      fin.position.set(side * (1.2 + i * 0.06), 2.2 - i * 0.32, -0.1 + i * 0.16);
+      fin.rotation.z = side * (1.0 + i * 0.12);
+      fin.rotation.y = side * -0.5;
+      group.add(fin);
+    }
+  }
+
+  for (let i = 0; i < 8; i++) {
+    const angle = (i / 8) * Math.PI * 2;
+    const arm = new THREE.Group();
+    arm.position.set(Math.cos(angle) * 0.45, 1.25, Math.sin(angle) * 0.45);
+    arm.rotation.y = Math.PI / 2 - angle;
+    for (let s = 0; s < 5; s++) {
+      const seg = new THREE.Mesh(
+        new THREE.CapsuleGeometry(0.2 - s * 0.03, 0.78, 4, 8),
+        s % 2 ? skinDark : skin,
+      );
+      seg.position.set(0, -s * 0.58, 0.2 + s * 0.38);
+      seg.rotation.x = 0.24 + s * 0.24;
+      arm.add(seg);
+      if (s < 4) {
+        const sucker = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), glow);
+        sucker.position.set(0, -s * 0.58 - 0.12, 0.34 + s * 0.38);
+        arm.add(sucker);
+      }
+    }
+    group.add(arm);
+  }
+
+  addGlow(group, 0x5ffcff, 3.4, new THREE.Vector3(0, 1.9, 0.2), 0.3);
+  return { group, materials: collectMaterials(group), hitRadius: 2.9, hitOffset: 1.6, baseScale: 1 };
+}
+
+function buildGoblin(): Built {
+  const group = new THREE.Group();
+  const green = mat(0x56a83f, 0x000000, 0, 0.08, 0.6);
+  const greenDark = mat(0x2f6b2c, 0x000000, 0, 0.1, 0.64);
+  const purple = mat(0x5a2d7a, 0x000000, 0, 0.18, 0.6);
+  const metal = mat(0x6b7480, 0x000000, 0, 0.92, 0.26);
+  const leather = mat(0x3a2418, 0x000000, 0, 0.05, 0.82);
+  const glow = mat(0xffd75e, 0xffc247, 2.6, 0.2, 0.25);
+  const orange = mat(0xff8a3d, 0xff6a1e, 1.2, 0.2, 0.4);
+
+  const wingShape = new THREE.Shape();
+  wingShape.moveTo(0, 0);
+  wingShape.lineTo(1.35, 0.18);
+  wingShape.lineTo(0.75, -0.45);
+  wingShape.lineTo(0, -0.12);
+  wingShape.lineTo(0, 0);
+  const wingGeo = new THREE.ExtrudeGeometry(wingShape, { depth: 0.04, bevelEnabled: false });
+  for (const side of [-1, 1]) {
+    const wing = new THREE.Mesh(wingGeo, purple);
+    wing.position.set(0, 0.62, 0);
+    wing.rotation.x = -Math.PI / 2;
+    wing.rotation.z = side * 0.26;
+    wing.scale.x = side;
+    group.add(wing);
+    for (let i = 0; i < 3; i++) {
+      const rib = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 1.25, 6), metal);
+      rib.position.set(side * (0.3 + i * 0.25), 0.64, -0.05 + i * 0.02);
+      rib.rotation.z = Math.PI / 2;
+      rib.rotation.y = side * 0.08;
+      group.add(rib);
+    }
+  }
+
+  const board = new THREE.Mesh(new RoundedBoxGeometry(0.66, 0.07, 0.3, 3, 0.025), metal);
+  board.position.y = 0.58;
+  group.add(board);
+  const tailFin = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.45, 4), purple);
+  tailFin.position.set(0, 0.62, -0.3);
+  tailFin.rotation.x = -Math.PI / 2;
+  group.add(tailFin);
+
+  const torso = new THREE.Mesh(new RoundedBoxGeometry(0.42, 0.62, 0.32, 3, 0.06), purple);
+  torso.position.y = 1.02;
+  group.add(torso);
+  const belt = new THREE.Mesh(new THREE.CylinderGeometry(0.23, 0.23, 0.09, 12), leather);
+  belt.position.y = 0.76;
+  group.add(belt);
+  const buckle = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.08, 0.03), glow);
+  buckle.position.set(0, 0.76, 0.17);
+  group.add(buckle);
+
+  for (const side of [-1, 1]) {
+    const leg = new THREE.Mesh(new THREE.CapsuleGeometry(0.06, 0.3, 4, 8), greenDark);
+    leg.position.set(side * 0.12, 0.48, 0);
+    group.add(leg);
+    const boot = new THREE.Mesh(new RoundedBoxGeometry(0.18, 0.16, 0.3, 3, 0.04), leather);
+    boot.position.set(side * 0.12, 0.62, 0.04);
+    group.add(boot);
+  }
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.3, 18, 14), green);
+  head.position.y = 1.58;
+  head.scale.set(1, 1.05, 0.95);
+  group.add(head);
+  for (const side of [-1, 1]) {
+    const ear = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.34, 5), greenDark);
+    ear.position.set(side * 0.3, 1.64, -0.02);
+    ear.rotation.z = side * -1.1;
+    group.add(ear);
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.055, 8, 6), glow);
+    eye.position.set(side * 0.11, 1.64, 0.26);
+    group.add(eye);
+    addGlow(group, 0xffd75e, 0.22, new THREE.Vector3(side * 0.11, 1.64, 0.29), 0.5);
+  }
+
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.2, 5), green);
+  nose.position.set(0, 1.54, 0.32);
+  nose.rotation.x = Math.PI / 2;
+  group.add(nose);
+  const grin = new THREE.Mesh(new THREE.TorusGeometry(0.13, 0.022, 6, 14, Math.PI), mat(0x1a1410, 0x000000, 0, 0.2, 0.8));
+  grin.position.set(0, 1.47, 0.27);
+  grin.rotation.z = Math.PI;
+  group.add(grin);
+
+  const hood = new THREE.Mesh(new THREE.ConeGeometry(0.33, 0.52, 10), purple);
+  hood.position.set(0, 1.9, 0);
+  hood.rotation.z = 0.12;
+  group.add(hood);
+  const hoodTip = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), greenDark);
+  hoodTip.position.set(0.05, 2.17, 0);
+  group.add(hoodTip);
+
+  const satchel = new THREE.Mesh(new RoundedBoxGeometry(0.22, 0.2, 0.12, 3, 0.03), leather);
+  satchel.position.set(0.28, 0.92, 0.08);
+  satchel.rotation.z = -0.15;
+  group.add(satchel);
+  for (let i = 0; i < 3; i++) {
+    const bomb = new THREE.Mesh(new THREE.SphereGeometry(0.07, 10, 8), orange);
+    bomb.position.set(0.22 + i * 0.07, 0.78 - i * 0.03, 0.18);
+    group.add(bomb);
+    const fuse = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.08, 4), metal);
+    fuse.position.set(bomb.position.x, bomb.position.y + 0.08, bomb.position.z);
+    group.add(fuse);
+  }
+
+  return { group, materials: collectMaterials(group), hitRadius: 1.0, hitOffset: 1.4, baseScale: 1.05 };
+}
+
+function buildSymbiote(): Built & { limbs: ZombieLimbs } {
+  const group = new THREE.Group();
+  const black = mat(0x08070d, 0x000000, 0, 0.28, 0.42);
+  const blackLight = mat(0x1a1624, 0x000000, 0, 0.2, 0.5);
+  const white = mat(0xf2f0ff, 0x9f7dff, 0.4, 0.1, 0.35);
+  const glow = mat(0xbfa6ff, 0x9f7dff, 2.4, 0.1, 0.25);
+  const teeth = mat(0xe8e2d1, 0x000000, 0, 0.05, 0.6);
+
+  addEnemyShadow(group, 0.9);
+
+  const torso = new THREE.Mesh(new RoundedBoxGeometry(0.66, 0.94, 0.4, 4, 0.1), black);
+  torso.position.y = 1.2;
+  group.add(torso);
+
+  const chest = new THREE.Mesh(new THREE.SphereGeometry(0.34, 16, 12), blackLight);
+  chest.position.set(0, 1.35, 0.17);
+  chest.scale.set(1, 1.15, 0.5);
+  group.add(chest);
+
+  const emblemShape = new THREE.Shape();
+  emblemShape.moveTo(0, 0.2);
+  emblemShape.lineTo(0.18, 0.02);
+  emblemShape.lineTo(0.07, -0.18);
+  emblemShape.lineTo(0, -0.08);
+  emblemShape.lineTo(-0.07, -0.18);
+  emblemShape.lineTo(-0.18, 0.02);
+  emblemShape.lineTo(0, 0.2);
+  const emblem = new THREE.Mesh(
+    new THREE.ExtrudeGeometry(emblemShape, { depth: 0.02, bevelEnabled: false }),
+    white,
+  );
+  emblem.position.set(0, 1.42, 0.36);
+  group.add(emblem);
+
+  for (const side of [-1, 1]) {
+    const shoulder = new THREE.Mesh(new THREE.SphereGeometry(0.25, 14, 10), blackLight);
+    shoulder.position.set(side * 0.4, 1.55, 0);
+    group.add(shoulder);
+    for (let i = 0; i < 2; i++) {
+      const spike = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.32, 5), blackLight);
+      spike.position.set(side * (0.42 + i * 0.08), 1.72 - i * 0.05, -0.08);
+      spike.rotation.z = side * -0.7;
+      group.add(spike);
+    }
+  }
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.28, 18, 14), black);
+  head.position.y = 1.98;
+  head.scale.set(0.95, 1.1, 0.95);
+  group.add(head);
+
+  for (const side of [-1, 1]) {
+    const eye = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.06, 0.04), white);
+    eye.position.set(side * 0.11, 2.03, 0.25);
+    eye.rotation.z = side * 0.32;
+    group.add(eye);
+    addGlow(group, 0xbfa6ff, 0.3, new THREE.Vector3(side * 0.11, 2.03, 0.29), 0.55);
+  }
+
+  const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.07, 0.03), blackLight);
+  mouth.position.set(0, 1.87, 0.27);
+  group.add(mouth);
+  for (let i = 0; i < 6; i++) {
+    const tooth = new THREE.Mesh(new THREE.ConeGeometry(0.018, 0.06, 4), teeth);
+    tooth.position.set(-0.09 + i * 0.036, 1.84 - (i % 2) * 0.02, 0.285);
+    tooth.rotation.z = Math.PI;
+    group.add(tooth);
+  }
+
+  for (let i = 0; i < 4; i++) {
+    const tendril = new THREE.Mesh(new THREE.CapsuleGeometry(0.04, 0.4, 4, 8), blackLight);
+    tendril.position.set(-0.24 + i * 0.16, 1.5, -0.24);
+    tendril.rotation.x = -0.7;
+    tendril.rotation.z = (i - 1.5) * 0.25;
+    group.add(tendril);
+  }
+
+  const makeArm = (side: number): THREE.Group => {
+    const pivot = new THREE.Group();
+    pivot.position.set(side * 0.44, 1.58, 0);
+    const upper = new THREE.Mesh(new THREE.CapsuleGeometry(0.1, 0.44, 4, 8), black);
+    upper.position.y = -0.24;
+    pivot.add(upper);
+    const fore = new THREE.Mesh(new THREE.CapsuleGeometry(0.08, 0.38, 4, 8), blackLight);
+    fore.position.set(side * 0.08, -0.56, 0.06);
+    fore.rotation.z = side * 0.35;
+    pivot.add(fore);
+    const claw = new THREE.Mesh(new THREE.SphereGeometry(0.11, 10, 8), black);
+    claw.position.set(side * 0.18, -0.78, 0.12);
+    pivot.add(claw);
+    for (let i = 0; i < 3; i++) {
+      const finger = new THREE.Mesh(new THREE.ConeGeometry(0.022, 0.14, 4), white);
+      finger.position.set(side * (0.16 + i * 0.04), -0.86, 0.16);
+      finger.rotation.z = side * (0.4 + i * 0.2);
+      pivot.add(finger);
+    }
+    group.add(pivot);
+    return pivot;
+  };
+
+  const makeLeg = (side: number): THREE.Group => {
+    const pivot = new THREE.Group();
+    pivot.position.set(side * 0.19, 0.72, 0);
+    const thigh = new THREE.Mesh(new THREE.CapsuleGeometry(0.12, 0.42, 4, 8), black);
+    thigh.position.y = -0.22;
+    pivot.add(thigh);
+    const shin = new THREE.Mesh(new THREE.CapsuleGeometry(0.09, 0.36, 4, 8), blackLight);
+    shin.position.y = -0.54;
+    pivot.add(shin);
+    const foot = new THREE.Mesh(new RoundedBoxGeometry(0.24, 0.12, 0.36, 3, 0.04), black);
+    foot.position.set(0, -0.74, 0.08);
+    pivot.add(foot);
+    group.add(pivot);
+    return pivot;
+  };
+
+  const leftArm = makeArm(-1);
+  const rightArm = makeArm(1);
+  const leftLeg = makeLeg(-1);
+  const rightLeg = makeLeg(1);
+
+  return {
+    group,
+    materials: collectMaterials(group),
+    hitRadius: 1.15,
+    hitOffset: 1.15,
+    baseScale: 1.1,
+    limbs: { leftArm, rightArm, leftLeg, rightLeg },
+  };
+}
+
+function buildMonkey(): Built & { limbs: ZombieLimbs } {
+  const group = new THREE.Group();
+  const fur = mat(0x6b3f2a, 0x000000, 0, 0.05, 0.82);
+  const furDark = mat(0x3b2117, 0x000000, 0, 0.05, 0.86);
+  const face = mat(0xc98b5e, 0x000000, 0, 0.02, 0.68);
+  const dark = mat(0x1a0b08, 0x000000, 0, 0.1, 0.8);
+  const glow = mat(0xff4a3d, 0xff2f4f, 2.8, 0.2, 0.25);
+  const teeth = mat(0xe8e2d1, 0x000000, 0, 0.05, 0.6);
+
+  addEnemyShadow(group, 0.5);
+
+  const torso = new THREE.Mesh(new THREE.SphereGeometry(0.3, 14, 10), fur);
+  torso.position.y = 0.62;
+  torso.scale.set(1, 1.15, 0.85);
+  group.add(torso);
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 12), fur);
+  head.position.y = 0.98;
+  group.add(head);
+  for (const side of [-1, 1]) {
+    const ear = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 8), furDark);
+    ear.position.set(side * 0.24, 1.0, 0);
+    ear.scale.set(0.7, 1, 0.5);
+    group.add(ear);
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.04, 8, 6), glow);
+    eye.position.set(side * 0.09, 1.02, 0.2);
+    group.add(eye);
+    addGlow(group, 0xff4a3d, 0.16, new THREE.Vector3(side * 0.09, 1.02, 0.24), 0.5);
+  }
+
+  for (let i = 0; i < 5; i++) {
+    const mane = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.2, 4), furDark);
+    const a = -1.1 + i * 0.55;
+    mane.position.set(Math.cos(a) * 0.2, 1.12 + Math.sin(a) * 0.1, -0.05);
+    mane.rotation.z = a;
+    group.add(mane);
+  }
+  const muzzle = new THREE.Mesh(new THREE.SphereGeometry(0.15, 12, 10), face);
+  muzzle.position.set(0, 0.93, 0.16);
+  muzzle.scale.set(1, 0.8, 0.9);
+  group.add(muzzle);
+  const nose = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), dark);
+  nose.position.set(0, 0.96, 0.3);
+  group.add(nose);
+  for (const side of [-1, 1]) {
+    const fang = new THREE.Mesh(new THREE.ConeGeometry(0.018, 0.08, 4), teeth);
+    fang.position.set(side * 0.05, 0.88, 0.28);
+    fang.rotation.z = Math.PI;
+    group.add(fang);
+  }
+
+  for (let i = 0; i < 4; i++) {
+    const tail = new THREE.Mesh(new THREE.CapsuleGeometry(0.035, 0.2, 4, 6), furDark);
+    tail.position.set(0, 0.65 - i * 0.04, -0.32 - i * 0.16);
+    tail.rotation.x = -0.55 - i * 0.25;
+    group.add(tail);
+  }
+
+  const makeArm = (side: number): THREE.Group => {
+    const pivot = new THREE.Group();
+    pivot.position.set(side * 0.26, 0.76, 0);
+    const arm = new THREE.Mesh(new THREE.CapsuleGeometry(0.07, 0.3, 4, 8), fur);
+    arm.position.y = -0.17;
+    pivot.add(arm);
+    const hand = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 6), face);
+    hand.position.set(0, -0.35, 0.04);
+    pivot.add(hand);
+    for (let i = 0; i < 3; i++) {
+      const claw = new THREE.Mesh(new THREE.ConeGeometry(0.014, 0.09, 4), teeth);
+      claw.position.set(-0.03 + i * 0.03, -0.4, 0.08);
+      claw.rotation.x = 0.4;
+      pivot.add(claw);
+    }
+    group.add(pivot);
+    return pivot;
+  };
+
+  const makeLeg = (side: number): THREE.Group => {
+    const pivot = new THREE.Group();
+    pivot.position.set(side * 0.15, 0.38, 0);
+    const leg = new THREE.Mesh(new THREE.CapsuleGeometry(0.075, 0.24, 4, 8), fur);
+    leg.position.y = -0.14;
+    pivot.add(leg);
+    const foot = new THREE.Mesh(new RoundedBoxGeometry(0.14, 0.08, 0.22, 3, 0.03), furDark);
+    foot.position.set(0, -0.3, 0.06);
+    pivot.add(foot);
+    group.add(pivot);
+    return pivot;
+  };
+
+  const leftArm = makeArm(-1);
+  const rightArm = makeArm(1);
+  const leftLeg = makeLeg(-1);
+  const rightLeg = makeLeg(1);
+
+  return {
+    group,
+    materials: collectMaterials(group),
+    hitRadius: 0.6,
+    hitOffset: 0.65,
+    baseScale: 0.85,
+    limbs: { leftArm, rightArm, leftLeg, rightLeg },
+  };
+}
+
+function buildRhino(): Built & { limbs: ZombieLimbs } {
+  const group = new THREE.Group();
+  const hide = mat(0x6b4a38, 0x000000, 0, 0.08, 0.72);
+  const hideDark = mat(0x3d2a20, 0x000000, 0, 0.1, 0.78);
+  const armor = mat(0x7c8792, 0x000000, 0, 0.95, 0.26);
+  const armorDark = mat(0x3e4a55, 0x000000, 0, 0.9, 0.32);
+  const glow = mat(0xffc247, 0xff8a3d, 2.2, 0.2, 0.3);
+  const hornMat = mat(0xd8c9a8, 0x000000, 0, 0.05, 0.5);
+
+  addEnemyShadow(group, 1.1);
+
+  const torso = new THREE.Mesh(new RoundedBoxGeometry(0.92, 1.1, 0.6, 4, 0.12), hide);
+  torso.position.y = 1.25;
+  group.add(torso);
+
+  const chestPlate = new THREE.Mesh(new RoundedBoxGeometry(0.84, 0.5, 0.12, 3, 0.04), armor);
+  chestPlate.position.set(0, 1.43, 0.32);
+  chestPlate.rotation.x = -0.12;
+  group.add(chestPlate);
+  for (let i = 0; i < 4; i++) {
+    const rivet = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), armorDark);
+    rivet.position.set(-0.28 + i * 0.18, 1.55, 0.38);
+    group.add(rivet);
+  }
+
+  const head = new THREE.Mesh(new RoundedBoxGeometry(0.58, 0.5, 0.64, 4, 0.1), hide);
+  head.position.set(0, 2.02, 0.08);
+  group.add(head);
+
+  const horn = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.92, 8), hornMat);
+  horn.position.set(0, 2.26, 0.78);
+  horn.rotation.x = Math.PI / 2.35;
+  horn.rotation.z = 0.04;
+  group.add(horn);
+  const hornBase = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.18, 0.12, 8), armorDark);
+  hornBase.position.set(0, 2.2, 0.36);
+  hornBase.rotation.x = Math.PI / 2;
+  group.add(hornBase);
+
+  for (const side of [-1, 1]) {
+    const ear = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.24, 5), hideDark);
+    ear.position.set(side * 0.3, 2.18, -0.06);
+    ear.rotation.z = side * -0.8;
+    group.add(ear);
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 6), glow);
+    eye.position.set(side * 0.18, 2.04, 0.34);
+    group.add(eye);
+    addGlow(group, 0xffc247, 0.18, new THREE.Vector3(side * 0.18, 2.04, 0.37), 0.45);
+  }
+
+  for (const side of [-1, 1]) {
+    const shoulder = new THREE.Mesh(new THREE.SphereGeometry(0.34, 14, 10), armor);
+    shoulder.position.set(side * 0.52, 1.72, 0);
+    shoulder.scale.set(1, 0.9, 0.9);
+    group.add(shoulder);
+    for (let i = 0; i < 3; i++) {
+      const spike = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.28, 5), armorDark);
+      spike.position.set(side * (0.58 + i * 0.03), 1.86 - i * 0.04, -0.08);
+      spike.rotation.z = side * -0.5;
+      group.add(spike);
+    }
+  }
+
+  const makeArm = (side: number): THREE.Group => {
+    const pivot = new THREE.Group();
+    pivot.position.set(side * 0.55, 1.68, 0);
+    const upper = new THREE.Mesh(new THREE.CapsuleGeometry(0.15, 0.4, 4, 8), hide);
+    upper.position.y = -0.22;
+    pivot.add(upper);
+    const guard = new THREE.Mesh(new RoundedBoxGeometry(0.28, 0.22, 0.3, 3, 0.06), armor);
+    guard.position.y = -0.34;
+    pivot.add(guard);
+    const fore = new THREE.Mesh(new THREE.CapsuleGeometry(0.13, 0.34, 4, 8), hideDark);
+    fore.position.y = -0.56;
+    pivot.add(fore);
+    const fist = new THREE.Mesh(new THREE.SphereGeometry(0.18, 10, 8), hide);
+    fist.position.set(0, -0.78, 0.05);
+    fist.scale.set(1, 0.9, 1.05);
+    pivot.add(fist);
+    for (let i = 0; i < 3; i++) {
+      const knuckle = new THREE.Mesh(new THREE.SphereGeometry(0.055, 8, 6), armorDark);
+      knuckle.position.set(-0.08 + i * 0.08, -0.8, 0.16);
+      pivot.add(knuckle);
+    }
+    group.add(pivot);
+    return pivot;
+  };
+
+  const makeLeg = (side: number): THREE.Group => {
+    const pivot = new THREE.Group();
+    pivot.position.set(side * 0.26, 0.72, 0);
+    const thigh = new THREE.Mesh(new THREE.CapsuleGeometry(0.16, 0.36, 4, 8), hide);
+    thigh.position.y = -0.2;
+    pivot.add(thigh);
+    const shin = new THREE.Mesh(new THREE.CapsuleGeometry(0.13, 0.32, 4, 8), hideDark);
+    shin.position.y = -0.52;
+    pivot.add(shin);
+    const foot = new THREE.Mesh(new RoundedBoxGeometry(0.32, 0.16, 0.44, 3, 0.05), armorDark);
+    foot.position.set(0, -0.72, 0.1);
+    pivot.add(foot);
+    group.add(pivot);
+    return pivot;
+  };
+
+  const leftArm = makeArm(-1);
+  const rightArm = makeArm(1);
+  const leftLeg = makeLeg(-1);
+  const rightLeg = makeLeg(1);
+
+  return {
+    group,
+    materials: collectMaterials(group),
+    hitRadius: 1.35,
+    hitOffset: 1.25,
+    baseScale: 1.25,
+    limbs: { leftArm, rightArm, leftLeg, rightLeg },
+  };
+}
+
+function buildCarnage(): Built & { limbs: ZombieLimbs } {
+  const group = new THREE.Group();
+  const red = mat(0xb3122b, 0x000000, 0, 0.18, 0.44);
+  const redDark = mat(0x5c0714, 0x000000, 0, 0.15, 0.52);
+  const black = mat(0x12060a, 0x000000, 0, 0.3, 0.4);
+  const white = mat(0xfff2f2, 0xff2f4f, 0.5, 0.1, 0.32);
+  const teeth = mat(0xf2e7d4, 0x000000, 0, 0.05, 0.55);
+  const glow = mat(0xff304f, 0xff2f4f, 3.2, 0.2, 0.22);
+
+  addEnemyShadow(group, 1.2);
+
+  const torso = new THREE.Mesh(new RoundedBoxGeometry(0.72, 1.3, 0.44, 4, 0.1), red);
+  torso.position.y = 1.5;
+  group.add(torso);
+
+  const chest = new THREE.Mesh(new THREE.SphereGeometry(0.38, 16, 12), redDark);
+  chest.position.set(0, 1.62, 0.2);
+  chest.scale.set(1, 1.2, 0.45);
+  group.add(chest);
+
+  const emblemShape = new THREE.Shape();
+  emblemShape.moveTo(0, 0.22);
+  emblemShape.lineTo(0.2, 0.04);
+  emblemShape.lineTo(0.08, -0.2);
+  emblemShape.lineTo(0, -0.08);
+  emblemShape.lineTo(-0.08, -0.2);
+  emblemShape.lineTo(-0.2, 0.04);
+  emblemShape.lineTo(0, 0.22);
+  const emblem = new THREE.Mesh(new THREE.ExtrudeGeometry(emblemShape, { depth: 0.02, bevelEnabled: false }), black);
+  emblem.position.set(0, 1.72, 0.4);
+  group.add(emblem);
+
+  for (const side of [-1, 1]) {
+    const shoulder = new THREE.Mesh(new THREE.SphereGeometry(0.28, 14, 10), redDark);
+    shoulder.position.set(side * 0.46, 1.85, 0);
+    group.add(shoulder);
+    for (let i = 0; i < 3; i++) {
+      const spike = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.38, 5), black);
+      spike.position.set(side * (0.5 + i * 0.05), 2.02 - i * 0.05, -0.1);
+      spike.rotation.z = side * -0.55;
+      group.add(spike);
+    }
+  }
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.32, 18, 14), red);
+  head.position.y = 2.42;
+  head.scale.set(0.95, 1.12, 0.95);
+  group.add(head);
+
+  for (const side of [-1, 1]) {
+    const eye = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.075, 0.05), white);
+    eye.position.set(side * 0.13, 2.48, 0.29);
+    eye.rotation.z = side * 0.38;
+    group.add(eye);
+    addGlow(group, 0xff304f, 0.42, new THREE.Vector3(side * 0.13, 2.48, 0.34), 0.65);
+  }
+
+  const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.09, 0.04), black);
+  mouth.position.set(0, 2.29, 0.3);
+  group.add(mouth);
+  for (let i = 0; i < 8; i++) {
+    const tooth = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.075, 4), teeth);
+    tooth.position.set(-0.12 + i * 0.034, 2.25 - (i % 2) * 0.025, 0.315);
+    tooth.rotation.z = Math.PI;
+    group.add(tooth);
+  }
+
+  for (let i = 0; i < 6; i++) {
+    const tendril = new THREE.Mesh(new THREE.CapsuleGeometry(0.045, 0.5, 4, 8), i % 2 ? redDark : black);
+    tendril.position.set(-0.3 + i * 0.12, 1.85, -0.28);
+    tendril.rotation.x = -0.8;
+    tendril.rotation.z = (i - 2.5) * 0.22;
+    group.add(tendril);
+  }
+
+  const makeArm = (side: number): THREE.Group => {
+    const pivot = new THREE.Group();
+    pivot.position.set(side * 0.5, 1.88, 0);
+    const upper = new THREE.Mesh(new THREE.CapsuleGeometry(0.11, 0.5, 4, 8), red);
+    upper.position.y = -0.26;
+    pivot.add(upper);
+    const fore = new THREE.Mesh(new THREE.CapsuleGeometry(0.09, 0.42, 4, 8), black);
+    fore.position.set(side * 0.08, -0.62, 0.05);
+    fore.rotation.z = side * 0.35;
+    pivot.add(fore);
+    const blade = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.8, 5), redDark);
+    blade.position.set(side * 0.34, -0.72, 0.1);
+    blade.rotation.z = side * -1.15;
+    blade.rotation.x = 0.25;
+    pivot.add(blade);
+    const claw = new THREE.Mesh(new THREE.SphereGeometry(0.12, 10, 8), black);
+    claw.position.set(side * 0.2, -0.84, 0.12);
+    pivot.add(claw);
+    for (let i = 0; i < 3; i++) {
+      const finger = new THREE.Mesh(new THREE.ConeGeometry(0.025, 0.16, 4), white);
+      finger.position.set(side * (0.17 + i * 0.05), -0.94, 0.17);
+      finger.rotation.z = side * (0.35 + i * 0.2);
+      pivot.add(finger);
+    }
+    group.add(pivot);
+    return pivot;
+  };
+
+  const makeLeg = (side: number): THREE.Group => {
+    const pivot = new THREE.Group();
+    pivot.position.set(side * 0.21, 0.78, 0);
+    const thigh = new THREE.Mesh(new THREE.CapsuleGeometry(0.13, 0.44, 4, 8), red);
+    thigh.position.y = -0.23;
+    pivot.add(thigh);
+    const shin = new THREE.Mesh(new THREE.CapsuleGeometry(0.1, 0.38, 4, 8), black);
+    shin.position.y = -0.58;
+    pivot.add(shin);
+    const foot = new THREE.Mesh(new RoundedBoxGeometry(0.28, 0.13, 0.4, 3, 0.04), black);
+    foot.position.set(0, -0.8, 0.1);
+    pivot.add(foot);
+    group.add(pivot);
+    return pivot;
+  };
+
+  const leftArm = makeArm(-1);
+  const rightArm = makeArm(1);
+  const leftLeg = makeLeg(-1);
+  const rightLeg = makeLeg(1);
+
+  return {
+    group,
+    materials: collectMaterials(group),
+    hitRadius: 1.5,
+    hitOffset: 1.5,
+    baseScale: 1.1,
+    limbs: { leftArm, rightArm, leftLeg, rightLeg },
+  };
+}
+
+
 function buildReaper(): Built {
   const group = new THREE.Group();
   const cloth = mat(0x150e20, 0x000000, 0, 0.15, 0.78);
@@ -3116,6 +3825,7 @@ export class Enemy {
   private attackTimer = 1.4 + Math.random() * 1.8;
   private specialTimer = 2 + Math.random() * 1.5;
   private contactTimer = 0;
+  private chargeTimer = 0;
   private summonTimer = 6;
   private summonedPhases = new Set<number>();
   private materials: THREE.MeshStandardMaterial[] = [];
@@ -3205,7 +3915,7 @@ export class Enemy {
     });
     const dot = new THREE.Sprite(dotMaterial);
     dot.scale.setScalar(dotSize);
-    const dotY = this.hoverHeight > 0 ? 0 : this.localHitOffset;
+    const dotY = this.localHitOffset;
     dot.position.set(0, dotY, 0.06);
     dot.renderOrder = 20;
     dot.userData.baseScale = dotSize;
@@ -3285,6 +3995,12 @@ export class Enemy {
       case 'artillery': return buildArtillery();
       case 'reaper': return buildReaper();
       case 'clown': return buildClown();
+      case 'kraken': return buildKraken();
+      case 'goblin': return buildGoblin();
+      case 'symbiote': return buildSymbiote();
+      case 'monkey': return buildMonkey();
+      case 'rhino': return buildRhino();
+      case 'carnage': return buildCarnage();
       case 'voidling': return buildVoidling();
       case 'demon': return buildDemon();
       case 'mech':
@@ -3368,6 +4084,7 @@ export class Enemy {
 
     this.attackTimer -= adt;
     this.specialTimer -= adt;
+    this.chargeTimer = Math.max(0, this.chargeTimer - adt);
     this.contactTimer -= adt;
     this.summonTimer -= adt;
 
@@ -3467,6 +4184,32 @@ export class Enemy {
       case 'clown':
         this.updateWalker(adt, ctx, 2.4);
         this.shootAtPlayer(ctx, manager, 8.5, 6, 2.8, 0.045, 3);
+        break;
+      case 'goblin':
+        this.updateFlyer(adt, ctx, 7.5, 1.45);
+        this.shootAtPlayer(ctx, manager, 10, 8, 2.5, 0.03, 3);
+        this.updateGoblin(ctx, manager);
+        break;
+      case 'symbiote':
+        this.updateWalker(adt, ctx, 1.4);
+        this.shootAtPlayer(ctx, manager, 9, 8, 2.6, 0.03, 2);
+        this.updateSymbiote(ctx, manager);
+        break;
+      case 'monkey':
+        this.updateWalker(adt, ctx, 0.9);
+        this.updateMonkey(ctx);
+        break;
+      case 'rhino':
+        this.updateRhino(ctx);
+        this.updateWalker(adt, ctx, 1.8);
+        break;
+      case 'kraken':
+        this.updateFlyer(adt, ctx, 10, 0.5, true);
+        this.updateKraken(ctx, manager);
+        break;
+      case 'carnage':
+        this.updateWalker(adt, ctx, 1.8);
+        this.updateCarnage(ctx, manager);
         break;
       case 'voidling':
         this.updateWalker(adt, ctx, 1.0);
@@ -3568,7 +4311,8 @@ export class Enemy {
     const dirX = dx / distance;
     const dirZ = dz / distance;
     const shamble = 0.78 + Math.sin(this.age * 7 + this.group.position.x) * 0.22;
-    const speed = this.stats.speed * this.speedMult * (this.kind === 'zombie' ? shamble : 1);
+    const charge = this.chargeTimer > 0 ? 2.45 : 1;
+    const speed = this.stats.speed * this.speedMult * charge * (this.kind === 'zombie' ? shamble : 1);
 
     if (distance > stopRange) {
       this.group.position.x += dirX * speed * dt;
@@ -3624,6 +4368,92 @@ export class Enemy {
       ctx.fx.burst(this.group.position.clone(), 0x9f7dff, 18, 5, 0.7);
       ctx.playSpatial('enemyShot', this.group.position, 0.7);
       this.fireAimed(ctx, manager, 2, 9, 8, 0.03);
+    }
+  }
+
+  private updateGoblin(ctx: CombatContext, manager: EnemyManager): void {
+    if (this.spawnT < 0.55) return;
+    if (this.specialTimer <= 0) {
+      this.specialTimer = 5.2;
+      this.radialBarrage(ctx, manager, 6, 7.5, 9, 0.12);
+      ctx.fx.burst(this.group.position.clone(), 0xffb347, 18, 6, 0.55);
+    }
+  }
+
+  private updateSymbiote(ctx: CombatContext, manager: EnemyManager): void {
+    if (this.spawnT < 0.5) return;
+    if (this.specialTimer <= 0) {
+      this.specialTimer = 5.8;
+      const dir = new THREE.Vector3().subVectors(ctx.player.pos, this.group.position);
+      dir.y = 0;
+      if (dir.lengthSq() > 0.001) {
+        dir.normalize();
+        this.group.position.addScaledVector(dir, 2.1);
+      }
+      this.fireAimed(ctx, manager, 2, 8, 10, 0.05);
+      ctx.fx.ring(this.group.position.clone(), 0x9f7dff, 2.2, 0.45, 0.4);
+      ctx.fx.burst(this.group.position.clone().setY(0.9), 0x9f7dff, 16, 5, 0.5);
+    }
+  }
+
+  private updateMonkey(ctx: CombatContext): void {
+    if (this.spawnT < 0.4) return;
+    if (this.specialTimer <= 0) {
+      this.specialTimer = 4.2;
+      const dir = new THREE.Vector3().subVectors(ctx.player.pos, this.group.position);
+      dir.y = 0;
+      if (dir.lengthSq() > 0.001) {
+        dir.normalize();
+        this.group.position.addScaledVector(dir, 1.2);
+      }
+      ctx.fx.burst(this.group.position.clone().setY(0.35), 0xff8a3d, 5, 3, 0.28);
+    }
+  }
+
+  private updateRhino(ctx: CombatContext): void {
+    if (this.spawnT < 0.5) return;
+    if (this.specialTimer <= 0) {
+      this.specialTimer = 6.2;
+      this.chargeTimer = 1.35;
+      ctx.playSpatial('enemyShot', this.group.position, 0.8);
+      ctx.fx.ring(this.group.position.clone(), 0xb08a5a, 2.6, 0.5, 0.4);
+      ctx.fx.burst(this.group.position.clone().setY(0.4), 0xb08a5a, 14, 5, 0.45);
+    }
+  }
+
+  private updateKraken(ctx: CombatContext, manager: EnemyManager): void {
+    if (this.spawnT < 0.6) return;
+    if (this.specialTimer <= 0) {
+      this.specialTimer = 6.4;
+      this.radialBarrage(ctx, manager, 16, 7, 12, 0.18);
+      for (let i = 0; i < 2; i++) {
+        const at = this.group.position.clone().add(new THREE.Vector3((Math.random() - 0.5) * 3, 0, (Math.random() - 0.5) * 3));
+        ctx.summon('monkey', at);
+      }
+      ctx.fx.ring(this.group.position.clone(), 0x5ffcff, 4.5, 0.9, 0.55);
+      ctx.fx.burst(this.group.position.clone(), 0x5ffcff, 30, 8, 0.9);
+    }
+  }
+
+  private updateCarnage(ctx: CombatContext, manager: EnemyManager): void {
+    if (this.spawnT < 0.55) return;
+    if (this.specialTimer <= 0) {
+      this.specialTimer = 5.6;
+      this.radialBarrage(ctx, manager, 12, 9, 12, 0.15);
+      const dir = new THREE.Vector3().subVectors(ctx.player.pos, this.group.position);
+      dir.y = 0;
+      if (dir.lengthSq() > 0.001) {
+        dir.normalize();
+        this.group.position.addScaledVector(dir, 2.4);
+      }
+      if (Math.random() < 0.75) {
+        for (let i = 0; i < 2; i++) {
+          const at = this.group.position.clone().add(new THREE.Vector3((Math.random() - 0.5) * 2.5, 0, (Math.random() - 0.5) * 2.5));
+          ctx.summon('monkey', at);
+        }
+      }
+      ctx.fx.ring(this.group.position.clone(), 0xff2f4f, 3.6, 0.7, 0.5);
+      ctx.fx.burst(this.group.position.clone().setY(1.2), 0xff2f4f, 26, 8, 0.8);
     }
   }
 

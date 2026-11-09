@@ -16,9 +16,9 @@ An original camera-first AR shooter built for the phone browser.
 - **Special bombs** — tap **BOMB** to throw your equipped Frag, Shock, Cryo, Plasma, Cluster or EMP bomb. Hold **FIRE** for 0.9 s to charge a stronger version: +35% damage and +18% radius.
 - **Sector levels** — eight named levels of ten waves each, with unique accents, enemy rosters, sector bosses and escalating multipliers. Levels loop with harder modifiers after the eighth sector.
 - **Progression** — seven starter weapons are unlocked immediately: Pulse Rifle, Viper SMG, Vanguard AR, Scatter Blaster, Sidearm 9, Magnum 44 and Wasp 93. Earn Salvage from kills, waves and bosses for the rest; the game-over screen shows your next unlock. The first run each day pays 2× Salvage.
-- **Enemies** — Hellwasps, Grave Saucers, Gravewalkers, Gorehulks, Void Spawn, Ripclaws, Cacklers, Void Larvae, Hellbrutes, Iron Reapers, Cinderbread, Straw Reapers, Shriek Wraiths, Tomb Bound, Hell Lanterns, Frost Maws, Scream Spires, Rotor Reavers, Sky Shredders, Starfangs, Black Omens, Pale Phantoms, Hex Casters, Rime Terrors, Siege Tanks, Iron Carriers, Grave Artillery, Grim Reapers and Evil Clowns, each with their own AI, voice and projectiles. Spawn pools are randomised every wave.
+- **Enemies** — Hellwasps, Grave Saucers, Gravewalkers, Gorehulks, Void Spawn, Ripclaws, Cacklers, Void Larvae, Hellbrutes, Iron Reapers, Cinderbread, Straw Reapers, Shriek Wraiths, Tomb Bound, Hell Lanterns, Frost Maws, Scream Spires, Rotor Reavers, Sky Shredders, Starfangs, Black Omens, Pale Phantoms, Hex Casters, Rime Terrors, Siege Tanks, Iron Carriers, Grave Artillery, Grim Reapers, Evil Clowns, Abyssal Krakens, Emerald Harriers, Void Symbiotes, Hell Monkeys, Ironhide Rhinos and Crimson Maelstroms, each with their own AI, voice and projectiles. Spawn pools are randomised every wave.
 - **Four difficulty levels** — Easy / Normal / Hard / Insane. Scales enemy HP, damage, speed, horde size, shield regen and score. Pick it from the main menu or Settings; it persists.
-- **Eleven bosses** every five waves — The Jailer, Bone Maw, The Grinning One, Void Colossus, The Butcher King, The Rainmaker, Aureole, The Brood Queen, The Mirrored, Umbra and The Collector. Original horror archetypes, not licensed characters.
+- **Thirteen bosses** every five waves — The Jailer, Bone Maw, The Grinning One, Abyssal Kraken, Void Colossus, The Butcher King, Crimson Maelstrom, The Rainmaker, Aureole, The Brood Queen, The Mirrored, Umbra and The Collector. Original creature designs, not licensed characters.
 - **Armoured wave modifiers** — every third wave can roll **Armoured Column** (tanks/APCs), **Air Superiority** (fighters/starships), **Horde Surge** (more, faster mobs) or **Elite Guard** (fewer, tougher enemies).
 - **Waves, combo multiplier, power-ups** — repair, shield, overcharge, rapid fire, cryo field. Drops magnetise to the player.
 - **Squad rooms** — 4-letter codes and nearby-room discovery. Works online through the Cloudflare Durable Object server, or on the same Wi-Fi with `npm run party`.
@@ -201,17 +201,19 @@ Boss HP scales separately (70% / 100% / 135% / 190%). Enemy speed also rises sli
 
 ---
 
-## The eleven bosses
+## The thirteen bosses
 
-Boss order: 5 The Jailer, 10 Bone Maw, 15 The Grinning One, 20 Void Colossus, 25 The Butcher King, 30 The Rainmaker, 35 Aureole, 40 The Brood Queen, 45 The Mirrored, 50 Umbra, 55 The Collector, then the cycle repeats.
+Boss order: 5 The Jailer, 10 Bone Maw, 15 The Grinning One, 20 Abyssal Kraken, 25 Void Colossus, 30 The Butcher King, 35 Crimson Maelstrom, 40 The Rainmaker, 45 Aureole, 50 The Brood Queen, 55 The Mirrored, 60 Umbra, 65 The Collector, then the cycle repeats.
 
 | Boss | Style |
 | --- | --- |
 | **The Jailer** | Orbiting sentinel fortress; radial barrage + aimed bursts. |
 | **Bone Maw** | Huge undead dinosaur; charges, bites and roars shockwave blasts. |
 | **The Grinning One** | Floating horror clown; confetti projectiles, mallet, summons Cacklers. |
+| **Abyssal Kraken** | Giant tentacled horror; radial ink bolts and summoned Hell Monkeys. |
 | **Void Colossus** | Cosmic armoured titan; dense energy fans and a summon phase. |
 | **The Butcher King** | Fast melee tyrant; rushdown bursts and brutal energy. |
+| **Crimson Maelstrom** | Red symbiote boss; tendril rings, lunges and monkey summons. |
 | **The Rainmaker** | Heavy saucer; dense projectile fans, summons escorts at 50% HP. |
 | **Aureole** | Ringed sentinel; twin expanding projectile rings + aimed fan. |
 | **The Brood Queen** | Ground queen; closes in, summons Gravewalkers, radial fire. |

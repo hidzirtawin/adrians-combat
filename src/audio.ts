@@ -719,6 +719,37 @@ export class AudioEngine {
         this.tone(220, t + 0.22, 0.3, 'sawtooth', 0.045, bus, 1200, 0.01, 160);
         this.noise(t + 0.24, 0.22, 0.03, bus, 'bandpass', 2400, 900);
         break;
+      case 'kraken':
+        this.tone(42, t, 1.2, 'sine', 0.16, bus, 320, 0.05, 26);
+        this.tone(84, t + 0.1, 0.9, 'triangle', 0.08, bus, 600, 0.04, 48);
+        this.noise(t, 0.9, 0.04, bus, 'lowpass', 420, 90);
+        this.tone(320, t + 0.4, 0.7, 'sine', 0.04, bus, 1600, 0.03, 120);
+        break;
+      case 'goblin':
+        [980, 1320, 880, 1560].forEach((f, i) => this.tone(f, t + i * 0.055, 0.06, 'square', 0.045, bus, 5200, 0.001, f * 1.2));
+        this.tone(220, t + 0.24, 0.16, 'sawtooth', 0.03, bus, 900, 0.01, 160);
+        break;
+      case 'symbiote':
+        this.tone(72, t, 0.75, 'sawtooth', 0.13, bus, 500, 0.02, 38);
+        this.noise(t, 0.55, 0.07, bus, 'lowpass', 700, 160);
+        this.tone(180, t + 0.2, 0.35, 'square', 0.04, bus, 900, 0.02, 90);
+        break;
+      case 'monkey':
+        [1460, 1820, 1240, 2100, 1600].forEach((f, i) => this.tone(f, t + i * 0.04, 0.035, 'square', 0.025, bus, 7000, 0.001, f * 1.25));
+        this.noise(t + 0.05, 0.1, 0.02, bus, 'highpass', 3200);
+        break;
+      case 'rhino':
+        this.tone(58, t, 0.7, 'sawtooth', 0.16, bus, 340, 0.01, 30);
+        this.tone(92, t + 0.05, 0.5, 'square', 0.06, bus, 500, 0.01, 46);
+        this.noise(t, 0.5, 0.07, bus, 'lowpass', 550, 110);
+        this.tone(520, t + 0.18, 0.12, 'square', 0.03, bus, 2400, 0.001, 260);
+        break;
+      case 'carnage':
+        this.tone(110, t, 0.9, 'sawtooth', 0.13, bus, 900, 0.02, 48);
+        this.tone(220, t + 0.06, 0.7, 'square', 0.05, bus, 1400, 0.02, 80);
+        this.noise(t, 0.7, 0.05, bus, 'bandpass', 1400, 300);
+        [880, 1180, 660].forEach((f, i) => this.tone(f, t + 0.18 + i * 0.07, 0.15, 'sawtooth', 0.03, bus, 5000, 0.01, f * 0.6));
+        break;
       case 'rex':
         this.tone(74, t, 0.78, 'sawtooth', 0.2, bus, 360, 0.01, 32);
         this.tone(44, t + 0.04, 0.65, 'triangle', 0.12, bus, 240, 0.01, 24);
